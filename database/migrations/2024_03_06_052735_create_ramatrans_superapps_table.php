@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('no_telp')->nullable();
             $table->string('password');
-            $table->unsignedInteger('master_cabang_id');
+            $table->unsignedInteger('master_cabang_id')->nullable();
             $table->foreignId('role_id')->constrained('roles')->onDelete('no action')->onUpdate('no action');
             $table->timestamps();
             $table->softDeletes();
