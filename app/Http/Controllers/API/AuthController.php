@@ -54,12 +54,14 @@ class AuthController extends Controller
                 'nama' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6',
+                'role_id' => 'required|numeric',
             ]);
             $user = new User([
                 'nama' => $request->nama,
                 'email' => $request->email,
                 'master_cabang_id' => $request->master_cabang_id,
                 'password' => Hash::make($request->password),
+                'role_id' => $request->role_id
             ]);
             $user->save();
             $customerRole = Role::where('name', 'Customer')->first();
