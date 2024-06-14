@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API\Jadwal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
+use App\Models\MasterRute;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,6 +24,38 @@ class JadwalController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getJadwalByRute(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'from' => 'required',
+                'to' => 'required',
+                'tanggal' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                throw new Exception($validator->errors()->first());
+            }
+            $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
+            $rute = MasterRute::where('kota_asal', $request->from)->where('kota_tujuan', $request->to)->first();
+            if (!$rute) {
+                throw new Exception('Rute tidak ditemukan');
+            }
+
+            $jadwal = Jadwal::where('master_rute_id', $rute->id)->whereDate('tanggal_berangkat', $tanggal)->first();
+            if (!$jadwal) {
+                throw new Exception('Jadwal tidak ditemukan');
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $jadwal,
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {

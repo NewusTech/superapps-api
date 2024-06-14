@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Pembayaran;
 
 use App\Http\Controllers\Controller;
+use App\Models\MetodePembayaran;
 use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use Exception;
@@ -15,7 +16,7 @@ class PembayaranController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('check.admin')->only(['update', 'destroy']);
+        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran']);
     }
     public function index()
     {
@@ -94,6 +95,60 @@ class PembayaranController extends Controller
                 'success' => true,
                 'data' => $response,
                 'message' => 'Berhasil post data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getMetodePembayaran()
+    {
+        try {
+            $data = MetodePembayaran::all();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function storeMetodePembayaran(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'metode' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+            $data = new MetodePembayaran();
+            $data->metode = $request->metode;
+            $data->save();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteMetodePembayaran($id)
+    {
+        try {
+            $data = MetodePembayaran::find($id);
+            if (!$data) {
+                return response()->json(['message' => 'Metode pembayaran not found'], 404);
+            }
+            $data->delete();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Metode pembayaran deleted successfully'
             ]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
