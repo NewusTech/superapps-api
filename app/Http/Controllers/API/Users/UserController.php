@@ -13,15 +13,32 @@ class UserController extends Controller
         $this->middleware('auth:api');
     }
 
-    public function store(Request $request)
+    public function index()
     {
-        try {
-            $authUser = auth()->user();
-            $user = User::where($authUser);
-            $user->update($request->all());
-            return response()->json($user, 200);
-        } catch (\Exception $e) {
-            return response()->json($e->getMessage(), 500);
+        $user = auth()->user();
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
         }
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'Berhasil get user'
+        ]);
+    }
+
+
+    public function updateProfile(Request $request)
+    {
+        $authUser = auth()->user();
+        $user = User::findOrFail($authUser->id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $user->update($request->all());
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'Berhasil update user'
+        ]);
     }
 }
