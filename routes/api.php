@@ -14,6 +14,7 @@ use App\Http\Controllers\API\Pembayaran\PembayaranController;
 use App\Http\Controllers\API\Pesanan\PesananController;
 use App\Http\Controllers\API\Role\RoleController;
 use App\Http\Controllers\API\Users\ManageUsersController;
+use App\Http\Controllers\API\Users\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,8 @@ Route::group([
 ], function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::resource('/user-profile', UserController::class);
+    Route::put('/update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
 });
 
 Route::group([
@@ -80,6 +83,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
     Route::resource('jadwal', JadwalController::class);
+    Route::get('jadwal_by_rute', [JadwalController::class, 'getJadwalByRute']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
@@ -102,4 +106,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'laporan'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
     Route::post('proses_pembayaran', [PembayaranController::class, 'prosesPembayaran']);
+    Route::get('metode-pembayaran', [PembayaranController::class, 'getMetodePembayaran']);
+    Route::post('metode-pembayaran', [PembayaranController::class, 'storeMetodePembayaran']);
+    Route::delete('metode-pembayaran/{id}', [PembayaranController::class, 'deleteMetodePembayaran']);
 });
