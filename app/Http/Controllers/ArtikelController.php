@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ArtikelController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+        $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
+    }
+    
     public function index()
     {
         try {

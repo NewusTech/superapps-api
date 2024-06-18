@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTFactory;
 use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
@@ -27,13 +29,21 @@ class AuthController extends Controller
             ]);
             $credentials = $request->only('email', 'password');
 
-            $token = Auth::guard('api')->attempt($credentials);
-            if (!$token) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Unauthorized',
-                ], 401);
+            $credentials = request(['email', 'password']);
+            $user = User::where('email', $credentials['email'])->first();
+
+            if (!$user || !Auth::guard('api')->attempt($credentials, 1440)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
             }
+            $role = Role::where('id', $user->role_id)->pluck('name')->first();
+            $customClaims = [
+                'id' => $user->id,
+                'role' => $role
+            ];
+
+            $factory = JWTFactory::customClaims($customClaims);
+            $payload = $factory->make();
+            $token = JWTAuth::encode($payload)->get();
 
             $user = Auth::guard('api')->user();
             $user['token'] = $token;
