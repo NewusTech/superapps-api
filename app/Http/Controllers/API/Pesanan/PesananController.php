@@ -33,6 +33,23 @@ class PesananController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try {
+            if (!$id) {
+                throw new Exception('Id tidak ditemukan');
+            }
+            $data = Pesanan::find($id);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
@@ -72,6 +89,7 @@ class PesananController extends Controller
             $data->master_titik_jemput_id = $request->titik_jemput_id;
             $data->biaya_tambahan = $request->biaya_tambahan;
             $data->kursi_id = $kursi->id;
+            $data->user_id = auth()->user()->id;
             $data->status = auth()->user()->roles == "Customer" ? "Menunggu" : "Sukses";
             $data->save();
 

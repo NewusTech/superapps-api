@@ -27,7 +27,8 @@ class User extends Authenticatable implements JWTSubject
         'no_telp',
         'password',
         'role_id',
-        'master_cabang_id'
+        'master_cabang_id',
+        'image_url'
     ];
 
     /**

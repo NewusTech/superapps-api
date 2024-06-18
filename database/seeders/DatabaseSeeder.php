@@ -5,7 +5,11 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\MasterCabang;
+use App\Models\MasterMobil;
+use App\Models\MasterRute;
+use App\Models\MasterSupir;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
@@ -29,7 +33,37 @@ class DatabaseSeeder extends Seeder
             Permission::create(['name' => $permission]);
         }
 
-        $cabang = MasterCabang::factory()->create();
+        $cabang = MasterCabang::create([
+            'nama' => 'Lampung',
+        ]);
+
+        // Create seeders for all Master tables
+        $dataSupirSeeder =  [[
+            'nama' => 'Heri',
+            'no_telp' => '0812345678912'
+        ], [
+            'nama' => 'Budi',
+            'no_telp' => '084141512912'
+        ]];
+        foreach ($dataSupirSeeder as $item) {
+            MasterSupir::create($item);
+        };
+
+        $dataRuteSeeder =  [
+            [
+                'kota_asal' => 'Lampung',
+                'kota_tujuan' => 'Palembang',
+                'harga' => 250000,
+            ], [
+                'kota_asal' => 'Palembang',
+                'kota_tujuan' => 'Lampung',
+                'harga' => 250000,
+            ]
+        ];
+        foreach ($dataRuteSeeder as $item) {
+            MasterRute::create($item);
+        }
+
 
         // Create admin User and assign the role to him.
         $superAdmin = Role::create(['name' => 'Super Admin']);
@@ -50,6 +84,5 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $user->assignRole([$superAdmin->id]);
-
     }
 }
