@@ -15,6 +15,7 @@ use App\Http\Controllers\API\Pesanan\PesananController;
 use App\Http\Controllers\API\Role\RoleController;
 use App\Http\Controllers\API\Users\ManageUsersController;
 use App\Http\Controllers\API\Users\UserController;
+use App\Http\Controllers\ArtikelController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -110,4 +111,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
     Route::get('metode-pembayaran', [PembayaranController::class, 'getMetodePembayaran']);
     Route::post('metode-pembayaran', [PembayaranController::class, 'storeMetodePembayaran']);
     Route::delete('metode-pembayaran/{id}', [PembayaranController::class, 'deleteMetodePembayaran']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'artikel'], function () {
+    Route::resource('artikel', ArtikelController::class);
 });
