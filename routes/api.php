@@ -115,4 +115,5 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'artikel'], function () {
     Route::resource('artikel', ArtikelController::class);
+    Route::get('/rekomendasi', [ArtikelController::class, 'rekomendasi']);
 });
