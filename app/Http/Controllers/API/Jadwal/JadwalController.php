@@ -46,7 +46,11 @@ class JadwalController extends Controller
             $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
             $rute = MasterRute::where('kota_asal', $request->from)->where('kota_tujuan', $request->to)->first();
             if (!$rute) {
-                throw new Exception('Rute tidak ditemukan');
+                return response()->json([
+                    'success' => true,
+                    'data' => $rute,
+                    'message' => 'Rute tidak ditemukan'
+                ]);
             }
 
             $jadwal = Jadwal::where('master_rute_id', $rute->id)->whereDate('tanggal_berangkat', $tanggal)->first();

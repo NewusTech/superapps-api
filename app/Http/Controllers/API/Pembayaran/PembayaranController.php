@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MetodePembayaran;
 use App\Models\Pembayaran;
 use App\Models\Pesanan;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -18,6 +19,23 @@ class PembayaranController extends Controller
         $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran']);
     }
+    private function getMidtransEnv()
+    {
+        return [
+            'SANDBOX' => [
+                'client_key' => env('MIDTRANS_SANDBOX_CLIENT_KEY'),
+                'server_key' => env('MIDTRANS_SANDBOX_SERVER_KEY'),
+                'url' => env('MIDTRANS_SANDBOX_TRANSACTION_API_URL'),
+            ],
+            'PRODUCTION' => [
+                'client_key' => env('MIDTRANS_PRODUCTION_CLIENT_KEY'),
+                'server_key' => env('MIDTRANS_PRODUCTION_SERVER_KEY'),
+                'url' => env('MIDTRANS_PRODUCTION_TRANSACTION_API_URL'),
+            ],
+
+        ];
+    }
+
     public function index()
     {
         try {
@@ -32,8 +50,25 @@ class PembayaranController extends Controller
         }
     }
 
+    public function showPembayaran(Request $request)
+    {
+        try {
+            if (!$request->id) {
+                throw new Exception('Id tidak ditemukan');
+            }
+            $data = Pembayaran::where('pesanan_id', $request->id)->get();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
     public function prosesPembayaran(Request $request)
     {
+        $midtransEnv = $this->getMidtransEnv();
         try {
             $validator = Validator::make($request->all(), [
                 'id_pesanan' => 'required',
@@ -44,7 +79,7 @@ class PembayaranController extends Controller
             }
 
             $pesanan = Pesanan::with('jadwal.master_rute')->where('id', $request->id_pesanan)->first();
-
+            $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
             if (!$pesanan) {
                 throw new Exception('Pesanan tidak ditemukan');
             }
@@ -58,32 +93,102 @@ class PembayaranController extends Controller
                 'transaction_details' => array(
                     'order_id' => $pembayaran->kode_pembayaran,
                     'gross_amount' => $pesanan->jadwal->master_rute->harga,
+                    // 'gross_amount' => 1,
                     'payment_link_id' => str(rand(1000, 9999)) . time()
                 ),
-                "expiry" => array(
-                    "start_time" => now(),
-                    "duration" => 1,
-                    "unit" => "days"
-                ),
                 'customer_details' => array(
-                    'first_name' => $pesanan->nama,
-                    'phone' => $pesanan->no_telp,
+                    'first_name' => $user->nama,
+                    'phone' => $user->no_telp,
+                    'email' => $user->email
                 ),
-                "item_details" => array(
-                    "id" => $pesanan->id,
-                    "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
-                    "price" => $pesanan->jadwal->master_rute->harga,
-                    "quantity" => 1,
+                'item_details' => array(
+                    array(
+                        "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
+                        "price" => $pesanan->jadwal->master_rute->harga,
+                        // "price" => 1,
+                        "quantity" => 1,
+                    )
                 ),
+                'usage_limit' => 1
             );
 
-            $auth = base64_encode(env('MIDTRANS_SERVER_KEY'));
+            // return response()->json($midtransEnv, 200);
+            // dd($midtransEnv['PRODUCTION']['server_key']);
+            $auth = base64_encode($midtransEnv['PRODUCTION']['server_key']);
 
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'Authorization' => "Basic $auth"
-            ])->post(env('MIDTRANS_TRANSACTION_API_URL'), $params);
+            ])->post($midtransEnv['PRODUCTION']['url'], $params);
+
+            if ($response->failed()) {
+                throw new Exception($response->body());
+            }
+
+            $response = json_decode($response->body());
+            $pembayaran->save();
+            return response()->json([
+                'success' => true,
+                'data' => $response,
+                'message' => 'Berhasil post data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function testProsesPembayaran(Request $request)
+    {
+        $midtransEnv = $this->getMidtransEnv();
+        try {
+            $validator = Validator::make($request->all(), [
+                'id_pesanan' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+
+            $pesanan = Pesanan::with('jadwal.master_rute')->where('id', $request->id_pesanan)->first();
+            $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
+            if (!$pesanan) {
+                throw new Exception('Pesanan tidak ditemukan');
+            }
+
+            // create pembayaran
+            $pembayaran = new Pembayaran();
+            $pembayaran->pesanan_id = $pesanan->id;
+            $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
+
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => 'TEST' . '-' . $pembayaran->kode_pembayaran,
+                    'gross_amount' => $pesanan->jadwal->master_rute->harga,
+                    'payment_link_id' => 'TEST' . '-' . str(rand(1000, 9999)) . time()
+                ),
+                'customer_details' => array(
+                    'first_name' => $user->nama,
+                    'phone' => $user->no_telp,
+                    'email' => $user->email
+                ),
+                'item_details' => array(
+                    array(
+                        "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
+                        "price" => $pesanan->jadwal->master_rute->harga,
+                        "quantity" => 1,
+                    )
+                ),
+                'usage_limit' => 1
+            );
+
+            $auth = base64_encode($midtransEnv['SANDBOX']['server_key']);
+
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => "Basic $auth"
+            ])->post($midtransEnv['SANDBOX']['url'], $params);
 
             if ($response->failed()) {
                 throw new Exception($response->body());
