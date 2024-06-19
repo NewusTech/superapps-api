@@ -16,10 +16,11 @@ class CheckAdminRole
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
-        if ($user && $user->roles != 'Admin' || $user && $user->roles != 'Super Admin') {
-            return response()->json(['error' => 'Anda Bukan Admin'], 403);
+        $roles = auth()->user();
+        $roles = $roles->roles->first();
+        if ($roles->name == 'Admin' || $roles->name == 'Super Admin') {
+            return $next($request);
         }
-        return $next($request);
+        return response()->json(['error' => 'Anda Bukan Admin'], 403);
     }
 }
