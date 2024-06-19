@@ -64,6 +64,24 @@ class DatabaseSeeder extends Seeder
             MasterRute::create($item);
         }
 
+        $dataMobilSeeder =  [
+            [
+                'nopol' => 'BE7748AB - Dummy',
+                'type' => 'Toyota Hi Ace - Dummy',
+                'jumlah_kursi' => 16,
+                'status' => 'Beroperasi',
+                'image_url' => 'https://www.toyota.astra.co.id/sites/default/files/2023-09/hiace_commuter_2022_0_4.png'
+            ], [
+                'nopol' => 'BE1145CA - Dummy',
+                'type' => 'Toyota Hi Ace - Dummy',
+                'jumlah_kursi' => 16,
+                'status' => 'Beroperasi',
+                'image_url' => 'https://www.toyota.astra.co.id/sites/default/files/2023-09/hiace_commuter_2022_0_4.png'
+            ]
+        ];
+        foreach ($dataMobilSeeder as $item) {
+            MasterMobil::create($item);
+        }
 
         // Create admin User and assign the role to him.
         $superAdmin = Role::create(['name' => 'Super Admin']);
