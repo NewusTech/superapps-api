@@ -50,12 +50,16 @@ class JadwalController extends Controller
                     'success' => true,
                     'data' => $rute,
                     'message' => 'Rute tidak ditemukan'
-                ]);
+                ], 404);
             }
 
             $jadwal = Jadwal::where('master_rute_id', $rute->id)->whereDate('tanggal_berangkat', $tanggal)->first();
             if (!$jadwal) {
-                throw new Exception('Jadwal tidak ditemukan');
+                return response()->json([
+                    'success' => true,
+                    'data' => $jadwal,
+                    'message' => 'Rute tidak ditemukan'
+                ], 404);
             }
             return response()->json([
                 'success' => true,
