@@ -106,6 +106,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'laporan'], function () {
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
+    Route::get('pembayaran/{pesanan_id}',[PembayaranController::class, 'showPembayaran']);
     Route::post('proses_pembayaran', [PembayaranController::class, 'prosesPembayaran']);
     Route::post('tes_proses_pembayaran', [PembayaranController::class, 'testProsesPembayaran']);
     Route::get('metode-pembayaran', [PembayaranController::class, 'getMetodePembayaran']);

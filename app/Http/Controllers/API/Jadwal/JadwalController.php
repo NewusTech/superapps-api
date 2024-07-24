@@ -118,7 +118,19 @@ class JadwalController extends Controller
 
     public function show(string $id)
     {
-        //
+        try {
+            $data = Jadwal::with('master_rute', 'master_mobil.kursi', 'master_supir')->find($id);
+            if (!$data) {
+                return response()->json(['message' => 'Jadwal not found'], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 

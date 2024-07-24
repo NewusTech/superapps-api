@@ -94,4 +94,30 @@ class AuthController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function forgotPassword(Request $request){
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|string|email|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                throw new Exception($validator->errors()->first());
+            }
+
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                throw new Exception('Email not found');
+            }
+
+            $user->sendPasswordResetNotification($user->email);
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+                'message' => 'Berhasil forgot password'
+            ]);
+    } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
