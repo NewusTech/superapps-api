@@ -92,10 +92,14 @@ class JadwalController extends Controller
                 throw new Exception($validator->errors()->first());
             }
 
-            $existing = Jadwal::where('master_supir_id', $request->master_supir_id);
-            if ($existing->exists()) {
-                throw new Exception('Jadwal dengan supir yang sama sudah ada');
+            $existing = Jadwal::where('master_supir_id', $request->master_supir_id)
+                        ->where('tanggal_berangkat', $request->tanggal_berangkat)
+                        ->where('master_mobil_id', $request->master_mobil_id)
+                        ->where('waktu_keberangkatan', $request->waktu_keberangkatan)->first();
+            if ($existing) {
+                throw new Exception('Jadwal dengan data yang sama sudah ada');
             }
+            // dd($existing, $request->all());
 
             $data = new Jadwal();
             $data->master_rute_id = $request->master_rute_id;
