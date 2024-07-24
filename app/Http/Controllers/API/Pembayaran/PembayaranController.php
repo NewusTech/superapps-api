@@ -156,14 +156,9 @@ class PembayaranController extends Controller
                 throw new Exception('Pesanan tidak ditemukan');
             }
 
-            // create pembayaran
-            $pembayaran = new Pembayaran();
-            $pembayaran->pesanan_id = $pesanan->id;
-            $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
-
             $params = array(
                 'transaction_details' => array(
-                    'order_id' => 'TEST' . '-' . $pembayaran->kode_pembayaran,
+                    'order_id' => 'TEST' . '-' . Pembayaran::generateUniqueKodeBayar(),
                     'gross_amount' => $pesanan->jadwal->master_rute->harga,
                     'payment_link_id' => 'TEST' . '-' . str(rand(1000, 9999)) . time()
                 ),
@@ -195,7 +190,6 @@ class PembayaranController extends Controller
             }
 
             $response = json_decode($response->body());
-            $pembayaran->save();
             return response()->json([
                 'success' => true,
                 'data' => $response,

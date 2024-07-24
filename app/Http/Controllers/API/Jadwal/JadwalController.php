@@ -92,10 +92,14 @@ class JadwalController extends Controller
                 throw new Exception($validator->errors()->first());
             }
 
-            $existing = Jadwal::where('master_supir_id', $request->master_supir_id);
-            if ($existing->exists()) {
-                throw new Exception('Jadwal dengan supir yang sama sudah ada');
+            $existing = Jadwal::where('master_supir_id', $request->master_supir_id)
+                        ->where('tanggal_berangkat', $request->tanggal_berangkat)
+                        ->where('master_mobil_id', $request->master_mobil_id)
+                        ->where('waktu_keberangkatan', $request->waktu_keberangkatan)->first();
+            if ($existing) {
+                throw new Exception('Jadwal dengan data yang sama sudah ada');
             }
+            // dd($existing, $request->all());
 
             $data = new Jadwal();
             $data->master_rute_id = $request->master_rute_id;
@@ -118,7 +122,19 @@ class JadwalController extends Controller
 
     public function show(string $id)
     {
-        //
+        try {
+            $data = Jadwal::with('master_rute', 'master_mobil.kursi', 'master_supir')->find($id);
+            if (!$data) {
+                return response()->json(['message' => 'Jadwal not found'], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 
