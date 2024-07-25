@@ -83,19 +83,18 @@ class JadwalController extends Controller
                 $item->destinationDepartureDate = $item->tanggal_berangkat;
                 $item->originDepartureDate = $item->tanggal_berangkat;
                 $item->originCity = $rute->kota_asal;
-                $item->departureCity = $rute->kota_tujuan;
+                $item->destinationCity = $rute->kota_tujuan;
                 $item->price = $rute->harga;
                 $item->facility = 'free meal';
                 $seatTaken = Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'Terisi')->get('nomor_kursi');
                 $item->seatTaken = $seatTaken->map(fn ($item) => $item->nomor_kursi);
                 $item->syarat_dan_ketentuan = "<p>Syarat dan Ketentuan berlaku.</p>";
             });
-            return response()->json(['data' => $jadwal]);
-            // return response()->json([
-            //     'success' => true,
-            //     'data' => $jadwal,
-            //     'message' => 'Berhasil get data'
-            // ]);
+            return response()->json([
+                'success' => true,
+                'data' => $jadwal,
+                'message' => 'Berhasil get data'
+            ]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
