@@ -156,9 +156,10 @@ class PembayaranController extends Controller
                 throw new Exception('Pesanan tidak ditemukan');
             }
 
+            $generatedCode = "TEST-". Pembayaran::generateUniqueKodeBayar();
             $params = array(
                 'transaction_details' => array(
-                    'order_id' => 'TEST' . '-' . \App\Models\Pembayaran::generateUniqueKodeBayar(),
+                    'order_id' => $generatedCode,
                     'gross_amount' => $pesanan->jadwal->master_rute->harga,
                     'payment_link_id' => 'TEST' . '-' . str(rand(1000, 9999)) . time()
                 ),
