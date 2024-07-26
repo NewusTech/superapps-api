@@ -71,14 +71,14 @@ class PembayaranController extends Controller
         $midtransEnv = $this->getMidtransEnv();
         try {
             $validator = Validator::make($request->all(), [
-                'id_pesanan' => 'required',
+                'orderCode' => 'required',
             ]);
 
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
 
-            $pesanan = Pesanan::with('jadwal.master_rute')->where('id', $request->id_pesanan)->first();
+            $pesanan = Pesanan::with('jadwal.master_rute')->where('kode_pesanan', $request->orderCode)->first();
             $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
             if (!$pesanan) {
                 throw new Exception('Pesanan tidak ditemukan');
@@ -93,7 +93,7 @@ class PembayaranController extends Controller
                 'transaction_details' => array(
                     'order_id' => $pembayaran->kode_pembayaran,
                     'gross_amount' => $pesanan->jadwal->master_rute->harga,
-                    // 'gross_amount' => 1,
+                    // 'gross_amount' => 1, // ini tes beneran tapi boongan
                     'payment_link_id' => str(rand(1000, 9999)) . time()
                 ),
                 'customer_details' => array(
@@ -105,7 +105,7 @@ class PembayaranController extends Controller
                     array(
                         "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
                         "price" => $pesanan->jadwal->master_rute->harga,
-                        // "price" => 1,
+                        // "price" => 1, // Ini testing beneran tapi boongan
                         "quantity" => 1,
                     )
                 ),
@@ -143,14 +143,14 @@ class PembayaranController extends Controller
         $midtransEnv = $this->getMidtransEnv();
         try {
             $validator = Validator::make($request->all(), [
-                'id_pesanan' => 'required',
+                'orderCode' => 'required',
             ]);
 
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
 
-            $pesanan = Pesanan::with('jadwal.master_rute')->where('id', $request->id_pesanan)->first();
+            $pesanan = Pesanan::with('jadwal.master_rute')->where('kode_pesanan', $request->orderCode)->first();
             $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
             if (!$pesanan) {
                 throw new Exception('Pesanan tidak ditemukan');
@@ -158,7 +158,7 @@ class PembayaranController extends Controller
 
             $params = array(
                 'transaction_details' => array(
-                    'order_id' => 'TEST' . '-' . Pembayaran::generateUniqueKodeBayar(),
+                    'order_id' => 'TEST' . '-' . \App\Models\Pembayaran::generateUniqueKodeBayar(),
                     'gross_amount' => $pesanan->jadwal->master_rute->harga,
                     'payment_link_id' => 'TEST' . '-' . str(rand(1000, 9999)) . time()
                 ),
@@ -203,7 +203,10 @@ class PembayaranController extends Controller
     public function getMetodePembayaran()
     {
         try {
-            $data = MetodePembayaran::all();
+            $data = MetodePembayaran::get();
+            $data->nama = $data->map(function ($item) {
+                return $item->metode;
+            });
             return response()->json([
                 'success' => true,
                 'data' => $data,
