@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: Setup PHP
-      uses: shivammathur/setup-php@v3
+      uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
     - name: Checkout
@@ -25,7 +25,8 @@ jobs:
       env:
         COMPOSER_ALLOW_SUPERUSER: 1
       run: |
-        composer install --prefer-dist --no-progress --no-suggest
+        set -e
+        composer install || composer update
     - run : |
           cd /home/backend-superapps/htdocs/backend-superapps.newus.id
           yes | php artisan migrate
