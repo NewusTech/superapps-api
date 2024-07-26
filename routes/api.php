@@ -16,6 +16,7 @@ use App\Http\Controllers\API\Role\RoleController;
 use App\Http\Controllers\API\Users\ManageUsersController;
 use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\API\Banner\BannerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -116,4 +117,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
 Route::group(['middleware' => 'api', 'prefix' => 'artikel'], function () {
     Route::resource('artikel', ArtikelController::class);
     Route::get('/rekomendasi', [ArtikelController::class, 'rekomendasi']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'banner'], function () {
+    Route::resource('banner', BannerController::class);
 });
