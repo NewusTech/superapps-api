@@ -45,7 +45,7 @@ class JadwalController extends Controller
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
             }
-            $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
+            $date = Carbon::parse($request->date)->format('Y-m-d');
             $rute = MasterRute::where('kota_asal', $request->from)->where('kota_tujuan', $request->to)->first();
             if (!$rute) {
                 return response()->json([
@@ -56,7 +56,7 @@ class JadwalController extends Controller
             }
 
             $jadwal = Jadwal::where('master_rute_id', $rute->id)
-                ->whereDate('tanggal_berangkat', $tanggal)
+                ->whereDate('tanggal_berangkat', $date)
                 ->get([
                     "id",
                     "master_rute_id",
