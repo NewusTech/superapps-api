@@ -13,6 +13,7 @@ class Pesanan extends Model
     protected $fillable = [
         'jadwal_id',
         'kode_pesanan',
+        'user_id',
         'kursi_id',
         'nama',
         'no_telp',
@@ -26,6 +27,10 @@ class Pesanan extends Model
         return $this->belongsTo(Jadwal::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
     protected static function boot()
     {
         parent::boot();
