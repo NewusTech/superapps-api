@@ -15,6 +15,10 @@ jobs:
           cd /home/backend-superapps/htdocs/backend-superapps.newus.id
           git checkout -f
           git pull
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
     - name: Install dependencies
       env:
         COMPOSER_ALLOW_SUPERUSER: 1
