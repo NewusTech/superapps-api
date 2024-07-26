@@ -110,7 +110,19 @@ class MasterMobilController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $data = MasterMobil::find($id);
+            if (!$data) {
+                return response()->json('Data not found', 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
