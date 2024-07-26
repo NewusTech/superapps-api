@@ -90,11 +90,6 @@ class MasterMobilController extends Controller
                 'image_url' => $request->image_url
             ]);
 
-            Kursi::factory()->count($request->jumlah_kursi)->create([
-                'master_mobil_id' => $data->id,
-                'status' => 'Kosong',
-            ]);
-
             return response()->json([
                 'success' => true,
                 'data' => $data,

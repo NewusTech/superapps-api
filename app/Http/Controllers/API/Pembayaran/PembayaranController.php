@@ -89,9 +89,11 @@ class PembayaranController extends Controller
             $pembayaran->pesanan_id = $pesanan->id;
             $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
 
+            $generatedCode = (string) Pembayaran::generateUniqueKodeBayar();
+            $orderCode = "TEST-{$generatedCode}";
             $params = array(
                 'transaction_details' => array(
-                    'order_id' => $pembayaran->kode_pembayaran,
+                    'order_id' => $orderCode,
                     'gross_amount' => $pesanan->jadwal->master_rute->harga,
                     // 'gross_amount' => 1, // ini tes beneran tapi boongan
                     'payment_link_id' => str(rand(1000, 9999)) . time()

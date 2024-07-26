@@ -74,9 +74,8 @@ class JadwalController extends Controller
             $jadwal->map(function ($item) {
                 $mobil = MasterMobil::where('id', $item->master_mobil_id)->first();
                 $rute = MasterRute::where('id', $item->master_rute_id)->first();
-                $kursi = Kursi::where('master_mobil_id', $item->master_mobil_id);
                 $item->img_url = $mobil->image_url;
-                $item->availableSeat = $kursi->where('status', '=', 'Kosong')->count();
+                $item->availableSeat = $mobil->jumlah_kursi - Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'Terisi')->count();
                 $item->carModel = $mobil->type;
                 $item->carSeat = $mobil->jumlah_kursi;
                 $item->departureDate = $item->tanggal_berangkat;
