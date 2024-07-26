@@ -24,7 +24,8 @@ jobs:
         COMPOSER_ALLOW_SUPERUSER: 1
       run: |
         set -e
-        composer install || composer update
+        # composer install || composer update
+        composer update
     - run : |
           cd /home/backend-superapps/htdocs/backend-superapps.newus.id
           yes | php artisan migrate
