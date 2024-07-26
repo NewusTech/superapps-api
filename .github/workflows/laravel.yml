@@ -16,3 +16,4 @@ jobs:
       with:
         php-version: '8.0'
     - uses: actions/checkout@v4
+    - name : check command
