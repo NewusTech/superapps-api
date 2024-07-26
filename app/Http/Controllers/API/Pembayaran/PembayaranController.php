@@ -156,7 +156,7 @@ class PembayaranController extends Controller
                 throw new Exception('Pesanan tidak ditemukan');
             }
 
-            $generatedCode = Pembayaran::generateUniqueKodeBayar();
+            $generatedCode = (string) Pembayaran::generateUniqueKodeBayar();
             $orderCode = "TEST-{$generatedCode}";
             $params = array(
                 'transaction_details' => array(
