@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API\Jadwal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
+use App\Models\Kursi;
+use App\Models\MasterMobil;
 use App\Models\MasterRute;
 use Carbon\Carbon;
 use Exception;
@@ -37,13 +39,13 @@ class JadwalController extends Controller
             $validator = Validator::make($request->all(), [
                 'from' => 'required',
                 'to' => 'required',
-                'tanggal' => 'required',
+                'date' => 'required',
             ]);
 
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
             }
-            $tanggal = Carbon::parse($request->tanggal)->format('Y-m-d');
+            $date = Carbon::parse($request->date)->format('Y-m-d');
             $rute = MasterRute::where('kota_asal', $request->from)->where('kota_tujuan', $request->to)->first();
             if (!$rute) {
                 return response()->json([
@@ -53,7 +55,15 @@ class JadwalController extends Controller
                 ], 404);
             }
 
-            $jadwal = Jadwal::where('master_rute_id', $rute->id)->whereDate('tanggal_berangkat', $tanggal)->first();
+            $jadwal = Jadwal::where('master_rute_id', $rute->id)
+                ->whereDate('tanggal_berangkat', $date)
+                ->get([
+                    "id",
+                    "master_rute_id",
+                    "master_mobil_id",
+                    "master_supir_id",
+                    "tanggal_berangkat"
+                ]);
             if (!$jadwal) {
                 return response()->json([
                     'success' => true,
@@ -61,6 +71,24 @@ class JadwalController extends Controller
                     'message' => 'Rute tidak ditemukan'
                 ], 404);
             }
+            $jadwal->map(function ($item) {
+                $mobil = MasterMobil::where('id', $item->master_mobil_id)->first();
+                $rute = MasterRute::where('id', $item->master_rute_id)->first();
+                $item->img_url = $mobil->image_url;
+                $item->availableSeat = $mobil->jumlah_kursi - Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'Terisi')->count();
+                $item->carModel = $mobil->type;
+                $item->carSeat = $mobil->jumlah_kursi;
+                $item->departureDate = $item->tanggal_berangkat;
+                $item->destinationDepartureDate = $item->tanggal_berangkat;
+                $item->originDepartureDate = $item->tanggal_berangkat;
+                $item->originCity = $rute->kota_asal;
+                $item->destinationCity = $rute->kota_tujuan;
+                $item->price = $rute->harga;
+                $item->facility = 'free meal';
+                $seatTaken = Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'Terisi')->get('nomor_kursi');
+                $item->seatTaken = $seatTaken->map(fn ($item) => $item->nomor_kursi);
+                $item->syarat_dan_ketentuan = "<p>Syarat dan Ketentuan berlaku.</p>";
+            });
             return response()->json([
                 'success' => true,
                 'data' => $jadwal,
@@ -92,10 +120,14 @@ class JadwalController extends Controller
                 throw new Exception($validator->errors()->first());
             }
 
-            $existing = Jadwal::where('master_supir_id', $request->master_supir_id);
-            if ($existing->exists()) {
-                throw new Exception('Jadwal dengan supir yang sama sudah ada');
+            $existing = Jadwal::where('master_supir_id', $request->master_supir_id)
+                ->where('tanggal_berangkat', $request->tanggal_berangkat)
+                ->where('master_mobil_id', $request->master_mobil_id)
+                ->where('waktu_keberangkatan', $request->waktu_keberangkatan)->first();
+            if ($existing) {
+                throw new Exception('Jadwal dengan data yang sama sudah ada');
             }
+            // dd($existing, $request->all());
 
             $data = new Jadwal();
             $data->master_rute_id = $request->master_rute_id;
@@ -118,7 +150,19 @@ class JadwalController extends Controller
 
     public function show(string $id)
     {
-        //
+        try {
+            $data = Jadwal::with('master_rute', 'master_mobil.kursi', 'master_supir')->find($id);
+            if (!$data) {
+                return response()->json(['message' => 'Jadwal not found'], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
 

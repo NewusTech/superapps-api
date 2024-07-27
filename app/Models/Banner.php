@@ -6,13 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MetodePembayaran extends Model
+class Banner extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'metode_pembayaran';
-    protected $fillable = [
-        'metode',
-        'keterangan',
-        'img'
-    ];
+
+    protected $table = 'banner';
+    protected $guarded = ['id'];
 }

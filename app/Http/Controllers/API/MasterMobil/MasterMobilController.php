@@ -90,11 +90,6 @@ class MasterMobilController extends Controller
                 'image_url' => $request->image_url
             ]);
 
-            Kursi::factory()->count($request->jumlah_kursi)->create([
-                'master_mobil_id' => $data->id,
-                'status' => 'Kosong',
-            ]);
-
             return response()->json([
                 'success' => true,
                 'data' => $data,
@@ -110,7 +105,19 @@ class MasterMobilController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $data = MasterMobil::find($id);
+            if (!$data) {
+                return response()->json('Data not found', 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**
