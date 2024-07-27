@@ -14,7 +14,7 @@ class ArtikelController extends Controller
         $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
     }
-    
+
     public function index()
     {
         try {
@@ -52,26 +52,43 @@ class ArtikelController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'judul' => 'required',
-                'image_url' => 'required',
-                'konten' => 'required',
-            ]);
-            if ($validator->fails()) {
-                throw new Exception($validator->errors()->first());
-            }
-            $data = artikel::create($request->all());
-            return response()->json([
-                'success' => true,
-                'data' => $data,
-                'message' => 'Berhasil get data'
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+{
+    try {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'judul' => 'required',
+            'image_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:500',
+            'konten' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            throw new Exception($validator->errors()->first());
         }
+
+        $data = $request->all();
+
+         // Proses upload gambar ke AWS S3
+         if ($request->hasFile('image_url')) {
+            $file = $request->file('image_url');
+            $gambarPath = $file->store('superapps/artikel', 's3');
+            $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
+            $data['image_url'] = $fullUrl;
+        } else {
+            $data['image_url'] = null;
+        }
+
+        $artikel = Artikel::create($data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $artikel,
+            'message' => 'Berhasil menyimpan data'
+        ]);
+    } catch (Exception $e) {
+        \Log::error('Error storing data: ' . $e->getMessage());
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
 
     /**
      * Display the specified resource.
@@ -128,6 +145,17 @@ class ArtikelController extends Controller
             if (!$artikel) {
                 return response()->json(['message' => 'Artikel not found'], 404);
             }
+
+            // Proses upload gambar ke AWS S3
+            if ($request->hasFile('image_url')) {
+                $file = $request->file('image_url');
+                $gambarPath = $file->store('superapps/artikel', 's3');
+                $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
+                $data['image_url'] = $fullUrl;
+            } else {
+                $data['image_url'] = null;
+            }
+
             $artikel->update($request->all());
             return response()->json([
                 'success' => true,
