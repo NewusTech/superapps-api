@@ -10,7 +10,6 @@ class Pembayaran extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'pembayaran';
-    // protected $guarded = ['id'];
     protected $fillable = [
         'kode_pembayaran',
         'pesanan_id',

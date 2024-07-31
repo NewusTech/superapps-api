@@ -90,13 +90,13 @@ class PesananController extends Controller
             $data->biaya_tambahan = $request->biaya_tambahan;
             $data->kursi_id = $kursi->id;
             $data->user_id = auth()->user()->id;
-            $data->status = auth()->user()->roles == "Customer" ? "Menunggu" : "Sukses";
+            $data->status = "Menunggu";
             $data->save();
 
             return response()->json([
                 'success' => true,
                 'data' => $data,
-                'message' => 'Berhasil get data'
+                'message' => 'Pesanan berhasil dibuat'
             ]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
