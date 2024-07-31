@@ -27,10 +27,16 @@ class Pesanan extends Model
         return $this->belongsTo(Jadwal::class);
     }
 
+    public function penumpang()
+    {
+        return $this->hasMany(Penumpang::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
     protected static function boot()
     {
         parent::boot();
