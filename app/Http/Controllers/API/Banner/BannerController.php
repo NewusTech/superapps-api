@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API\Banner;
 
+use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Exception;
 use Illuminate\Http\Request;
