@@ -32,7 +32,7 @@ class AuthController extends Controller
             $credentials = request(['email', 'password']);
             $user = User::where('email', $credentials['email'])->first();
 
-            if (!$user || !Auth::guard('api')->attempt($credentials, 1440)) {
+            if (!$user || !Auth::guard('api')->attempt($credentials)) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
             $role = Role::where('id', $user->role_id)->pluck('name')->first();

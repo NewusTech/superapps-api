@@ -7,6 +7,7 @@ use App\Models\Pesanan;
 use App\Models\Jadwal;
 use App\Models\Kursi;
 use App\Models\MasterMobil;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,11 +23,24 @@ class PesananController extends Controller
     public function index()
     {
         try {
-            $data = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir')->get();
+            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user')->get();
+            $data = $pesanan->map(function ($pesanan) {
+                return [
+                    'kode_pesanan' => $pesanan->kode_pesanan,
+                    'nama_pemesan' => $pesanan->user->nama,
+                    'rute' => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
+                    'jam_berangkat' => date('H:i', strtotime($pesanan->jadwal->waktu_keberangkatan)),
+                    'tanggal_berangkat' => date('d-m-Y', strtotime($pesanan->jadwal->tanggal_berangkat)),
+                    'mobil' => $pesanan->jadwal->master_mobil->type . ' - ' . $pesanan->jadwal->master_mobil->nopol,
+                    'supir' => $pesanan->jadwal->master_supir->nama,
+                    'harga' => $pesanan->jadwal->master_rute->harga,
+                    'status' => $pesanan->status
+                ];
+            });
             return response()->json([
                 'success' => true,
-                'data' => $data,
-                'message' => 'Berhasil get data'
+                'message' => 'Berhasil get data',
+                'data' => $data
             ]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -54,11 +68,10 @@ class PesananController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'nama' => 'required',
-                'no_telp' => 'required',
-                'no_kursi' => 'required|numeric',
+                'no_kursi' => 'required',
                 'jadwal_id' => 'required',
                 'titik_jemput_id' => 'required',
+                'penumpang' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -83,12 +96,10 @@ class PesananController extends Controller
             $kursi->save();
 
             $data = new Pesanan();
-            $data->nama = $request->nama;
-            $data->no_telp = $request->no_telp;
             $data->jadwal_id = $request->jadwal_id;
+            $data->kursi_id = $kursi->id;
             $data->master_titik_jemput_id = $request->titik_jemput_id;
             $data->biaya_tambahan = $request->biaya_tambahan;
-            $data->kursi_id = $kursi->id;
             $data->user_id = auth()->user()->id;
             $data->status = "Menunggu";
             $data->save();

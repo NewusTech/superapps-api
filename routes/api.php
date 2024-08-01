@@ -11,6 +11,7 @@ use App\Http\Controllers\API\MasterTitikJemput\MasterTitikJemputController;
 use App\Http\Controllers\API\MasterSupir\MasterSupirController;
 use App\Http\Controllers\API\Paket\PaketController;
 use App\Http\Controllers\API\Pembayaran\PembayaranController;
+use App\Http\Controllers\API\Penumpang\PenumpangController;
 use App\Http\Controllers\API\Pesanan\PesananController;
 use App\Http\Controllers\API\Role\RoleController;
 use App\Http\Controllers\API\Users\ManageUsersController;
@@ -91,6 +92,10 @@ Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'penumpang'], function () {
+    Route::resource('penumpang', PenumpangController::class);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'users'], function () {
