@@ -13,6 +13,7 @@ class Pesanan extends Model
     protected $fillable = [
         'kode_pesanan',
         'jadwal_id',
+        'user_id',
         'kursi_id',
         'user_id',
         'metode_id',
@@ -33,6 +34,11 @@ class Pesanan extends Model
     public function penumpang()
     {
         return $this->hasMany(Penumpang::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     protected static function boot()
