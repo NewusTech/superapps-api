@@ -24,7 +24,9 @@ class PesananController extends Controller
     {
         try {
             $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user')->get();
-            $data = $pesanan->map(function ($pesanan) {
+            $total_uang = 0;
+            $data = $pesanan->map(function ($pesanan)use(&$total_uang) {
+                $total_uang += $pesanan->jadwal->master_rute->harga;
                 return [
                     'kode_pesanan' => $pesanan->kode_pesanan,
                     'nama_pemesan' => $pesanan->user->nama,
@@ -37,10 +39,13 @@ class PesananController extends Controller
                     'status' => $pesanan->status
                 ];
             });
+            $total_pesanan = $data->count();
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data',
-                'data' => $data
+                'data' => $data,
+                'total_pesanan' => $total_pesanan,
+                'total_uang' => $total_uang
             ]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
