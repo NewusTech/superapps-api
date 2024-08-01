@@ -11,11 +11,11 @@ class Pesanan extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'pesanan';
     protected $fillable = [
-        'jadwal_id',
         'kode_pesanan',
+        'jadwal_id',
         'kursi_id',
-        'nama',
-        'no_telp',
+        'user_id',
+        'metode_id',
         'biaya_tambahan',
         'master_titik_jemput_id',
         'status'
@@ -24,6 +24,10 @@ class Pesanan extends Model
     public function jadwal()
     {
         return $this->belongsTo(Jadwal::class);
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 
     public function penumpang()
