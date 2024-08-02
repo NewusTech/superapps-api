@@ -16,6 +16,7 @@ class Penumpang extends Model
         'nama',
         'nik',
         'email',
+        'kursi_id',
         'no_telp',
         'pesanan_id'
     ];

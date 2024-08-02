@@ -7,9 +7,11 @@ use App\Models\Pesanan;
 use App\Models\Jadwal;
 use App\Models\Kursi;
 use App\Models\MasterMobil;
+use App\Models\Penumpang;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PesananController extends Controller
@@ -20,12 +22,23 @@ class PesananController extends Controller
         $this->middleware('check.admin')->only(['konfirmasiPesanan', 'destroy']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user')->get();
+            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user')
+                ->get();
+            if ($request->status) {
+                $pesanan = $pesanan->where('status', $request->status);
+            }
+
+            if ($request->startDate && $request->endDate) {
+                $startDate = date('Y-m-d 00:00:00', strtotime($request->startDate));
+                $endDate = date('Y-m-d 23:59:59', strtotime($request->endDate));
+                $pesanan = $pesanan->whereBetween('created_at', [$startDate, $endDate]);
+            }
+
             $total_uang = 0;
-            $data = $pesanan->map(function ($pesanan)use(&$total_uang) {
+            $data = $pesanan->map(function ($pesanan) use (&$total_uang) {
                 $total_uang += $pesanan->jadwal->master_rute->harga;
                 return [
                     'kode_pesanan' => $pesanan->kode_pesanan,
@@ -73,9 +86,10 @@ class PesananController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'no_kursi' => 'required',
                 'jadwal_id' => 'required',
+                'metode_id' => 'required',
                 'titik_jemput_id' => 'required',
+                'titik_antar_id' => 'required',
                 'penumpang' => 'required'
             ]);
 
@@ -87,31 +101,47 @@ class PesananController extends Controller
             if (!$existJadwal) {
                 throw new Exception('Jadwal tidak ditemukan');
             }
+            $mobilByJadwal = $existJadwal->master_mobil_id;
+            $kursiExist = Kursi::where('master_mobil_id', $mobilByJadwal)->get('nomor_kursi');
+            $kursiExist = $kursiExist->map(function ($kursi) {
+                return $kursi->nomor_kursi;
+            });
 
-            $mobilByJadwal = Jadwal::find($request->jadwal_id)->master_mobil_id;
-            $jumlahTotalKursi = MasterMobil::where('id', $mobilByJadwal)->first()->jumlah_kursi;
-
-            if ($request->no_kursi > $jumlahTotalKursi) {
-                throw new Exception('Kursi tidak tersedia');
+            $pesanan = new Pesanan();
+            $pesanan->jadwal_id = $request->jadwal_id;
+            $pesanan->master_titik_jemput_id = $request->titik_jemput_id;
+            $pesanan->titik_antar_id = $request->titik_antar_id;
+            $pesanan->metode_id = $request->metode_id;
+            $pesanan->biaya_tambahan = str_contains($request->metode_id, 'Payment') ? 4000 : 0;
+            $pesanan->user_id = auth()->user()->id;
+            $pesanan->status = "Menunggu";
+            if (!$pesanan->save()) {
+                throw new Exception('Pesanan gagal dibuat');
             }
 
-            $kursi = new Kursi();
-            $kursi->master_mobil_id = $mobilByJadwal;
-            $kursi->nomor_kursi = $request->no_kursi;
-            $kursi->save();
+            foreach ($request->penumpang as $penumpang) {
+                if (in_array($penumpang['no_kursi'], $kursiExist->toArray())) {
+                    throw new Exception("Kursi " . $penumpang['no_kursi'] . " tidak tersedia");
+                }
+                $kursi = Kursi::create([
+                    'master_mobil_id' => $mobilByJadwal,
+                    'nomor_kursi' => $penumpang['no_kursi']
+                ]);
 
-            $data = new Pesanan();
-            $data->jadwal_id = $request->jadwal_id;
-            $data->kursi_id = $kursi->id;
-            $data->master_titik_jemput_id = $request->titik_jemput_id;
-            $data->biaya_tambahan = $request->biaya_tambahan;
-            $data->user_id = auth()->user()->id;
-            $data->status = "Menunggu";
-            $data->save();
+                Penumpang::create([
+                    'nama' => $penumpang['nama'],
+                    'nik' => $penumpang['nik'],
+                    'email' => $penumpang['email'],
+                    'kursi_id' => $kursi->id,
+                    'pesanan_id' => $pesanan->id,
+                    'no_telp' => $penumpang['no_telp'],
+                    'status' => 'terisi'
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
-                'data' => $data,
+                'data' => $pesanan,
                 'message' => 'Pesanan berhasil dibuat'
             ]);
         } catch (Exception $e) {

@@ -14,11 +14,10 @@ class Pesanan extends Model
         'kode_pesanan',
         'jadwal_id',
         'user_id',
-        'kursi_id',
-        'user_id',
         'metode_id',
         'biaya_tambahan',
         'master_titik_jemput_id',
+        'titik_antar_id',
         'status'
     ];
 
