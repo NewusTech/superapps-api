@@ -26,9 +26,9 @@ class PesananController extends Controller
     {
         try {
             $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user')
-                ->get();
+                ->orderBy('created_at', 'desc');
             if ($request->status) {
-                $pesanan = $pesanan->where('status', $request->status);
+                $pesanan = $pesanan->where('status', 'like',"%$request->status%");
             }
 
             if ($request->startDate && $request->endDate) {
@@ -37,6 +37,26 @@ class PesananController extends Controller
                 $pesanan = $pesanan->whereBetween('created_at', [$startDate, $endDate]);
             }
 
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $pesanan = $pesanan->where(function ($query) use ($searchTerm) {
+                        $query->whereHas('user', function ($query) use ($searchTerm) {
+                            $query->where('nama', 'like', "%{$searchTerm}%");
+                        })
+                        ->orWhereHas('jadwal.master_rute', function ($query) use ($searchTerm) {
+                            $query->where('kota_asal', 'like', "%{$searchTerm}%")
+                            ->orWhere('kota_tujuan', 'like', "%{$searchTerm}%");
+                        })
+                        ->orWhereHas('jadwal.master_mobil', function ($query) use ($searchTerm) {
+                            $query->where('type', 'like', "%{$searchTerm}%");
+                        })
+                        ->orWhereHas('jadwal.master_supir', function ($query) use ($searchTerm) {
+                            $query->where('nama', 'like', "%{$searchTerm}%");
+                        });
+                });
+            }
+
+            $pesanan = $pesanan->get();
             $total_uang = 0;
             $data = $pesanan->map(function ($pesanan) use (&$total_uang) {
                 $total_uang += $pesanan->jadwal->master_rute->harga;
@@ -65,13 +85,13 @@ class PesananController extends Controller
         }
     }
 
-    public function show($id)
+    public function show($orderCode)
     {
         try {
-            if (!$id) {
+            if (!$orderCode) {
                 throw new Exception('Id tidak ditemukan');
             }
-            $data = Pesanan::find($id);
+            $data = Pesanan::with('penumpang')->where('kode_pesanan', $orderCode)->first();
             return response()->json([
                 'success' => true,
                 'data' => $data,
