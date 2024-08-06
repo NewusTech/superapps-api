@@ -92,6 +92,14 @@ class PesananController extends Controller
                 throw new Exception('Id tidak ditemukan');
             }
             $data = Pesanan::with('penumpang')->where('kode_pesanan', $orderCode)->first();
+            if (!$data) {
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => 'Pesanan tidak ditemukan'
+                    ]
+                );
+            }
             return response()->json([
                 'success' => true,
                 'data' => $data,

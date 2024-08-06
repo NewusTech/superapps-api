@@ -87,7 +87,8 @@ class MasterMobilController extends Controller
                 'type' => $request->type,
                 'jumlah_kursi' => $request->jumlah_kursi,
                 'status' => 'Non-Aktif',
-                'image_url' => $request->image_url
+                'image_url' => $request->image_url,
+                'available_seats' => $request->jumlah_kursi
             ]);
 
             return response()->json([

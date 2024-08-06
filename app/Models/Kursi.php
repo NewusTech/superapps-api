@@ -22,4 +22,16 @@ class Kursi extends Model
     {
         return $this->belongsTo(MasterMobil::class, 'master_mobil_id');
     }
+    public static function boot()
+    {
+        parent::boot();
+
+        self::updated(function ($kursi) {
+            if ($kursi->isDirty('status')) {
+                $mobil = MasterMobil::find($kursi->master_mobil_id);
+                $mobil->available_seats -= 1;
+                $mobil->save();
+            }
+        });
+    }
 }

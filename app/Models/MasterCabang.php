@@ -11,5 +11,6 @@ class MasterCabang extends Model
     protected $table = 'master_cabang';
     protected $fillable = [
         'nama',
+        'alamat',
     ];
 }

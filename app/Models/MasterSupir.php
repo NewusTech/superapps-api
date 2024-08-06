@@ -9,7 +9,13 @@ class MasterSupir extends Model
 {
     use HasFactory;
     protected $table = 'master_supir';
-    protected $fillable = ['nama', 'no_telp'];
+    protected $fillable = [
+        'nama',
+        'no_telp',
+        'nik',
+        'alamat',
+        'tanggal_bergabung'
+    ];
 
     public function jadwal()
     {
