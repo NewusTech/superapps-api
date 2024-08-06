@@ -15,7 +15,8 @@ class MasterMobil extends Model
         'jumlah_kursi',
         'status',
         'image_url',
-        'available_seats'
+        'available_seats',
+        'fasilitas'
     ];
 
     public static function boot(){

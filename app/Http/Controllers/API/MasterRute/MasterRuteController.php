@@ -18,22 +18,7 @@ class MasterRuteController extends Controller
     public function index(Request $request)
     {
         try {
-            $paginate_count = 10;
-            $master_rute = MasterRute::query();
-            if ($request->has('search') && $request->input('search')) {
-                $searchTerm = $request->input('search');
-                $master_rute->where(function ($query) use ($searchTerm) {
-                    $query->where('kota_asal', 'like', '%' . $searchTerm . '%')
-                        ->orWhere('harga', 'like', '%' . $searchTerm . '%');
-                });
-            }
-
-            if ($request->has('paginate_count') && $request->input('paginate_count')) {
-                $paginate_count = $request->input('paginate_count');
-            }
-
-            $data = $master_rute->paginate($paginate_count);
-
+            $data = MasterRute::get();
             return response()->json([
                 'success' => true,
                 'data' => $data,
@@ -74,6 +59,7 @@ class MasterRuteController extends Controller
             $master_rute->kota_asal = $request->kota_asal;
             $master_rute->kota_tujuan = $request->kota_tujuan;
             $master_rute->harga = $request->harga;
+            $master_rute->waktu_keberangkatan = $request->waktu_keberangkatan;
             $master_rute->save();
 
             return response()->json([

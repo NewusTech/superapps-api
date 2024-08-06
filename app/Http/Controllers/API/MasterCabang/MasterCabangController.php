@@ -49,6 +49,7 @@ class MasterCabangController extends Controller
 
             $master_cabang = new MasterCabang();
             $master_cabang->nama = $request->nama;
+            $master_cabang->alamat = $request->alamat;
             $master_cabang->save();
 
             return response()->json([
