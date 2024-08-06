@@ -7,9 +7,11 @@ use App\Models\Jadwal;
 use App\Models\Kursi;
 use App\Models\MasterMobil;
 use App\Models\MasterRute;
+use App\Models\SyaratKetentuan;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class JadwalController extends Controller
@@ -40,6 +42,7 @@ class JadwalController extends Controller
                 'from' => 'required',
                 'to' => 'required',
                 'date' => 'required',
+                'seats' => 'required'
             ]);
 
             if ($validator->fails()) {
@@ -57,6 +60,9 @@ class JadwalController extends Controller
 
             $jadwal = Jadwal::where('master_rute_id', $rute->id)
                 ->whereDate('tanggal_berangkat', $date)
+                ->whereHas('master_mobil', function ($query) use ($request) {
+                    $query->where('available_seats', '>=', $request->seats);
+                })
                 ->get([
                     "id",
                     "master_rute_id",
@@ -75,7 +81,6 @@ class JadwalController extends Controller
                 $mobil = MasterMobil::where('id', $item->master_mobil_id)->first();
                 $rute = MasterRute::where('id', $item->master_rute_id)->first();
                 $item->img_url = $mobil->image_url;
-                $item->availableSeat = $mobil->jumlah_kursi - Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'Terisi')->count();
                 $item->carModel = $mobil->type;
                 $item->carSeat = $mobil->jumlah_kursi;
                 $item->departureDate = $item->tanggal_berangkat;
@@ -84,10 +89,11 @@ class JadwalController extends Controller
                 $item->originCity = $rute->kota_asal;
                 $item->destinationCity = $rute->kota_tujuan;
                 $item->price = $rute->harga;
-                $item->facility = 'free meal';
-                $seatTaken = Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'Terisi')->get('nomor_kursi');
+                $item->facility = $mobil->fasilitas;
+                $seatTaken = Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
                 $item->seatTaken = $seatTaken->map(fn ($item) => $item->nomor_kursi);
-                $item->syarat_dan_ketentuan = "<p>Syarat dan Ketentuan berlaku.</p>";
+                $item->availableSeat = $mobil->available_seats - $seatTaken->count();
+                $item->syarat_dan_ketentuan = SyaratKetentuan::first('description')->description;
             });
             return response()->json([
                 'success' => true,

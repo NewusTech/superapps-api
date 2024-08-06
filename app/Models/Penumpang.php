@@ -21,6 +21,16 @@ class Penumpang extends Model
         'pesanan_id'
     ];
 
+    protected static function boot(){
+        parent::boot();
+        static::created(function ($penumpang) {
+            $kursi = Kursi::where('id', $penumpang->kursi_id)->first();
+            $kursi->update([
+                'status' => 'Terisi'
+            ]);
+        });
+    }
+
     public function pesanan()
     {
         return $this->belongsTo(Pesanan::class);
