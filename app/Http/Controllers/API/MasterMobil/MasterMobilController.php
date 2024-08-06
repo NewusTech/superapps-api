@@ -52,7 +52,10 @@ class MasterMobilController extends Controller
                 'jumlah_kursi' => 'required|numeric',
             ]);
             if ($validator->fails()) {
-                throw new Exception($validator->errors()->first());
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first()
+                ]);
             }
 
             $existingData = MasterMobil::where('nopol', $request->nopol)->first();

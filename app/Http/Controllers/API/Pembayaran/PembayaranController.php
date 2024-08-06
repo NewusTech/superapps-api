@@ -78,7 +78,7 @@ class PembayaranController extends Controller
                 return response()->json($validator->errors(), 422);
             }
 
-            $pesanan = Pesanan::with('jadwal.master_rute')->where('kode_pesanan', $request->orderCode)->first();
+            $pesanan = Pesanan::with(['jadwal.master_rute', 'penumpang'])->where('kode_pesanan', $request->orderCode)->first();
             $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
             if (!$pesanan) {
                 throw new Exception('Pesanan tidak ditemukan');
@@ -87,13 +87,14 @@ class PembayaranController extends Controller
             // create pembayaran
             $pembayaran = new Pembayaran();
             $pembayaran->pesanan_id = $pesanan->id;
+            $pembayaran->amount = $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count();
             $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
 
             $generatedCode = (string) Pembayaran::generateUniqueKodeBayar();
             $params = array(
                 'transaction_details' => array(
                     'order_id' => $generatedCode,
-                    'gross_amount' => $pesanan->jadwal->master_rute->harga,
+                    'gross_amount' => $pembayaran->amount,
                     // 'gross_amount' => 1, // ini tes beneran tapi boongan
                     'payment_link_id' => str(rand(1000, 9999)) . time()
                 ),
@@ -107,14 +108,12 @@ class PembayaranController extends Controller
                         "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
                         "price" => $pesanan->jadwal->master_rute->harga,
                         // "price" => 1, // Ini testing beneran tapi boongan
-                        "quantity" => 1,
+                        "quantity" =>  $pesanan->penumpang->count(),
                     )
                 ),
                 'usage_limit' => 1
             );
 
-            // return response()->json($midtransEnv, 200);
-            // dd($midtransEnv['PRODUCTION']['server_key']);
             $auth = base64_encode($midtransEnv['PRODUCTION']['server_key']);
 
             $response = Http::withHeaders([
@@ -124,7 +123,7 @@ class PembayaranController extends Controller
             ])->post($midtransEnv['PRODUCTION']['url'], $params);
 
             if ($response->failed()) {
-                throw new Exception($response->body());
+                return response()->json(['message' => json_decode($response->body())], 500);
             }
 
             $response = json_decode($response->body());
@@ -197,6 +196,23 @@ class PembayaranController extends Controller
                 'success' => true,
                 'data' => $response,
                 'message' => 'Berhasil post data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getStatusPembayaran($paymentCode){
+        try {
+            $data = Pembayaran::with('pesanan.metode')->where('kode_pembayaran', $paymentCode)
+            ->get(['id', 'kode_pembayaran', 'status', 'pesanan_id','updated_at'])->first();
+            if (!$data) {
+                throw new Exception('Pembayaran tidak ditemukan');
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
