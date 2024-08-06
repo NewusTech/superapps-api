@@ -42,7 +42,7 @@ class MasterSupirController extends Controller
                 throw new Exception($validator->errors()->first());
             }
 
-            $existingData = MasterSupir::where('nama', $request->nama)->first();
+            $existingData = MasterSupir::where('nama', $request->nama)->orWhere('nik', $request->nik)->first();
 
             if ($existingData) {
                 throw new Exception('Data dengan nama yang sama sudah ada.');
@@ -51,6 +51,9 @@ class MasterSupirController extends Controller
             $master_supir = new MasterSupir();
             $master_supir->nama = $request->nama;
             $master_supir->no_telp = $request->no_telp;
+            $master_supir->nik = $request->nik;
+            $master_supir->alamat = $request->alamat;
+            $master_supir->tanggal_bergabung = date('Y-m-d', strtotime($request->tanggal_bergabung));
             $master_supir->save();
 
             return response()->json([

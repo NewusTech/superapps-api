@@ -21,25 +21,10 @@ class MasterMobilController extends Controller
     {
 
         try {
-            $paginate_count = 10;
-            $master_mobil = MasterMobil::query();
-            if ($request->has('search') && $request->input('search')) {
-                $searchTerm = $request->input('search');
-                $master_mobil->where(function ($query) use ($searchTerm) {
-                    $query->where('kota_asal', 'like', '%' . $searchTerm . '%')
-                        ->orWhere('harga', 'like', '%' . $searchTerm . '%');
-                });
-            }
-
-            if ($request->has('paginate_count') && $request->input('paginate_count')) {
-                $paginate_count = $request->input('paginate_count');
-            }
-
-            $data = $master_mobil->paginate($paginate_count);
-
+            $master_mobil = MasterMobil::get(['id', 'nopol', 'type', 'jumlah_kursi', 'available_seats', 'fasilitas','status','created_at']);
             return response()->json([
                 'success' => true,
-                'data' => $data,
+                'data' => $master_mobil,
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
@@ -65,7 +50,6 @@ class MasterMobilController extends Controller
                 'nopol' => 'required',
                 'type' => 'required',
                 'jumlah_kursi' => 'required|numeric',
-                'image_url' => 'required'
             ]);
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
@@ -88,7 +72,8 @@ class MasterMobilController extends Controller
                 'jumlah_kursi' => $request->jumlah_kursi,
                 'status' => 'Non-Aktif',
                 'image_url' => $request->image_url,
-                'available_seats' => $request->jumlah_kursi
+                'available_seats' => $request->jumlah_kursi,
+                'fasilitas' => $request->fasilitas
             ]);
 
             return response()->json([
