@@ -38,13 +38,21 @@ class MasterCabangController extends Controller
             ]);
 
             if ($validator->fails()) {
-                throw new Exception($validator->errors()->first());
+                return response()->json(
+                    [
+                        'success' => false,
+                        'message' => $validator->errors()->first()
+                    ], 422);
             }
 
             $existingData = MasterCabang::where('nama', $request->nama)->first();
 
             if ($existingData) {
-                throw new Exception('Data dengan nama yang sama sudah ada.');
+                return response()->json([
+                    'success' => false,
+                    'data' => $existingData,
+                    'message' => 'Data sudah ada'
+                ]);
             }
 
             $master_cabang = new MasterCabang();

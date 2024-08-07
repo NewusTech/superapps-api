@@ -145,7 +145,14 @@ class MasterRuteController extends Controller
                     'message' => 'ID tidak ditemukan'
                 ]);
             }
-            $data = MasterRute::find($id);
+            $data = MasterRute::with('jadwal')->find($id);
+            if ($data->jadwal) {
+                return response()->json([
+                    'success' => false,
+                    'data' => '',
+                    'message' => 'Data ini sedang digunakan pada jadwal. Hapus jadwal terlebih dahulu.'
+                ]);
+            }
             $data->delete();
 
             return response()->json([

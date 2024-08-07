@@ -43,6 +43,25 @@ class KursiController extends Controller
     {
         //
     }
+    public function updateStatus(Request $request, string $id){
+        // Todo: Update Status belum selesai
+        try {
+            $where = ['id' => $id];
+            $data = Kursi::where($where)->get();
+            if (!$data) return response()->json(['success' => false, 'message' => 'Kursi tidak ditemukan'], 404);
+
+            $data->update([
+                'status' => $request->status
+            ]);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil update data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
     public function edit(string $id)
     {

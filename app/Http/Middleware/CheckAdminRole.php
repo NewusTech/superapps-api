@@ -18,9 +18,9 @@ class CheckAdminRole
     {
         $roles = auth()->user();
         $roles = $roles->roles->first();
-        if ($roles->name == 'Admin' || $roles->name == 'Super Admin') {
+        if (str_contains($roles->name, 'Admin')) {
             return $next($request);
         }
-        return response()->json(['error' => 'Anda Bukan Admin'], 403);
+        return response()->json(['message' => 'Anda Bukan Admin'], 403);
     }
 }
