@@ -29,7 +29,7 @@ class Kursi extends Model
         self::updated(function ($kursi) {
             if ($kursi->isDirty('status')) {
                 $mobil = MasterMobil::find($kursi->master_mobil_id);
-                $mobil->available_seats -= 1;
+                $mobil->available_seats = $kursi->where('status','like', '%kosong%')->count();
                 $mobil->save();
             }
         });
