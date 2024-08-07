@@ -120,7 +120,6 @@ class JadwalController extends Controller
                 'master_supir_id' => 'required',
                 'waktu_keberangkatan' => 'required',
                 'tanggal_berangkat' => 'required',
-                'ketersediaan' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -142,7 +141,7 @@ class JadwalController extends Controller
             $data->master_supir_id = $request->master_supir_id;
             $data->tanggal_berangkat = $request->tanggal_berangkat;
             $data->waktu_keberangkatan = $request->waktu_keberangkatan;
-            $data->ketersediaan = $request->ketersediaan;
+            $data->ketersediaan = $request->ketersediaan ?? 'Tersedia';
             $data->save();
 
             return response()->json([
@@ -175,8 +174,21 @@ class JadwalController extends Controller
     public function dropdownJadwal(){
         try {
             $rute = MasterRute::get(['id','kota_asal','kota_tujuan']);
+            $rute = $rute->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'rute' => "$item->kota_asal - $item->kota_tujuan",
+                ];
+            });
             $supir = MasterSupir::get(['id','nama', 'no_telp']);
             $mobil = MasterMobil::where('status', 'not like', '%non%')->get(['id','type','nopol']);
+            $mobil = $mobil->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'nama' => "$item->type - $item->nopol",
+                ];
+            });
+
             $data = [
                 'rute' => $rute,
                 'supir' => $supir,
