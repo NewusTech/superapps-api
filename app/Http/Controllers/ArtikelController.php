@@ -26,7 +26,7 @@ class ArtikelController extends Controller
             ]);
         } catch (Exception $e) {
 
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -40,7 +40,7 @@ class ArtikelController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -86,7 +86,7 @@ class ArtikelController extends Controller
         ]);
     } catch (Exception $e) {
         \Log::error('Error storing data: ' . $e->getMessage());
-        return response()->json(['error' => $e->getMessage()], 500);
+        return response()->json(['message' => $e->getMessage()], 500);
     }
 }
 
@@ -106,7 +106,7 @@ class ArtikelController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -127,7 +127,7 @@ class ArtikelController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -163,7 +163,7 @@ class ArtikelController extends Controller
                 'message' => 'Berhasil ubah data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -183,7 +183,7 @@ class ArtikelController extends Controller
                 'message' => 'Berhasil hapus data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

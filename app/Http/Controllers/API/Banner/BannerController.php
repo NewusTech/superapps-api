@@ -27,7 +27,7 @@ class BannerController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -57,7 +57,7 @@ class BannerController extends Controller
                 'message' => 'Berhasil menyimpan data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -73,7 +73,7 @@ class BannerController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -89,7 +89,7 @@ class BannerController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -128,7 +128,7 @@ class BannerController extends Controller
                 'message' => 'Berhasil ubah data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -152,7 +152,7 @@ class BannerController extends Controller
                 'message' => 'Berhasil hapus data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

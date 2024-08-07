@@ -25,7 +25,7 @@ class MasterRuteController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -68,7 +68,7 @@ class MasterRuteController extends Controller
                 'message' => 'Berhasil menambah data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -85,7 +85,7 @@ class MasterRuteController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -129,7 +129,7 @@ class MasterRuteController extends Controller
                 'message' => 'Berhasil update data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -161,7 +161,7 @@ class MasterRuteController extends Controller
                 'message' => 'Berhasil delete data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

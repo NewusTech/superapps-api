@@ -33,7 +33,7 @@ class AuthController extends Controller
             $user = User::where('email', $credentials['email'])->first();
 
             if (!$user || !Auth::guard('api')->attempt($credentials)) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+                return response()->json(['message' => 'Unauthorized'], 401);
             }
             $role = Role::where('id', $user->role_id)->pluck('name')->first();
             $customClaims = [
@@ -54,7 +54,7 @@ class AuthController extends Controller
                 'message' => 'Berhasil login'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -91,7 +91,7 @@ class AuthController extends Controller
                 'message' => 'Berhasil register'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -117,7 +117,7 @@ class AuthController extends Controller
                 'message' => 'Berhasil forgot password'
             ]);
     } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

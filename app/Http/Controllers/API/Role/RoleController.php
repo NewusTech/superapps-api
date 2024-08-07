@@ -26,7 +26,7 @@ class RoleController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -41,7 +41,7 @@ class RoleController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
     public function store(Request $request)
@@ -53,7 +53,7 @@ class RoleController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], 401);
+                return response()->json(['message' => $validator->errors()], 401);
             }
 
             $role = new Role();
@@ -69,7 +69,7 @@ class RoleController extends Controller
                 'message' => 'Berhasil tambah data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -81,7 +81,7 @@ class RoleController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json(['error' => $validator->errors()], 401);
+                return response()->json(['message' => $validator->errors()], 401);
             }
 
             $data = Role::find($id);
@@ -99,7 +99,7 @@ class RoleController extends Controller
                 'message' => 'Berhasil update data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -119,7 +119,7 @@ class RoleController extends Controller
                 'message' => 'Berhasil delete data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }

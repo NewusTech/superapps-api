@@ -81,7 +81,7 @@ class PesananController extends Controller
                 'total_uang' => $total_uang
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -106,7 +106,7 @@ class PesananController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -115,7 +115,6 @@ class PesananController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'jadwal_id' => 'required',
-                'metode_id' => 'required',
                 'titik_jemput_id' => 'required',
                 'titik_antar_id' => 'required',
                 'penumpang' => 'required'
@@ -139,7 +138,6 @@ class PesananController extends Controller
             $pesanan->jadwal_id = $request->jadwal_id;
             $pesanan->master_titik_jemput_id = $request->titik_jemput_id;
             $pesanan->titik_antar_id = $request->titik_antar_id;
-            $pesanan->metode_id = $request->metode_id;
             $pesanan->biaya_tambahan = str_contains($request->metode_id, 'Payment') ? 4000 : 0;
             $pesanan->user_id = auth()->user()->id;
             $pesanan->status = "Menunggu";
@@ -173,7 +171,7 @@ class PesananController extends Controller
                 'message' => 'Pesanan berhasil dibuat'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -195,7 +193,7 @@ class PesananController extends Controller
                 'message' => 'Berhasil update data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -213,7 +211,7 @@ class PesananController extends Controller
                 'message' => 'Berhasil delete data'
             ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }
