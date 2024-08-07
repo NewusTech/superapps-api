@@ -44,6 +44,25 @@ class KursiController extends Controller
     {
         //
     }
+
+    public function getKursiByMobil($mobilId){
+        try {
+            $kursi = Kursi::where('master_mobil_id', $mobilId)->get(['id', 'status', 'nomor_kursi']);
+            if(!$kursi){
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data not found'
+                ]);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $kursi,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
     public function updateStatus(Request $request, string $id){
         try {
             DB::transaction(function () use ($request) {

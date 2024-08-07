@@ -74,6 +74,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'supir'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'kursi'], function () {
     Route::resource('kursi', KursiController::class);
+    Route::get('kursi_by_mobil/{id}', [KursiController::class, 'getKursiByMobil']);
     Route::put('{id}/update-status', [KursiController::class, 'updateStatus']);
 });
 
