@@ -7,6 +7,7 @@ use App\Models\Jadwal;
 use App\Models\Kursi;
 use App\Models\MasterMobil;
 use App\Models\MasterRute;
+use App\Models\MasterSupir;
 use App\Models\SyaratKetentuan;
 use Carbon\Carbon;
 use Exception;
@@ -171,6 +172,25 @@ class JadwalController extends Controller
         }
     }
 
+    public function dropdownJadwal(){
+        try {
+            $rute = MasterRute::get(['id','kota_asal','kota_tujuan']);
+            $supir = MasterSupir::get(['id','nama', 'no_telp']);
+            $mobil = MasterMobil::where('status', 'not like', '%non%')->get(['id','type','nopol']);
+            $data = [
+                'rute' => $rute,
+                'supir' => $supir,
+                'mobil' => $mobil,
+            ];
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
     public function edit(string $id)
     {

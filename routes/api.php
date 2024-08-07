@@ -54,15 +54,10 @@ Route::group([
     Route::resource('master_rute', MasterRuteController::class);
 });
 
-Route::group(
-    [
-        'middleware' => 'api',
-        'prefix' => 'mobil'
-    ],
-    function () {
-        Route::resource('master_mobil', MasterMobilController::class);
-    }
-);
+Route::group(['middleware' => 'api', 'prefix' => 'mobil'], function () {
+    Route::resource('master_mobil', MasterMobilController::class);
+    Route::post('{id}/update-status', [MasterMobilController::class, 'updateStatus']);
+});
 
 
 Route::group(['middleware' => 'api', 'prefix' => 'cabang'], function () {
@@ -79,6 +74,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'supir'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'kursi'], function () {
     Route::resource('kursi', KursiController::class);
+    Route::post('{id}/update-status', [KursiController::class, 'updateStatus']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
@@ -87,6 +83,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
     Route::resource('jadwal', JadwalController::class);
+    Route::get('dropdown-jadwal', [JadwalController::class, 'dropdownJadwal']);
     Route::get('jadwal_by_rute', [JadwalController::class, 'getJadwalByRute']);
 });
 
@@ -117,7 +114,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'laporan'], function () {
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
-    Route::get('pembayaran/{pesanan_id}',[PembayaranController::class, 'showPembayaran']);
+    Route::get('pembayaran/{pesanan_id}', [PembayaranController::class, 'showPembayaran']);
     Route::post('proses_pembayaran', [PembayaranController::class, 'prosesPembayaran']);
     Route::post('tes_proses_pembayaran', [PembayaranController::class, 'testProsesPembayaran']);
     Route::get('status/{paymentCode}', [PembayaranController::class, 'getStatusPembayaran']);

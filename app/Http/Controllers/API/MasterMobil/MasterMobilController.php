@@ -14,14 +14,14 @@ class MasterMobilController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware('check.admin')->only([ 'update', 'destroy']);
+        $this->middleware('check.admin')->only(['update', 'destroy']);
     }
 
     public function index(Request $request)
     {
 
         try {
-            $master_mobil = MasterMobil::get(['id', 'nopol', 'type', 'jumlah_kursi', 'available_seats', 'fasilitas','status','created_at']);
+            $master_mobil = MasterMobil::get(['id', 'nopol', 'type', 'jumlah_kursi', 'available_seats', 'fasilitas', 'status', 'created_at']);
             return response()->json([
                 'success' => true,
                 'data' => $master_mobil,
@@ -109,6 +109,26 @@ class MasterMobilController extends Controller
         }
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'status' => 'required'
+            ]);
+            if ($validator->fails()) return response()->json(['success' => false, 'message' => $validator->errors()->first()]);
+
+            $data = MasterMobil::find($id);
+            $data->status = $request->status;
+            $data->save();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil update data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
     /**
      * Show the form for editing the specified resource.
      */
