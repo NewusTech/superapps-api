@@ -13,8 +13,14 @@ class Pembayaran extends Model
     protected $fillable = [
         'kode_pembayaran',
         'pesanan_id',
+        'amount',
         'status'
     ];
+
+    public function pesanan()
+    {
+        return $this->belongsTo(Pesanan::class, 'pesanan_id', 'id');
+    }
 
     public static function generateUniqueKodeBayar()
     {

@@ -26,10 +26,13 @@ class Pesanan extends Model
         return $this->belongsTo(Jadwal::class);
     }
 
-
+    public function metode()
+    {
+        return $this->belongsTo(MetodePembayaran::class, 'metode_id', 'id');
+    }
     public function penumpang()
     {
-        return $this->hasMany(Penumpang::class);
+        return $this->hasMany(Penumpang::class, 'pesanan_id', 'id');
     }
 
     public function user()

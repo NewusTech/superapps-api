@@ -18,6 +18,7 @@ use App\Http\Controllers\API\Users\ManageUsersController;
 use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
+use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -89,6 +90,10 @@ Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
     Route::get('jadwal_by_rute', [JadwalController::class, 'getJadwalByRute']);
 });
 
+Route::group(['middleware' => 'api', 'prefix' => 'syarat-ketentuan'], function () {
+    Route::resource('syarat-ketentuan', SyaratKetentuanController::class);
+});
+
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
@@ -115,6 +120,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
     Route::get('pembayaran/{pesanan_id}',[PembayaranController::class, 'showPembayaran']);
     Route::post('proses_pembayaran', [PembayaranController::class, 'prosesPembayaran']);
     Route::post('tes_proses_pembayaran', [PembayaranController::class, 'testProsesPembayaran']);
+    Route::get('status/{paymentCode}', [PembayaranController::class, 'getStatusPembayaran']);
     Route::get('metode-pembayaran', [PembayaranController::class, 'getMetodePembayaran']);
     Route::post('metode-pembayaran', [PembayaranController::class, 'storeMetodePembayaran']);
     Route::delete('metode-pembayaran/{id}', [PembayaranController::class, 'deleteMetodePembayaran']);
