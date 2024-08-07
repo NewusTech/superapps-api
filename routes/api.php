@@ -74,7 +74,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'supir'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'kursi'], function () {
     Route::resource('kursi', KursiController::class);
-    Route::post('{id}/update-status', [KursiController::class, 'updateStatus']);
+    Route::put('{id}/update-status', [KursiController::class, 'updateStatus']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
