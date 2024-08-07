@@ -113,43 +113,55 @@ class JadwalController extends Controller
     public function store(Request $request)
     {
         try {
+            DB::beginTransaction();
 
-            $validator = Validator::make($request->all(), [
-                'master_rute_id' => 'required',
-                'master_mobil_id' => 'required',
-                'master_supir_id' => 'required',
-                'waktu_keberangkatan' => 'required',
-                'tanggal_berangkat' => 'required',
-            ]);
+            $requestData = $request->all();
+            $createdData = [];
 
-            if ($validator->fails()) {
-                throw new Exception($validator->errors()->first());
+            foreach ($requestData as $data) {
+                $validator = Validator::make($data, [
+                    'master_rute_id' => 'required',
+                    'master_mobil_id' => 'required',
+                    'master_supir_id' => 'required',
+                    'waktu_keberangkatan' => 'required',
+                    'tanggal_berangkat' => 'required',
+                ]);
+
+                if ($validator->fails()) {
+                    throw new Exception($validator->errors()->first());
+                }
+
+                $existing = Jadwal::where('master_supir_id', $data['master_supir_id'])
+                    ->where('tanggal_berangkat', $data['tanggal_berangkat'])
+                    ->where('master_mobil_id', $data['master_mobil_id'])
+                    ->where('waktu_keberangkatan', $data['waktu_keberangkatan'])
+                    ->first();
+
+                if ($existing) {
+                    throw new Exception('Jadwal dengan data yang sama sudah ada untuk salah satu data dalam array');
+                }
+
+                $jadwal = new Jadwal();
+                $jadwal->master_rute_id = $data['master_rute_id'];
+                $jadwal->master_mobil_id = $data['master_mobil_id'];
+                $jadwal->master_supir_id = $data['master_supir_id'];
+                $jadwal->tanggal_berangkat = $data['tanggal_berangkat'];
+                $jadwal->waktu_keberangkatan = $data['waktu_keberangkatan'];
+                $jadwal->ketersediaan = $data['ketersediaan'] ?? 'Tersedia';
+                $jadwal->save();
+
+                $createdData[] = $jadwal;
             }
 
-            $existing = Jadwal::where('master_supir_id', $request->master_supir_id)
-                ->where('tanggal_berangkat', $request->tanggal_berangkat)
-                ->where('master_mobil_id', $request->master_mobil_id)
-                ->where('waktu_keberangkatan', $request->waktu_keberangkatan)->first();
-            if ($existing) {
-                throw new Exception('Jadwal dengan data yang sama sudah ada');
-            }
-            // dd($existing, $request->all());
-
-            $data = new Jadwal();
-            $data->master_rute_id = $request->master_rute_id;
-            $data->master_mobil_id = $request->master_mobil_id;
-            $data->master_supir_id = $request->master_supir_id;
-            $data->tanggal_berangkat = $request->tanggal_berangkat;
-            $data->waktu_keberangkatan = $request->waktu_keberangkatan;
-            $data->ketersediaan = $request->ketersediaan ?? 'Tersedia';
-            $data->save();
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'data' => $data,
-                'message' => 'Berhasil get data'
+                'data' => $createdData,
+                'message' => 'Berhasil menyimpan semua data'
             ]);
         } catch (Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
