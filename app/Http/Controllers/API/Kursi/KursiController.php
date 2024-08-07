@@ -63,15 +63,17 @@ class KursiController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    public function updateStatus(Request $request, string $id){
+    public function updateStatus(Request $request){
         try {
-            DB::transaction(function () use ($request) {
-                foreach ($request->data as $item) {
+            $data = [];
+            DB::transaction(function () use ($request, &$data) {
+                foreach ($request->all() as $item) {
                     $kursi = Kursi::findOrFail($item['id']);  // Throw exception if not found
                     $kursi->update(['status' => $item['status']]);
+                    $data[] = $kursi;
                 }
             });
-            return response()->json(['success' => true, 'message' => 'Berhasil update data']);
+            return response()->json(['success' => true, 'data' => $data, 'message' => 'Berhasil update data']);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }

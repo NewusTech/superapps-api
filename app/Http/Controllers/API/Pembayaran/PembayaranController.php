@@ -7,6 +7,7 @@ use App\Models\MetodePembayaran;
 use App\Models\Pembayaran;
 use App\Models\Pesanan;
 use App\Models\User;
+use App\Services\PaymentService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -14,10 +15,13 @@ use Illuminate\Support\Facades\Validator;
 
 class PembayaranController extends Controller
 {
-    public function __construct()
+    protected $paymentService;
+
+    public function __construct(PaymentService $paymentService)
     {
         $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran']);
+        $this->paymentService = $paymentService;
     }
     private function getMidtransEnv()
     {
@@ -68,71 +72,8 @@ class PembayaranController extends Controller
     }
     public function prosesPembayaran(Request $request)
     {
-        $midtransEnv = $this->getMidtransEnv();
         try {
-            $validator = Validator::make($request->all(), [
-                'orderCode' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json($validator->errors(), 422);
-            }
-
-            $pesanan = Pesanan::with(['jadwal.master_rute', 'penumpang'])->where('kode_pesanan', $request->orderCode)->first();
-            $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
-            if (!$pesanan) {
-                throw new Exception('Pesanan tidak ditemukan');
-            }
-
-            // create pembayaran
-            $pembayaran = new Pembayaran();
-            $pembayaran->pesanan_id = $pesanan->id;
-            $pembayaran->amount = $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count();
-            $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
-
-            $generatedCode = (string) Pembayaran::generateUniqueKodeBayar();
-            $params = array(
-                'transaction_details' => array(
-                    'order_id' => $generatedCode,
-                    'gross_amount' => $pembayaran->amount,
-                    // 'gross_amount' => 1, // ini tes beneran tapi boongan
-                    'payment_link_id' => str(rand(1000, 9999)) . time()
-                ),
-                'customer_details' => array(
-                    'first_name' => $user->nama,
-                    'phone' => $user->no_telp,
-                    'email' => $user->email
-                ),
-                'item_details' => array(
-                    array(
-                        "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
-                        "price" => $pesanan->jadwal->master_rute->harga,
-                        // "price" => 1, // Ini testing beneran tapi boongan
-                        "quantity" =>  $pesanan->penumpang->count(),
-                    )
-                ),
-                'usage_limit' => 1
-            );
-
-            $auth = base64_encode($midtransEnv['PRODUCTION']['server_key']);
-
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => "Basic $auth"
-            ])->post($midtransEnv['PRODUCTION']['url'], $params);
-
-            if ($response->failed()) {
-                return response()->json(['message' => json_decode($response->body())], 500);
-            }
-
-            $response = json_decode($response->body());
-            $pembayaran->save();
-            return response()->json([
-                'success' => true,
-                'data' => $response,
-                'message' => 'Berhasil post data'
-            ]);
+            return $this->paymentService->processPayment($request);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
