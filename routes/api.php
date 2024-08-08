@@ -56,7 +56,7 @@ Route::group([
 
 Route::group(['middleware' => 'api', 'prefix' => 'mobil'], function () {
     Route::resource('master_mobil', MasterMobilController::class);
-    Route::post('{id}/update-status', [MasterMobilController::class, 'updateStatus']);
+    Route::patch('{id}/update-status', [MasterMobilController::class, 'updateStatus']);
 });
 
 
