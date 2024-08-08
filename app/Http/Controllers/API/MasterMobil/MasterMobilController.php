@@ -73,7 +73,7 @@ class MasterMobilController extends Controller
                 'nopol' => $request->nopol,
                 'type' => $request->type,
                 'jumlah_kursi' => $request->jumlah_kursi,
-                'status' => 'Non-Aktif',
+                'status' => 'Aktif',
                 'image_url' => $request->image_url,
                 'available_seats' => $request->jumlah_kursi,
                 'fasilitas' => $request->fasilitas
