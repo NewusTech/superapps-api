@@ -200,7 +200,25 @@ class PesananController extends Controller
         }
     }
 
-
+    public function pesananByUserId(){
+        try {
+            $data = Pesanan::where('user_id', auth()->user()->id)->get();
+            if(!$data){
+                return response()->json([
+                    'success' => false,
+                    'data' => $data,
+                    'message' => 'Pesanan tidak ditemukan'
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
 
     public function konfirmasiPesanan(Request $request)
     {
