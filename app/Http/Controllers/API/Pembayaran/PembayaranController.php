@@ -148,6 +148,13 @@ class PembayaranController extends Controller
     public function handleMidtransNotification(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'order_id' => 'required',
+                'transaction_status' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
             $data = $request->all();
             $paymentCode = $data['order_id'];
             $status = $data['transaction_status'];
