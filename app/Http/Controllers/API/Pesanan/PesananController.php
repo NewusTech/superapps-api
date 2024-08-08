@@ -91,7 +91,9 @@ class PesananController extends Controller
             if (!$orderCode) {
                 throw new Exception('Id tidak ditemukan');
             }
-            $data = Pesanan::with('penumpang')->where('kode_pesanan', $orderCode)->first();
+            $data = Pesanan::with(['penumpang.kursi','titikJemput', 'titikAntar', 'jadwal.master_rute', 'jadwal.master_mobil'])->where('kode_pesanan', $orderCode)->first();
+            $totalHarga = $data->jadwal->master_rute->harga * $data->penumpang->count();
+
             if (!$data) {
                 return response()->json(
                     [
@@ -100,6 +102,25 @@ class PesananController extends Controller
                     ]
                 );
             }
+            $penumpang = $data->penumpang->map(function ($item) {
+                return [
+                    'nama' => $item->nama,
+                    'nik' => $item->nik,
+                    'email' => $item->email,
+                    'no_telp'=> $item->no_telp,
+                    'kursi' => $item->kursi->nomor_kursi
+                ];
+            });
+
+            $data = [
+                'mobil' => $data->jadwal->master_mobil->type . ' - ' . $data->jadwal->master_mobil->nopol,
+                'rute' => $data->jadwal->master_rute->kota_asal . ' - ' . $data->jadwal->master_rute->kota_tujuan,
+                'titik_jemput' => $data->titikJemput->nama,
+                'titik_antar' => $data->titikAntar->nama,
+                'jam_berangkat' => date('H:i', strtotime($data->jadwal->waktu_keberangkatan)),
+                'total_harga' => $totalHarga,
+                'penumpang' => $penumpang,
+            ];
             return response()->json([
                 'success' => true,
                 'data' => $data,
