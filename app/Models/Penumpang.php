@@ -26,7 +26,7 @@ class Penumpang extends Model
         static::created(function ($penumpang) {
             $kursi = Kursi::where('id', $penumpang->kursi_id)->first();
             $kursi->update([
-                'status' => 'Terisi'
+                'status' => 'terisi'
             ]);
         });
     }

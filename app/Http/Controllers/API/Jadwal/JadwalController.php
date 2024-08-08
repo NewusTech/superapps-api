@@ -182,6 +182,7 @@ class JadwalController extends Controller
             $titikAntar = MasterTitikJemput::where('master_cabang_id', $cabangAntar->id)->get(['id', 'nama']);
             $data = [
                 'id' => $data->id,
+                'mobil_id' => $data->master_mobil_id,
                 'titik_jemput'=> $titikJemput,
                 'titik_antar'=> $titikAntar,
             ];
