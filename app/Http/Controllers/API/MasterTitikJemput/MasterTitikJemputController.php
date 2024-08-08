@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\MasterTitikJemput;
 
 use App\Http\Controllers\Controller;
+use App\Models\MasterCabang;
 use App\Models\MasterTitikJemput;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,10 +17,15 @@ class MasterTitikJemputController extends Controller
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = MasterTitikJemput::all();
+            $data = MasterTitikJemput::query();
+            if ($request->cabang) {
+                $cabang = MasterCabang::where('nama', 'like', "%{$request->cabang}%")->first();
+                $data->where('master_cabang_id', $cabang->id);
+            }
+            $data = $data->get();
             return response()->json([
                 'success' => true,
                 'data' => $data,

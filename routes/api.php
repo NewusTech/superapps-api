@@ -94,6 +94,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'syarat-ketentuan'], function (
 
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
+    Route::get('user', [PesananController::class, 'pesananByUserId']);
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
 });
 
