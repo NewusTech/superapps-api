@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\MetodePembayaran;
 use App\Models\Pesanan;
 use App\Models\Pembayaran;
 use App\Models\User;
@@ -20,7 +21,7 @@ class PaymentService
 
     public function processPayment($request)
     {
-        dd($request->all());
+
         $validator = Validator::make($request->all(), [
             'orderCode' => 'required',
             'metode_id' => 'required',
@@ -34,22 +35,27 @@ class PaymentService
         if (!$pesanan) {
             throw new Exception('Pesanan tidak ditemukan');
         }
+        $kodePembayaran = MetodePembayaran::where('id', $request->metode_id)->first();
+        $user = User::where('id', $pesanan->user_id)->get(['id', 'nama', 'no_telp', 'email'])->first();
 
-        $user = User::where('id', $pesanan->user_id)->get(['nama', 'no_telp', 'email'])->first();
+        return response()->json([
+            'user' => $user,
+            'kodePembayaran' => $kodePembayaran
+        ],200);
 
         $pembayaran = new Pembayaran();
         $pembayaran->pesanan_id = $pesanan->id;
         $pembayaran->amount = $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count();
         $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
 
-        switch ($request->paymentMethodId) {
-            case 'gateway':
+        switch ($kodePembayaran) {
+            case 1:
                 return $this->handleGatewayPayment($user, $pembayaran, $pesanan);
 
-            case 'transfer':
+            case 2:
                 return $this->handleTransferPayment($pembayaran);
 
-            case 'cash':
+            case 3:
                 return $this->handleCashPayment($pembayaran);
 
             default:
