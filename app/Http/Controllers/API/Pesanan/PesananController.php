@@ -154,14 +154,10 @@ class PesananController extends Controller
             }
 
             foreach ($request->penumpang as $penumpang) {
-                if (in_array($penumpang['no_kursi'], $kursiExist->toArray())) {
+                $kursi = Kursi::where('master_mobil_id', $mobilByJadwal)->where('status','like' ,'%kosong%')->where('nomor_kursi', $penumpang['no_kursi'])->first();
+                if (!$kursi) {
                     throw new Exception("Kursi " . $penumpang['no_kursi'] . " tidak tersedia");
                 }
-                $kursi = Kursi::create([
-                    'master_mobil_id' => $mobilByJadwal,
-                    'nomor_kursi' => $penumpang['no_kursi']
-                ]);
-
                 Penumpang::create([
                     'nama' => $penumpang['nama'],
                     'nik' => $penumpang['nik'],
