@@ -117,6 +117,10 @@ class PesananController extends Controller
                 'jadwal_id' => 'required',
                 'titik_jemput_id' => 'required',
                 'titik_antar_id' => 'required',
+                'nama' => 'required',
+                'no_telp' => 'required',
+                'email' => 'required',
+                'nik' => 'required',
                 'penumpang' => 'required'
             ]);
 
@@ -138,6 +142,10 @@ class PesananController extends Controller
             $pesanan->jadwal_id = $request->jadwal_id;
             $pesanan->master_titik_jemput_id = $request->titik_jemput_id;
             $pesanan->titik_antar_id = $request->titik_antar_id;
+            $pesanan->nama = $request->nama;
+            $pesanan->no_telp = $request->no_telp;
+            $pesanan->email = $request->email;
+            $pesanan->nik = $request->nik;
             $pesanan->biaya_tambahan = str_contains($request->metode_id, 'Payment') ? 4000 : 0;
             $pesanan->user_id = auth()->user()->id;
             $pesanan->status = "Menunggu";
