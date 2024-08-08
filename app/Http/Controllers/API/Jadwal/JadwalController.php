@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API\Jadwal;
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
 use App\Models\Kursi;
+use App\Models\MasterCabang;
 use App\Models\MasterMobil;
 use App\Models\MasterRute;
 use App\Models\MasterSupir;
+use App\Models\MasterTitikJemput;
 use App\Models\SyaratKetentuan;
 use Carbon\Carbon;
 use Exception;
@@ -173,6 +175,16 @@ class JadwalController extends Controller
             if (!$data) {
                 return response()->json(['message' => 'Jadwal not found'], 404);
             }
+
+            $cabangJemput= MasterCabang::where('nama', 'like', '%'.$data->master_rute->kota_asal.'%')->first(['id', 'nama']);
+            $cabangAntar= MasterCabang::where('nama', 'like', '%'.$data->master_rute->kota_tujuan.'%')->first(['id', 'nama']);
+            $titikJemput = MasterTitikJemput::where('master_cabang_id', $cabangJemput->id)->get(['id', 'nama']);
+            $titikAntar = MasterTitikJemput::where('master_cabang_id', $cabangAntar->id)->get(['id', 'nama']);
+            $data = [
+                'id' => $data->id,
+                'titik_jemput'=> $titikJemput,
+                'titik_antar'=> $titikAntar,
+            ];
             return response()->json([
                 'success' => true,
                 'data' => $data,
