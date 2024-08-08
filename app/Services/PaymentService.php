@@ -20,6 +20,7 @@ class PaymentService
 
     public function processPayment($request)
     {
+        dd($request->all());
         $validator = Validator::make($request->all(), [
             'orderCode' => 'required',
             'metode_id' => 'required',

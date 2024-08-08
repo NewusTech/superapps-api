@@ -16,6 +16,10 @@ class Pesanan extends Model
         'user_id',
         'metode_id',
         'biaya_tambahan',
+        'nama',
+        'email',
+        'nik',
+        'no_telp',
         'master_titik_jemput_id',
         'titik_antar_id',
         'status'
