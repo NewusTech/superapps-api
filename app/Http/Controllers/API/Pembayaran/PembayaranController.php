@@ -158,6 +158,11 @@ class PembayaranController extends Controller
             $data = $request->all();
             $paymentCode = $data['order_id'];
             $status = $data['transaction_status'];
+
+            // Extract the payment code from the order id
+            $paymentIdParts = explode("-", $paymentCode);
+            $paymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
+
             $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
             $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
 
