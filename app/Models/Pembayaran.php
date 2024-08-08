@@ -14,6 +14,7 @@ class Pembayaran extends Model
         'kode_pembayaran',
         'pesanan_id',
         'amount',
+        'payment_link',
         'status'
     ];
 

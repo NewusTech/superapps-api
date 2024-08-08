@@ -13,6 +13,7 @@ class MetodePembayaran extends Model
     protected $fillable = [
         'metode',
         'keterangan',
+        'kode',
         'img'
     ];
 }

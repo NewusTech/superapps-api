@@ -123,6 +123,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
     Route::get('metode-pembayaran', [PembayaranController::class, 'getMetodePembayaran']);
     Route::post('metode-pembayaran', [PembayaranController::class, 'storeMetodePembayaran']);
     Route::delete('metode-pembayaran/{id}', [PembayaranController::class, 'deleteMetodePembayaran']);
+    Route::post('midtrans-notification', [PembayaranController::class, 'handleMidtransNotification']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'artikel'], function () {

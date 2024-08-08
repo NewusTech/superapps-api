@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Kursi;
 use App\Models\MetodePembayaran;
 use App\Models\Pesanan;
 use App\Models\Pembayaran;
+use App\Models\Penumpang;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -38,17 +40,16 @@ class PaymentService
         $kodePembayaran = MetodePembayaran::where('id', $request->metode_id)->first();
         $user = User::where('id', $pesanan->user_id)->get(['id', 'nama', 'no_telp', 'email'])->first();
 
-        return response()->json([
-            'user' => $user,
-            'kodePembayaran' => $kodePembayaran
-        ],200);
+        $pesanan->update([
+            'metode_id' => $request->metode_id
+        ]);
 
         $pembayaran = new Pembayaran();
         $pembayaran->pesanan_id = $pesanan->id;
         $pembayaran->amount = $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count();
         $pembayaran->kode_pembayaran = Pembayaran::generateUniqueKodeBayar();
 
-        switch ($kodePembayaran) {
+        switch ($kodePembayaran->kode) {
             case 1:
                 return $this->handleGatewayPayment($user, $pembayaran, $pesanan);
 
@@ -65,16 +66,15 @@ class PaymentService
 
     protected function handleGatewayPayment($user, $pembayaran, $pesanan)
     {
-        $generatedCode = (string) Pembayaran::generateUniqueKodeBayar();
         $params = array(
             'transaction_details' => array(
-                'order_id' => $generatedCode,
+                'order_id' => $pembayaran->kode_pembayaran,
                 'gross_amount' => $pembayaran->amount,
                 'payment_link_id' => str(rand(1000, 9999)) . time()
             ),
             'customer_details' => array(
                 'first_name' => $user->nama,
-                'phone' => $user->no_telp,
+                'phone' => $user->no_telp ?? '081234567890',
                 'email' => $user->email
             ),
             'item_details' => array(
@@ -86,6 +86,7 @@ class PaymentService
             ),
             'usage_limit' => 1
         );
+
 
         $auth = base64_encode($this->midtransEnv['PRODUCTION']['server_key']);
 
@@ -100,6 +101,7 @@ class PaymentService
         }
 
         $response = json_decode($response->body());
+        $pembayaran->payment_link = $response->payment_url;
         $pembayaran->save();
 
         return response()->json([
@@ -111,19 +113,30 @@ class PaymentService
 
     protected function handleTransferPayment($pembayaran)
     {
-        $pembayaran->status = 'pending_transfer';
+        $metodeId = Pesanan::where('id', $pembayaran->pesanan_id)->first()->metode_id;
+        $metode = MetodePembayaran::where('id', $metodeId)->first();
+        $rekening = explode('-', $metode->metode);
+        $norek = explode(':', $metode->keterangan);
+        $data = [
+            'kode_pembayaran' => $pembayaran->kode_pembayaran,
+            'harga' => $pembayaran->amount,
+            'metode' => $rekening[0],
+            'bank' => $rekening[1],
+            'nomor_rekening' => trim($norek[1]),
+        ];
+        $pembayaran->status = 'Menunggu Pembayaran';
         $pembayaran->save();
 
         return response()->json([
             'success' => true,
-            'data' => $pembayaran,
+            'data' => $data,
             'message' => 'Instruksi transfer telah dikirim'
         ]);
     }
 
     protected function handleCashPayment($pembayaran)
     {
-        $pembayaran->status = 'paid_cash';
+        $pembayaran->status = 'Menunggu pembayaran';
         $pembayaran->save();
 
         return response()->json([
@@ -132,7 +145,18 @@ class PaymentService
             'message' => 'Pembayaran cash berhasil dicatat'
         ]);
     }
-
+    public function handleCancelPayment($pembayaran, $pesanan){
+        if($pembayaran->status == 'Gagal'|| $pembayaran->status == 'Kadaluarsa')
+            {
+                $penumpang = Penumpang::where('pesanan_id', $pesanan->id)->get();
+                foreach ($penumpang as $item) {
+                $kursi = Kursi::where('id',   $item->kursi_id)->first();
+                $kursi->update([
+                    'status' => 'kosong',
+                ]);
+                }
+            }
+    }
     protected function getMidtransEnv()
     {
         return [
