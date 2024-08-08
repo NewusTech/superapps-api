@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API\Pembayaran;
 
 use App\Http\Controllers\Controller;
+use App\Models\Kursi;
 use App\Models\MetodePembayaran;
 use App\Models\Pembayaran;
+use App\Models\Penumpang;
 use App\Models\Pesanan;
 use App\Models\User;
 use App\Services\PaymentService;
@@ -143,13 +145,63 @@ class PembayaranController extends Controller
         }
     }
 
-    public function getStatusPembayaran($paymentCode){
+    public function handleMidtransNotification(Request $request)
+    {
+        try {
+            $data = $request->all();
+            $paymentCode = $data['order_id'];
+            $status = $data['transaction_status'];
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+
+            if (!$pembayaran) {
+                return response()->json(['message' => 'pembayaran tidak ditemukan'], 404);
+            }
+
+            $statusMapping = [
+                'capture' => 'Sukses',
+                'settlement' => 'Sukses',
+                'pending' => 'Menunggu pembayaran',
+                'deny' => 'Gagal',
+                'cancel' => 'Gagal',
+                'expire' => 'Kadaluarsa',
+                'failure' => 'Gagal',
+            ];
+            $convertedStatus = $statusMapping[$status] ?? 'Gagal';
+
+            $pembayaran->update([
+                'status' => $convertedStatus,
+            ]);
+
+            $pesanan->update([
+                'status' => $convertedStatus,
+            ]);
+            $this->paymentService->handleCancelPayment($pembayaran, $pesanan);
+            return response()->json([
+                'success' => true,
+                'data' => $pembayaran,
+                'message' => 'Berhasil update data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+    public function getStatusPembayaran($paymentCode)
+    {
         try {
             $data = Pembayaran::with('pesanan.metode')->where('kode_pembayaran', $paymentCode)
-            ->get(['id', 'kode_pembayaran', 'status', 'pesanan_id','updated_at'])->first();
+                ->get(['id', 'kode_pembayaran', 'status', 'pesanan_id', 'updated_at', 'amount'])->first();
             if (!$data) {
                 throw new Exception('Pembayaran tidak ditemukan');
             }
+            $data = [
+                'kode_pembayaran' => $data->kode_pembayaran,
+                'metode' => $data->pesanan->metode->metode,
+                'status' => $data->status,
+                'tanggal' => $data->updated_at->format('d-m-Y'),
+                'jam' => $data->updated_at->format('H:i:s'),
+                'harga' => $data->amount
+            ];
             return response()->json([
                 'success' => true,
                 'data' => $data,
@@ -182,12 +234,17 @@ class PembayaranController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'metode' => 'required',
+                'keterangan' => 'required',
+                'kode' => 'required|numeric',
             ]);
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
             $data = new MetodePembayaran();
             $data->metode = $request->metode;
+            $data->keterangan = $request->keterangan;
+            $data->kode = $request->kode;
+            $data->img = $request->image;
             $data->save();
             return response()->json([
                 'success' => true,
