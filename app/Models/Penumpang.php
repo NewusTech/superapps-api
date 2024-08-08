@@ -31,6 +31,9 @@ class Penumpang extends Model
         });
     }
 
+    public function kursi(){
+        return $this->belongsTo(Kursi::class);
+    }
     public function pesanan()
     {
         return $this->belongsTo(Pesanan::class);

@@ -39,6 +39,15 @@ class Pesanan extends Model
         return $this->hasMany(Penumpang::class, 'pesanan_id', 'id');
     }
 
+    public function titikJemput()
+    {
+        return $this->belongsTo(MasterTitikJemput::class, 'master_titik_jemput_id', 'id');
+    }
+
+    public function titikAntar(){
+        return $this->belongsTo(MasterTitikJemput::class, 'titik_antar_id', 'id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
