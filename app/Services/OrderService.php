@@ -44,9 +44,9 @@ class OrderService
         $seatTaken =[];
         $data = [
             'pembayaran' => [
-                'status' => $pesanan->pembayaran->status,
+                'status' => $pesanan->pembayaran->status ?? $pesanan->status,
                 'metode' => $pesanan->metode->metode,
-                'nominal' => $pesanan->pembayaran->amount
+                'nominal' =>$pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count()
             ],
             'penumpang' => $pesanan->penumpang->map(function ($penumpang) use(&$seatTaken){
                 array_push($seatTaken, $penumpang->kursi->nomor_kursi);
