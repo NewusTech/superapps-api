@@ -21,7 +21,7 @@ class PembayaranController extends Controller
 
     public function __construct(PaymentService $paymentService)
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api',['except' => ['handleMidtransNotification']]);
         $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran']);
         $this->paymentService = $paymentService;
     }
@@ -158,12 +158,25 @@ class PembayaranController extends Controller
             $data = $request->all();
             $paymentCode = $data['order_id'];
             $status = $data['transaction_status'];
-
             // Extract the payment code from the order id
             $paymentIdParts = explode("-", $paymentCode);
-            $paymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
+            $formattedPaymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
 
-            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $auth = base64_encode($this->getMidtransEnv()['PRODUCTION']['server_key']);
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => "Basic $auth"
+            ])->get("https://api.midtrans.com/v2/{$paymentCode}/status");
+
+            if ($response->failed()) {
+                return response()->json(['message' => json_decode($response->body())], 500);
+            }
+
+            $response = json_decode($response->body());
+            $status = $response->transaction_status; // Update status from get midtrans
+
+            $pembayaran = Pembayaran::where('kode_pembayaran', $formattedPaymentCode)->first();
             $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
 
             if (!$pembayaran) {
