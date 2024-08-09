@@ -34,6 +34,9 @@ class Pesanan extends Model
     {
         return $this->belongsTo(MetodePembayaran::class, 'metode_id', 'id');
     }
+    public function pembayaran(){
+        return $this->hasOne(Pembayaran::class, 'pesanan_id', 'id');
+    }
     public function penumpang()
     {
         return $this->hasMany(Penumpang::class, 'pesanan_id', 'id');

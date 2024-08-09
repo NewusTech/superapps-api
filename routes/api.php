@@ -95,6 +95,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'syarat-ketentuan'], function (
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
     Route::get('user', [PesananController::class, 'pesananByUserId']);
+    Route::get('riwayat', [PesananController::class, 'getAllHistoryPesanan']);
+    Route::get('riwayat/{orderCode}', [PesananController::class, 'getDetailPesanan']);
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
 });
 

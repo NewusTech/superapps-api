@@ -8,6 +8,7 @@ use App\Models\Jadwal;
 use App\Models\Kursi;
 use App\Models\MasterMobil;
 use App\Models\Penumpang;
+use App\Services\OrderService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,10 +17,12 @@ use Illuminate\Support\Facades\Validator;
 
 class PesananController extends Controller
 {
-    public function __construct()
+    protected $orderService;
+    public function __construct(OrderService $orderService)
     {
         $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['konfirmasiPesanan', 'destroy']);
+        $this->orderService = $orderService;
     }
 
     public function index(Request $request)
@@ -85,6 +88,37 @@ class PesananController extends Controller
         }
     }
 
+    public function getAllHistoryPesanan(){
+        try {
+            $data = $this->orderService->getAllOrders();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getDetailPesanan($orderCode){
+        try {
+            if (!$orderCode) {
+                return response()->json([
+                        'success' => false,
+                        'message' => 'Pesanan tidak ditemukan'
+                    ], 404);
+            }
+            $data = $this->orderService->getOrderDetails($orderCode);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
     public function show($orderCode)
     {
         try {
