@@ -227,13 +227,46 @@ class PembayaranController extends Controller
     public function getMetodePembayaran()
     {
         try {
+
             $data = MetodePembayaran::get();
-            $data->nama = $data->map(function ($item) {
-                return $item->metode;
-            });
+
+            if ($data->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Metode pembayaran tidak ditemukan'
+                ], 404);
+            }
+
+            $response = [
+                'payment_gateway' => [],
+                'bank_transfer' => [],
+                'cash' => null
+            ];
+
+            foreach ($data as $item) {
+                $metodeData = [
+                    'id' => $item->id,
+                    'nama' => $item->metode,
+                    'keterangan' => $item->keterangan,
+                    'kode' => $item->kode,
+                    'img' => $item->img
+                ];
+
+                switch ($item->kode) {
+                    case 1:
+                        $response['payment_gateway'][] = $metodeData;
+                        break;
+                    case 2:
+                        $response['bank_transfer'][] = $metodeData;
+                        break;
+                    case 3:
+                        $response['cash'] = $metodeData;
+                        break;
+                }
+            }
             return response()->json([
                 'success' => true,
-                'data' => $data,
+                'data' => $response,
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
