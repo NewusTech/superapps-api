@@ -21,7 +21,7 @@ class OrderService
                 'kota_asal' => $order->jadwal->master_rute->kota_asal,
                 'kota_tujuan' => $order->jadwal->master_rute->kota_tujuan,
                 'tanggal' => $order->jadwal->tanggal_berangkat,
-                'jam' => $order->jadwal->jam_berangkat,
+                'jam' => $order->jadwal->waktu_keberangkatan,
                 'status' => $order->status,
             ];
         });
