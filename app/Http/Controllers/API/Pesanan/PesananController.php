@@ -203,7 +203,7 @@ class PesananController extends Controller
             $pesanan->nik = $request->nik;
             $pesanan->biaya_tambahan = str_contains($request->metode_id, 'Payment') ? 4000 : 0;
             $pesanan->user_id = auth()->user()->id;
-            $pesanan->status = "Menunggu";
+            $pesanan->status = "Menunggu Pembayaran";
             if (!$pesanan->save()) {
                 throw new Exception('Pesanan gagal dibuat');
             }
