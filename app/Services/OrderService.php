@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Pesanan;
+use Carbon\Carbon;
 
 class OrderService
 {
@@ -31,34 +32,41 @@ class OrderService
 
     public function getOrderDetails($orderCode)
     {
-        $pesanan = $this->pesanan->where('user_id', auth()->user()->id)
-            ->where('kode_pesanan', $orderCode)
-            ->first();
-
-        if (!$pesanan) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Pesanan tidak ditemukan',
-            ]);
+        $user = auth()->user();
+        if (str_contains($user->roles->first()->name, 'Admin')) {
+            $pesanan = $this->pesanan->where('kode_pesanan', $orderCode)->first();
+        } else {
+            $pesanan = $this->pesanan
+                ->where('user_id', $user->id)
+                ->where('kode_pesanan', $orderCode)
+                ->first();
         }
-        $seatTaken =[];
+        if (!$pesanan) {
+            return $pesanan;
+        }
+
+        $seatTaken = [];
         $data = [
             'pembayaran' => [
-                'status' => $pesanan->pembayaran->status ?? $pesanan->status,
-                'metode' => $pesanan->metode->metode,
-                'nominal' =>$pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count()
+                'status' => $pesanan->pembayaran?->status ?? $pesanan->status,
+                'metode' => $pesanan->metode?->metode ?? null,
+                'payment_link' => $pesanan->pembayaran?->link ?? null,
+                'created_at' => $pesanan->pembayaran?->created_at ?? null,
+                'expired_at' => Carbon::parse($pesanan->pembayaran?->created_at)->addMinutes(15) ?? null,
+                'nominal' => $pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count()
             ],
-            'penumpang' => $pesanan->penumpang->map(function ($penumpang) use(&$seatTaken){
+            'penumpang' => $pesanan->penumpang->map(function ($penumpang) use (&$seatTaken) {
                 array_push($seatTaken, $penumpang->kursi->nomor_kursi);
                 return [
                     'nama' => $penumpang->nama,
-                    'nik'=> $penumpang->nik,
+                    'nik' => $penumpang->nik,
                     'no_telp' => $penumpang->no_telp,
                     'kursi' => $penumpang->kursi->nomor_kursi,
                 ];
             }),
             'pesanan' => [
                 'mobil' => $pesanan->jadwal->master_mobil->type,
+                'kode_pesanan' => $pesanan->kode_pesanan,
                 'jam' => $pesanan->jadwal->waktu_keberangkatan,
                 'tanggal' => $pesanan->jadwal->tanggal_berangkat,
                 'kota_asal' => $pesanan->jadwal->master_rute->kota_asal,
