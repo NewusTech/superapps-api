@@ -122,6 +122,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
     Route::post('proses_pembayaran', [PembayaranController::class, 'prosesPembayaran']);
     Route::post('tes_proses_pembayaran', [PembayaranController::class, 'testProsesPembayaran']);
     Route::get('status/{paymentCode}', [PembayaranController::class, 'getStatusPembayaran']);
+    Route::patch('update-status/{orderCode}', [PembayaranController::class, 'updateStatusPembayaran']);
     Route::get('metode-pembayaran', [PembayaranController::class, 'getMetodePembayaran']);
     Route::post('metode-pembayaran', [PembayaranController::class, 'storeMetodePembayaran']);
     Route::delete('metode-pembayaran/{id}', [PembayaranController::class, 'deleteMetodePembayaran']);

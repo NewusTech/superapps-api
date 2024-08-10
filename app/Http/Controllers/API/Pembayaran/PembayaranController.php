@@ -21,8 +21,8 @@ class PembayaranController extends Controller
 
     public function __construct(PaymentService $paymentService)
     {
-        $this->middleware('auth:api',['except' => ['handleMidtransNotification']]);
-        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran']);
+        $this->middleware('auth:api', ['except' => ['handleMidtransNotification']]);
+        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran','updateStatusPembayaran']);
         $this->paymentService = $paymentService;
     }
     private function getMidtransEnv()
@@ -145,6 +145,31 @@ class PembayaranController extends Controller
         }
     }
 
+    public function updateStatusPembayaran($orderCode)
+    {
+        try {
+            $pesanan = Pesanan::where('kode_pesanan', $orderCode)->first();
+            $pembayaran = Pembayaran::where('pesanan_id', $pesanan->id)->first();
+            // dd($pesanan, $pembayaran);
+            if (!$pembayaran) {
+                return response()->json(['message' => 'Pembayaran Tidak ditemukan'], 404);
+            }
+
+            $pembayaran->update([
+                'status' => 'Sukses'
+            ]);
+            $pesanan->update([
+                'status' => 'Sukses'
+            ]);
+            return response()->json([
+                'success' => true,
+                'data' => $pembayaran,
+                'message' => 'Berhasil update data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
     public function handleMidtransNotification(Request $request)
     {
         try {
