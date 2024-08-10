@@ -14,7 +14,7 @@ class OrderService
     }
     public function getAllOrders()
     {
-        $pesanan = $this->pesanan->where('user_id', auth()->user()->id)->get();
+        $pesanan = $this->pesanan->where('user_id', auth()->user()->id)->orderBy('created_at', 'desc')->get();
         $data = $pesanan->map(function ($order) {
             return [
                 'created_at' => $order->created_at,
@@ -50,7 +50,7 @@ class OrderService
             'pembayaran' => [
                 'status' => $pesanan->pembayaran?->status ?? $pesanan->status,
                 'metode' => $pesanan->metode?->metode ?? null,
-                'payment_link' => $pesanan->pembayaran?->link ?? null,
+                'payment_link' => $pesanan->pembayaran?->payment_link ?? null,
                 'created_at' => $pesanan->pembayaran?->created_at ?? null,
                 'expired_at' => Carbon::parse($pesanan->pembayaran?->created_at)->addMinutes(15) ?? null,
                 'nominal' => $pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count()
