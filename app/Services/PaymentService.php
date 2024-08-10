@@ -102,6 +102,7 @@ class PaymentService
 
         $response = json_decode($response->body());
         $pembayaran->payment_link = $response->payment_url;
+        $response->kode = 1;
         $pembayaran->save();
 
         return response()->json([
@@ -123,6 +124,7 @@ class PaymentService
             'metode' => $rekening[0],
             'bank' => $rekening[1],
             'nomor_rekening' => trim($norek[1]),
+            'kode' => 2
         ];
         $pembayaran->status = 'Menunggu Pembayaran';
         $pembayaran->save();
@@ -138,6 +140,7 @@ class PaymentService
     {
         $pembayaran->status = 'Menunggu pembayaran';
         $pembayaran->save();
+        $pembayaran->kode = 3;
 
         return response()->json([
             'success' => true,
