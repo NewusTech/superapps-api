@@ -22,7 +22,7 @@ class PembayaranController extends Controller
     public function __construct(PaymentService $paymentService)
     {
         $this->middleware('auth:api', ['except' => ['handleMidtransNotification']]);
-        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran', 'updateStatusPembayaran']);
+        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran','updateStatusPembayaran']);
         $this->paymentService = $paymentService;
     }
     private function getMidtransEnv()
@@ -236,16 +236,11 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    public function getStatusPembayaran($orderCode)
+    public function getStatusPembayaran($paymentCode)
     {
         try {
-            $data = Pembayaran::with('pesanan.metode')
-                ->whereHas('pesanan', function ($query) use ($orderCode) {
-                    $query->where('kode_pesanan', $orderCode);
-                })
-                ->get(['id', 'kode_pembayaran', 'status', 'pesanan_id', 'updated_at', 'amount'])
-                ->first();
-
+            $data = Pembayaran::with('pesanan.metode')->where('kode_pembayaran', $paymentCode)
+                ->get(['id', 'kode_pembayaran', 'status', 'pesanan_id', 'updated_at', 'amount'])->first();
             if (!$data) {
                 throw new Exception('Pembayaran tidak ditemukan');
             }
