@@ -28,7 +28,7 @@ class PesananController extends Controller
     public function index(Request $request)
     {
         try {
-            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user')
+            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user', 'pembayaran')
                 ->orderBy('created_at', 'desc');
             if ($request->status) {
                 $pesanan = $pesanan->where('status', 'like',"%$request->status%");
@@ -71,7 +71,7 @@ class PesananController extends Controller
                     'tanggal_berangkat' => date('d-m-Y', strtotime($pesanan->jadwal->tanggal_berangkat)),
                     'mobil' => $pesanan->jadwal->master_mobil->type . ' - ' . $pesanan->jadwal->master_mobil->nopol,
                     'supir' => $pesanan->jadwal->master_supir->nama,
-                    'harga' => $pesanan->jadwal->master_rute->harga,
+                    'harga' => $pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count(),
                     'status' => $pesanan->status
                 ];
             });
@@ -110,6 +110,13 @@ class PesananController extends Controller
                     ], 404);
             }
             $data = $this->orderService->getOrderDetails($orderCode);
+            if(!$data) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pesanan tidak ditemukan',
+                    'data' => $data
+                ], 404);
+            }
             return response()->json([
                 'success' => true,
                 'data' => $data,
