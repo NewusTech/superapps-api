@@ -50,6 +50,7 @@ class OrderService
             'pembayaran' => [
                 'status' => $pesanan->pembayaran?->status ?? $pesanan->status,
                 'metode' => $pesanan->metode?->metode ?? null,
+                'kode_pembayaran' => $pesanan->pembayaran?->kode_pembayaran ?? null,
                 'payment_link' => $pesanan->pembayaran?->payment_link ?? null,
                 'created_at' => $pesanan->pembayaran?->created_at ?? null,
                 'expired_at' => Carbon::parse($pesanan->pembayaran?->created_at)->addMinutes(15) ?? null,
