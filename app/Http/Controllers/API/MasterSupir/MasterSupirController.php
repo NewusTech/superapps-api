@@ -30,6 +30,20 @@ class MasterSupirController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $data = MasterSupir::find($id);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {

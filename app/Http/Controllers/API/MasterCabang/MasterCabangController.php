@@ -70,6 +70,26 @@ class MasterCabangController extends Controller
         }
     }
 
+    public function show($id){
+        try {
+            $data = MasterCabang::find($id);
+            if (!$data) {
+                return response()->json([
+                    'success' => false,
+                    'data' => $data,
+                    'message' => 'ID tidak ditemukan'
+                ]);
+            }
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     public function update(Request $request, string $id)
     {
         try {
