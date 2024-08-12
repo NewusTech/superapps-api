@@ -85,7 +85,6 @@ class ArtikelController extends Controller
             'message' => 'Berhasil menyimpan data'
         ]);
     } catch (Exception $e) {
-        \Log::error('Error storing data: ' . $e->getMessage());
         return response()->json(['message' => $e->getMessage()], 500);
     }
 }

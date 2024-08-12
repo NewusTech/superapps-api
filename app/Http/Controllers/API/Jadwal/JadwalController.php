@@ -166,6 +166,7 @@ class JadwalController extends Controller
         }
     }
 
+
     public function show(string $id)
     {
         try {
@@ -230,7 +231,20 @@ class JadwalController extends Controller
 
     public function edit(string $id)
     {
-        //
+        try {
+            $data = Jadwal::find($id);
+            if (!$data) {
+                return response()->json(['message' => 'Jadwal not found'], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     public function update(Request $request, string $id)
