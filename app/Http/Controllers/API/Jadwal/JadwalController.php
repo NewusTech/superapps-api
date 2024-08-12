@@ -94,7 +94,7 @@ class JadwalController extends Controller
                 $item->price = $rute->harga;
                 $item->facility = $mobil->fasilitas;
                 $seatTaken = Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
-                $item->seatTaken = $seatTaken->map(fn ($item) => $item->nomor_kursi);
+                $item->seatTaken = $seatTaken->map(fn($item) => $item->nomor_kursi);
                 $item->availableSeat = $mobil->available_seats - $seatTaken->count();
                 $item->syarat_dan_ketentuan = SyaratKetentuan::first('description')->description;
             });
@@ -108,9 +108,7 @@ class JadwalController extends Controller
         }
     }
 
-    public function create()
-    {
-    }
+    public function create() {}
 
     public function store(Request $request)
     {
@@ -176,15 +174,15 @@ class JadwalController extends Controller
                 return response()->json(['message' => 'Jadwal not found'], 404);
             }
 
-            $cabangJemput= MasterCabang::where('nama', 'like', '%'.$data->master_rute->kota_asal.'%')->first(['id', 'nama']);
-            $cabangAntar= MasterCabang::where('nama', 'like', '%'.$data->master_rute->kota_tujuan.'%')->first(['id', 'nama']);
+            $cabangJemput = MasterCabang::where('nama', 'like', '%' . $data->master_rute->kota_asal . '%')->first(['id', 'nama']);
+            $cabangAntar = MasterCabang::where('nama', 'like', '%' . $data->master_rute->kota_tujuan . '%')->first(['id', 'nama']);
             $titikJemput = MasterTitikJemput::where('master_cabang_id', $cabangJemput->id)->get(['id', 'nama']);
             $titikAntar = MasterTitikJemput::where('master_cabang_id', $cabangAntar->id)->get(['id', 'nama']);
             $data = [
                 'id' => $data->id,
                 'mobil_id' => $data->master_mobil_id,
-                'titik_jemput'=> $titikJemput,
-                'titik_antar'=> $titikAntar,
+                'titik_jemput' => $titikJemput,
+                'titik_antar' => $titikAntar,
             ];
             return response()->json([
                 'success' => true,
@@ -196,17 +194,18 @@ class JadwalController extends Controller
         }
     }
 
-    public function dropdownJadwal(){
+    public function dropdownJadwal()
+    {
         try {
-            $rute = MasterRute::get(['id','kota_asal','kota_tujuan']);
+            $rute = MasterRute::get(['id', 'kota_asal', 'kota_tujuan']);
             $rute = $rute->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'rute' => "$item->kota_asal - $item->kota_tujuan",
                 ];
             });
-            $supir = MasterSupir::get(['id','nama', 'no_telp']);
-            $mobil = MasterMobil::where('status', 'not like', '%non%')->get(['id','type','nopol']);
+            $supir = MasterSupir::get(['id', 'nama', 'no_telp']);
+            $mobil = MasterMobil::where('status', 'not like', '%non%')->get(['id', 'type', 'nopol']);
             $mobil = $mobil->map(function ($item) {
                 return [
                     'id' => $item->id,
@@ -238,10 +237,6 @@ class JadwalController extends Controller
     {
 
         try {
-            $user = auth()->user()->roles->first()->name;
-            if ($user != 'Admin') {
-                throw new Exception('Anda bukan Admin');
-            }
 
             $validator = Validator::make($request->all(), [
                 'master_rute_id' => 'required',
@@ -249,19 +244,22 @@ class JadwalController extends Controller
                 'master_supir_id' => 'required',
                 'waktu_keberangkatan' => 'required',
                 'tanggal_berangkat' => 'required',
-                'ketersediaan' => 'required'
             ]);
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
             }
 
             $data = Jadwal::find($id);
+            if (!$data) {
+                return response()->json(['message' => 'Jadwal tidak ditemukan'], 404);
+            }
 
             $data->master_rute_id = $request->master_rute_id;
             $data->master_mobil_id = $request->master_mobil_id;
             $data->master_supir_id = $request->master_supir_id;
             $data->waktu_keberangkatan = $request->waktu_keberangkatan;
-            $data->ketersediaan = $request->ketersediaan;
+            $data->tanggal_berangkat = $request->tanggal_berangkat;
+            $data->ketersediaan = $request->ketersediaan ?? 'tersedia';
             $data->save();
             return response()->json([
                 'success' => true,
