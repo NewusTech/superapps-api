@@ -93,6 +93,7 @@ class MasterCabangController extends Controller
 
             $master_cabang = MasterCabang::find($id);
             $master_cabang->nama = $request->nama;
+            $master_cabang->alamat = $request->alamat;
             $master_cabang->save();
 
             return response()->json([

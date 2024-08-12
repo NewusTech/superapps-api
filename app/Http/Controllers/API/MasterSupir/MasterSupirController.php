@@ -91,6 +91,9 @@ class MasterSupirController extends Controller
             $master_supir = MasterSupir::find($id);
             $master_supir->nama = $request->nama;
             $master_supir->no_telp = $request->no_telp;
+            $master_supir->nik = $request->nik;
+            $master_supir->alamat = $request->alamat;
+            $master_supir->tanggal_bergabung = date('Y-m-d', strtotime($request->tanggal_bergabung));
             $master_supir->save();
 
             return response()->json([

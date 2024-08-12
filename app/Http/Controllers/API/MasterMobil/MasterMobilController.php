@@ -147,7 +147,7 @@ class MasterMobilController extends Controller
                 'nopol' => 'required',
                 'type' => 'required',
                 'jumlah_kursi' => 'required|numeric',
-                'image_url' => 'required'
+                'fasilitas' => 'required'
             ]);
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
@@ -168,6 +168,7 @@ class MasterMobilController extends Controller
             $data->type = $request->type;
             $data->jumlah_kursi = $request->jumlah_kursi;
             $data->image_url = $request->image_url;
+            $data->fasilitas = $request->fasilitas;
             $data->save();
 
             if ($data->jumlah_kursi == $request->jumlah_kursi) {
