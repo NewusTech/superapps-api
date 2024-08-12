@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Users;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -29,6 +30,15 @@ class UserController extends Controller
 
     public function updateProfile(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required',
+            'nik' => 'required',
+            'alamat' => 'required',
+            'no_telp' => 'required|min:8|max:13',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()->first()], 422);
+        }
         $authUser = auth()->user();
         $user = User::findOrFail($authUser->id);
         if (!$user) {

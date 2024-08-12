@@ -26,6 +26,8 @@ class User extends Authenticatable implements JWTSubject
         'nama',
         'email',
         'no_telp',
+        'alamat',
+        'nik',
         'password',
         'role_id',
         'master_cabang_id',
