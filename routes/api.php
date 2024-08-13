@@ -19,6 +19,7 @@ use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
+use App\Http\Controllers\API\TiketController\TiketController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -94,6 +95,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'syarat-ketentuan'], function (
 
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
+    Route::get('tiket/{orderCode}', [TiketController::class, 'download']);
     Route::get('user', [PesananController::class, 'pesananByUserId']);
     Route::get('riwayat', [PesananController::class, 'getAllHistoryPesanan']);
     Route::get('riwayat/{orderCode}', [PesananController::class, 'getDetailPesanan']);
