@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\TiketController\TiketController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/tiket/{orderCode}', [TiketController::class, 'template']);
+Route::get('/tiket/{orderCode}/download', [TiketController::class, 'download']);
