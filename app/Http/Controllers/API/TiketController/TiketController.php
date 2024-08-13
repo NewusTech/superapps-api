@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Penumpang;
 use App\Models\Pesanan;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
-use Barryvdh\DomPDF\PDF;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TiketController extends Controller
