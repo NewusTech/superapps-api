@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\TiketController;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pembayaran;
 use App\Models\Penumpang;
 use App\Models\Pesanan;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
@@ -38,12 +39,12 @@ class TiketController extends Controller
         }
     }
 
-    public function download($orderCode)
+    public function download($paymentCode)
     {
         try {
             // dd($orderCode);
-            $pesanan = Pesanan::where('kode_pesanan', $orderCode)->first();
-            $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->id)->get();
+            $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
 
             $data = [];
             $penumpang->map(function ($penumpang) use (&$data) {
@@ -58,9 +59,9 @@ class TiketController extends Controller
                     'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
                 ];
             });
-            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($orderCode));
+            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
             $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode]);
-            return $pdf->download("Pesanan.{$orderCode}.pdf");
+            return $pdf->download("{$paymentCode}.pdf");
         } catch (\Throwable $th) {
             throw $th;
         }
