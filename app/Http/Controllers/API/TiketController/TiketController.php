@@ -11,12 +11,11 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TiketController extends Controller
 {
-    public function template($orderCode)
+    public function template($paymentCode)
     {
         try {
-            // dd($orderCode);
-            $pesanan = Pesanan::where('kode_pesanan', $orderCode)->first();
-            $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->id)->get();
+            $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
 
             $data = [];
             $penumpang->map(function ($penumpang) use (&$data) {
@@ -32,7 +31,7 @@ class TiketController extends Controller
                 ];
             });
 
-            $qrcode = QrCode::size(208)->margin(0)->generate($orderCode);
+            $qrcode = QrCode::size(208)->margin(0)->generate($paymentCode);
             return view('tiket', compact('data', 'qrcode'));
         } catch (\Throwable $th) {
             throw $th;
@@ -42,7 +41,6 @@ class TiketController extends Controller
     public function download($paymentCode)
     {
         try {
-            // dd($orderCode);
             $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
             $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
 
