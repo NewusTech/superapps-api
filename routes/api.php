@@ -18,6 +18,7 @@ use App\Http\Controllers\API\Users\ManageUsersController;
 use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
+use App\Http\Controllers\API\Perjalanan\PerjalananController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
 use App\Http\Controllers\API\TiketController\TiketController;
 use Illuminate\Http\Request;
@@ -85,6 +86,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
     Route::resource('jadwal', JadwalController::class);
+    Route::get('jadwal-per-tanggal', [JadwalController::class, 'getJadwalPerTanggal']);
     Route::get('dropdown-jadwal', [JadwalController::class, 'dropdownJadwal']);
     Route::get('jadwal_by_rute', [JadwalController::class, 'getJadwalByRute']);
 });
@@ -96,10 +98,15 @@ Route::group(['middleware' => 'api', 'prefix' => 'syarat-ketentuan'], function (
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
     Route::get('tiket/{orderCode}', [TiketController::class, 'download']);
+    Route::get('invoice/{orderCode}', [TiketController::class, 'invoiceDownload']);
     Route::get('user', [PesananController::class, 'pesananByUserId']);
     Route::get('riwayat', [PesananController::class, 'getAllHistoryPesanan']);
     Route::get('riwayat/{orderCode}', [PesananController::class, 'getDetailPesanan']);
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {
+    Route::get('list-penumpang', [PerjalananController::class, 'index']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'penumpang'], function () {

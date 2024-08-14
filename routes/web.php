@@ -18,5 +18,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/tiket/{orderCode}', [TiketController::class, 'template']);
-Route::get('/tiket/{orderCode}/download', [TiketController::class, 'download']);
+Route::get('/tiket/{paymentCode}', [TiketController::class, 'template']);
+Route::get('/tiket/{paymentCode}/download', [TiketController::class, 'download']);
+Route::get('/invoice/{paymentCode}', [TiketController::class, 'invoice']);
+Route::get('/invoice/{paymentCode}/download', [TiketController::class, 'invoiceDownload']);
