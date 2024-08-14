@@ -130,12 +130,12 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td style="text-align: center">{{$data->pembayaran->harga_tiket}}</td>
                             <td style="text-align: center">{{$data->pembayaran->jumlah_tiket}}</td>
+                            <td style="text-align: center">Rp.{{number_format($data->pembayaran->harga_tiket,0,',','.')}}</td>
                         </tr>
                         <tr>
                             <td style="text-align: center"><strong>Total Harga</strong></td>
-                            <td style="text-align: center">{{$data->pembayaran->total_harga}}</td>
+                            <td style="text-align: center">Rp.{{number_format($data->pembayaran->total_harga,0,',','.')}}</td>
                         </tr>
                     </tbody>
                 </table>

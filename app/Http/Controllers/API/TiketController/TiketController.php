@@ -22,7 +22,13 @@ class TiketController extends Controller
         try {
             $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
             $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
-
+            if (!$pesanan || !$penumpang) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $pesanan,
+                    'message' => 'Data tidak ditemukan'
+                ], 404);
+            }
             $data = [];
             $penumpang->map(function ($penumpang) use (&$data) {
                 $data[] = [
@@ -85,6 +91,15 @@ class TiketController extends Controller
             $pesanan = Pesanan::with('penumpang', 'metode', 'jadwal.master_rute', 'penumpang.kursi')
                 ->where('id', $pembayaran->pesanan_id)
                 ->first();
+
+                if (!$pesanan || !$pembayaran) {
+                    return response()->json([
+                        'success' => true,
+                        'data' => $pesanan,
+                        'message' => 'Pesanan tidak ditemukan'
+                    ], 404);
+                }
+
             $data->pesanan = new stdClass();
             $data->pesanan->nama = $pesanan->nama;
             $data->pesanan->invoice = $pesanan->pembayaran->kode_pembayaran;
@@ -103,8 +118,8 @@ class TiketController extends Controller
 
             $data->pembayaran = new stdClass();
             $data->pembayaran->jumlah_tiket = $pesanan->penumpang->count();
-            $data->pembayaran->harga_tiket = $pesanan->jadwal->master_rute->harga;
-            $data->pembayaran->total_harga = $data->pembayaran->harga_tiket * $data->pembayaran->jumlah_tiket;
+            $data->pembayaran->harga_tiket = $pembayaran->amount / $data->pembayaran->jumlah_tiket;
+            $data->pembayaran->total_harga = $pembayaran->amount;
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             return $pdf->stream("INVOICE-$paymentCode.pdf");
             // http://localhost:5000/invoice/INV-20240810070315-8263
