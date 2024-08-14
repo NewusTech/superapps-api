@@ -15,7 +15,7 @@ class TiketController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['template', 'invoice']]);
     }
     public function template($paymentCode)
     {

@@ -54,7 +54,9 @@ class OrderService
                 'payment_link' => $pesanan->pembayaran?->payment_link ?? null,
                 'created_at' => $pesanan->pembayaran?->created_at ?? null,
                 'expired_at' => Carbon::parse($pesanan->pembayaran?->created_at)->addMinutes(15) ?? null,
-                'nominal' => $pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count()
+                'nominal' => $pesanan->pembayaran->amount ?? $pesanan->jadwal->master_rute->harga * $pesanan->penumpang->count(),
+                'link_tiket' => "https://backend-superapps.newus.id/tiket/{$pesanan->pembayaran?->kode_pembayaran}",
+                'link_invoice' => "https://backend-superapps.newus.id/invoice/{$pesanan->pembayaran?->kode_pembayaran}",
             ],
             'penumpang' => $pesanan->penumpang->map(function ($penumpang) use (&$seatTaken) {
                 array_push($seatTaken, $penumpang->kursi->nomor_kursi);
