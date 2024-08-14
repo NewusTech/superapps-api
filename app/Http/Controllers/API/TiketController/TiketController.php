@@ -22,7 +22,13 @@ class TiketController extends Controller
         try {
             $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
             $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
-
+            if (!$pesanan || !$penumpang) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $pesanan,
+                    'message' => 'Data tidak ditemukan'
+                ], 404);
+            }
             $data = [];
             $penumpang->map(function ($penumpang) use (&$data) {
                 $data[] = [
