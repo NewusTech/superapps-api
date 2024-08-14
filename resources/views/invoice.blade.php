@@ -43,7 +43,7 @@
 </head>
 
 <body style="padding: 40px; font-family:'Nunito', sans-serif;">
-    <table>
+    <table style="width: 100%;">
         <tr>
             <td>
                 <!-- HEADER -->
@@ -65,7 +65,7 @@
                     </tr>
                 </table>
                 <!-- BODY -->
-                <table style="table-layout: auto; width: 80%;">
+                <table style="table-layout: auto; width: 75%;">
                     <tr>
                         <td style="padding:0;">
                             <div>
