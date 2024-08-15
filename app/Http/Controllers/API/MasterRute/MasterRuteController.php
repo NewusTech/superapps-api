@@ -28,6 +28,22 @@ class MasterRuteController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+    public function dropdown(){
+        try {
+            $data = MasterRute::select('kota_asal', 'kota_tujuan')->get();
+            $from = $data->pluck('kota_asal')->unique()->values()->all();
+            $to = $data->pluck('kota_tujuan')->unique()->values()->all();
+
+            return response()->json([
+                'data' => [
+                    'from' => $from,
+                    'to' => $to,
+                ]
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
 
     public function create()
     {

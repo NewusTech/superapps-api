@@ -190,6 +190,7 @@ class TiketController extends Controller
             $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
 
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
+            // return view('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
             return $pdf->stream("$paymentCode.pdf");
         } catch (\Throwable $th) {
             throw $th;
