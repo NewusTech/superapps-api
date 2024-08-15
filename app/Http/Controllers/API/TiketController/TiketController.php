@@ -122,7 +122,6 @@ class TiketController extends Controller
             $data->pembayaran->total_harga = $pembayaran->amount;
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             return $pdf->stream("INVOICE-$paymentCode.pdf");
-            // http://localhost:5000/invoice/INV-20240810070315-8263
 
         } catch (\Throwable $th) {
             throw $th;
@@ -160,7 +159,7 @@ class TiketController extends Controller
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             $role = auth()->user()->roles[0]->name;
             if (str_contains($role, 'Admin')) {
-                return response()->json(['link' => "https://backend-superapps.newus.id/tiket/$paymentCode"]);
+                return response()->json(['link' => "https://backend-superapps.newus.id/invoice/$paymentCode"]);
             }
             return $pdf->download("INVOICE-$paymentCode.pdf");
         } catch (\Throwable $th) {
