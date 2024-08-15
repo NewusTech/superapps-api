@@ -14,6 +14,7 @@ class MetodePembayaran extends Model
         'metode',
         'keterangan',
         'kode',
+        'biaya_tambahan',
         'img'
     ];
 }
