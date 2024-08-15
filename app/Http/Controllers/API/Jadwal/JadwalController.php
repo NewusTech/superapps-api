@@ -87,7 +87,8 @@ class JadwalController extends Controller
                     "master_rute_id",
                     "master_mobil_id",
                     "master_supir_id",
-                    "tanggal_berangkat"
+                    "tanggal_berangkat",
+                    "waktu_keberangkatan",
                 ]);
             if (!$jadwal) {
                 return response()->json([
@@ -102,6 +103,7 @@ class JadwalController extends Controller
                 $item->img_url = $mobil->image_url;
                 $item->carModel = $mobil->type;
                 $item->carSeat = $mobil->jumlah_kursi;
+                $item->departureTime = $item->waktu_keberangkatan;
                 $item->departureDate = $item->tanggal_berangkat;
                 $item->destinationDepartureDate = $item->tanggal_berangkat;
                 $item->originDepartureDate = $item->tanggal_berangkat;
