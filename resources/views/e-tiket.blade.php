@@ -85,10 +85,8 @@
                                 <p style="margin-bottom: 10px;"><strong>{{$data->no_telp}}</strong></p>
                             </div>
                         </td>
-                        <td style="vertical-align: top; text-align: center;">
-                            <div>
-                                <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 150px; height: 150px;">
-                            </div>
+                        <td style=" text-align: right; padding-right:30px">
+                            <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 150px; height: 150px;">
                         </td>
                     </tr>
                 </table>
@@ -158,6 +156,8 @@
             </td>
         </tr>
     </table>
+    <div style="page-break-after: always;"></div>
+    <div><strong>Syarat & Ketentuan</strong></div>
 </body>
 
 </html>

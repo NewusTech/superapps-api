@@ -10,6 +10,7 @@ use App\Http\Controllers\API\MasterRute\MasterRuteController;
 use App\Http\Controllers\API\MasterTitikJemput\MasterTitikJemputController;
 use App\Http\Controllers\API\MasterSupir\MasterSupirController;
 use App\Http\Controllers\API\Paket\PaketController;
+use App\Http\Controllers\API\Pariwisata\PariwisataController;
 use App\Http\Controllers\API\Pembayaran\PembayaranController;
 use App\Http\Controllers\API\Penumpang\PenumpangController;
 use App\Http\Controllers\API\Pesanan\PesananController;
@@ -49,11 +50,9 @@ Route::group([
     Route::put('/update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
 });
 
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'rute'
-], function () {
+Route::group(['middleware' => 'api','prefix' => 'rute'], function () {
     Route::resource('master_rute', MasterRuteController::class);
+    Route::get('dropdown', [MasterRuteController::class, 'dropdown']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'mobil'], function () {
@@ -106,6 +105,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
 });
 
+Route::group(['middleware' => 'api'], function () {
+    Route::resource('pariwisata', PariwisataController::class);
+});
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {
     Route::get('list-penumpang', [PerjalananController::class, 'index']);
 });
