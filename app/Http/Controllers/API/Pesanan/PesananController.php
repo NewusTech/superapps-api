@@ -200,6 +200,7 @@ class PesananController extends Controller
                 return $kursi->nomor_kursi;
             });
 
+            DB::beginTransaction();
             $pesanan = new Pesanan();
             $pesanan->jadwal_id = $request->jadwal_id;
             $pesanan->master_titik_jemput_id = $request->titik_jemput_id;
@@ -210,6 +211,10 @@ class PesananController extends Controller
             $pesanan->nik = $request->nik;
             $pesanan->user_id = auth()->user()->id;
             $pesanan->status = "Menunggu Pembayaran";
+
+            if (!$pesanan->save()) {
+                throw new Exception('Pesanan gagal dibuat');
+            }
 
             foreach ($request->penumpang as $penumpang) {
                 $kursi = Kursi::where('master_mobil_id', $mobilByJadwal)->where('status','like' ,'%kosong%')->where('nomor_kursi', $penumpang['no_kursi'])->first();
@@ -226,16 +231,15 @@ class PesananController extends Controller
                     'status' => 'terisi'
                 ]);
             }
-            if (!$pesanan->save()) {
-                throw new Exception('Pesanan gagal dibuat');
-            }
 
+            DB::commit();
             return response()->json([
                 'success' => true,
                 'data' => $pesanan,
                 'message' => 'Pesanan berhasil dibuat'
             ]);
         } catch (Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
