@@ -7,6 +7,7 @@ use App\Models\Pembayaran;
 use App\Models\Penumpang;
 use App\Models\Pesanan;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use stdClass;
@@ -15,12 +16,15 @@ class TiketController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['template', 'invoice']]);
+        $this->middleware('auth:api', ['except' => ['template', 'invoice', 'eTiket']]);
     }
     public function template($paymentCode)
     {
         try {
-            $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pesanan) {
+                return response()->json(["message" => "Pembayaran tidak ditemukan"], 404);
+            }
             $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
             if (!$pesanan || !$penumpang) {
                 return response()->json([
@@ -54,7 +58,10 @@ class TiketController extends Controller
     public function download($paymentCode)
     {
         try {
-            $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $pesanan = Pembayaran::where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pesanan) {
+                return response()->json(["message" => "Pembayaran tidak ditemukan"], 404);
+            }
             $penumpang = Penumpang::with('pesanan.jadwal.master_rute', 'pesanan.jadwal.master_mobil', 'kursi')->where('pesanan_id', $pesanan->pesanan_id)->get();
 
             $data = [];
@@ -87,18 +94,21 @@ class TiketController extends Controller
         try {
             $data = new stdClass();
 
-            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pembayaran) {
+                return response()->json(["message" => "Pembayaran tidak ditemukan"], 404);
+            }
             $pesanan = Pesanan::with('penumpang', 'metode', 'jadwal.master_rute', 'penumpang.kursi')
                 ->where('id', $pembayaran->pesanan_id)
                 ->first();
 
-                if (!$pesanan || !$pembayaran) {
-                    return response()->json([
-                        'success' => true,
-                        'data' => $pesanan,
-                        'message' => 'Pesanan tidak ditemukan'
-                    ], 404);
-                }
+            if (!$pesanan || !$pembayaran) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $pesanan,
+                    'message' => 'Pesanan tidak ditemukan'
+                ], 404);
+            }
 
             $data->pesanan = new stdClass();
             $data->pesanan->nama = $pesanan->nama;
@@ -122,7 +132,6 @@ class TiketController extends Controller
             $data->pembayaran->total_harga = $pembayaran->amount;
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             return $pdf->stream("INVOICE-$paymentCode.pdf");
-
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -132,7 +141,10 @@ class TiketController extends Controller
         try {
             $data = new stdClass();
 
-            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pembayaran) {
+                return response()->json(["message" => "Pembayaran tidak ditemukan"], 404);
+            }
             $pesanan = Pesanan::with('penumpang', 'metode', 'jadwal.master_rute', 'penumpang.kursi')
                 ->where('id', $pembayaran->pesanan_id)
                 ->first();
@@ -162,6 +174,44 @@ class TiketController extends Controller
                 return response()->json(['link' => "https://backend-superapps.newus.id/invoice/$paymentCode"]);
             }
             return $pdf->download("INVOICE-$paymentCode.pdf");
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    public function eTiket($paymentCode)
+    {
+        try {
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pembayaran) {
+                return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
+            }
+            $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
+            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
+
+            $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
+            return $pdf->stream("$paymentCode.pdf");
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    public function eTiketDownload($paymentCode)
+    {
+        try {
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pembayaran) {
+                return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
+            }
+            $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
+            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
+
+            $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
+
+            $role = auth()->user()->roles[0]->name;
+            if (str_contains($role, 'Admin')) {
+                return response()->json(['link' => "https://backend-superapps.newus.id/e-tiket/$paymentCode"]);
+            }
+            return $pdf->download("$paymentCode.pdf");
         } catch (\Throwable $th) {
             throw $th;
         }

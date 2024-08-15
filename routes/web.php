@@ -22,3 +22,5 @@ Route::get('/tiket/{paymentCode}', [TiketController::class, 'template']);
 Route::get('/tiket/{paymentCode}/download', [TiketController::class, 'download']);
 Route::get('/invoice/{paymentCode}', [TiketController::class, 'invoice']);
 Route::get('/invoice/{paymentCode}/download', [TiketController::class, 'invoiceDownload']);
+Route::get('/e-tiket/{paymentCode}', [TiketController::class, 'eTiket']);
+Route::get('/e-tiket/{paymentCode}/download', [TiketController::class, 'eTiketDownload']);
