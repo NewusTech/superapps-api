@@ -98,6 +98,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'syarat-ketentuan'], function (
 Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::resource('pesanan', PesananController::class);
     Route::get('tiket/{orderCode}', [TiketController::class, 'download']);
+    Route::get('e-tiket/{orderCode}', [TiketController::class, 'eTiketDownload']);
     Route::get('invoice/{orderCode}', [TiketController::class, 'invoiceDownload']);
     Route::get('user', [PesananController::class, 'pesananByUserId']);
     Route::get('riwayat', [PesananController::class, 'getAllHistoryPesanan']);
