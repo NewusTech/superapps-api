@@ -208,12 +208,8 @@ class PesananController extends Controller
             $pesanan->no_telp = $request->no_telp;
             $pesanan->email = $request->email;
             $pesanan->nik = $request->nik;
-            $pesanan->biaya_tambahan = str_contains($request->metode_id, 'Payment') ? 4000 : 0;
             $pesanan->user_id = auth()->user()->id;
             $pesanan->status = "Menunggu Pembayaran";
-            if (!$pesanan->save()) {
-                throw new Exception('Pesanan gagal dibuat');
-            }
 
             foreach ($request->penumpang as $penumpang) {
                 $kursi = Kursi::where('master_mobil_id', $mobilByJadwal)->where('status','like' ,'%kosong%')->where('nomor_kursi', $penumpang['no_kursi'])->first();
@@ -229,6 +225,9 @@ class PesananController extends Controller
                     'no_telp' => $penumpang['no_telp'],
                     'status' => 'terisi'
                 ]);
+            }
+            if (!$pesanan->save()) {
+                throw new Exception('Pesanan gagal dibuat');
             }
 
             return response()->json([

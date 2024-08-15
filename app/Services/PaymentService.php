@@ -66,10 +66,11 @@ class PaymentService
 
     protected function handleGatewayPayment($user, $pembayaran, $pesanan)
     {
+        $biayaTambahan = MetodePembayaran::where('id', $pesanan->metode_id)->first('biaya_tambahan');
         $params = array(
             'transaction_details' => array(
                 'order_id' => $pembayaran->kode_pembayaran,
-                'gross_amount' => $pembayaran->amount,
+                'gross_amount' => $pembayaran->amount + $biayaTambahan->biaya_tambahan,
                 'payment_link_id' => str(rand(1000, 9999)) . time()
             ),
             'customer_details' => array(
@@ -80,7 +81,7 @@ class PaymentService
             'item_details' => array(
                 array(
                     "name" => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
-                    "price" => $pesanan->jadwal->master_rute->harga,
+                    "price" => $pesanan->jadwal->master_rute->harga + $biayaTambahan->biaya_tambahan,
                     "quantity" =>  $pesanan->penumpang->count(),
                 )
             ),
