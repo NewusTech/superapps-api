@@ -81,7 +81,7 @@ class JadwalController extends Controller
                 ->whereDate('tanggal_berangkat', $date)
                 ->whereHas('master_mobil', function ($query) use ($request) {
                     $query->where('available_seats', '>=', $request->seats);
-                })
+                })->orderBy('waktu_keberangkatan', 'asc')
                 ->get([
                     "id",
                     "master_rute_id",
@@ -109,9 +109,10 @@ class JadwalController extends Controller
                 $item->originDepartureDate = $item->tanggal_berangkat;
                 $item->originCity = $rute->kota_asal;
                 $item->destinationCity = $rute->kota_tujuan;
+                $item->transitionCity = $item->originCity !== 'Lampung' && $item->destinationCity !== 'Lampung' ? 'Lampung': '';
                 $item->price = $rute->harga;
                 $item->facility = $mobil->fasilitas;
-                $seatTaken = Kursi::where('master_mobil_id', $item->master_mobil_id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
+                $seatTaken = Kursi::where('jadwal_id', $item->id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
                 $item->seatTaken = $seatTaken->map(fn($item) => $item->nomor_kursi);
                 $item->availableSeat = $mobil->available_seats - $seatTaken->count();
                 $item->syarat_dan_ketentuan = SyaratKetentuan::first('description')->description;

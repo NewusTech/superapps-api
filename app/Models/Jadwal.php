@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Jadwal extends Model
@@ -19,6 +20,23 @@ class Jadwal extends Model
         'tanggal_berangkat',
         'ketersedian',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($jadwal) {
+            $mobil = MasterMobil::find($jadwal->master_mobil_id);
+            for ($i = 1; $i <= $mobil->jumlah_kursi; $i++) {
+                $jadwal->kursi()->create([
+                    'master_mobil_id' => $mobil->id,
+                    'jadwal_id' => $jadwal->id,
+                    'nomor_kursi' => $i,
+                    'status' => 'kosong',
+                ]);
+            }
+        });
+    }
 
     public function master_rute()
     {
@@ -38,5 +56,9 @@ class Jadwal extends Model
     public function pemesanan()
     {
         return $this->hasMany(Pesanan::class, 'jadwal_id', 'id');
+    }
+    public function kursi() : HasMany
+    {
+        return $this->hasMany(Kursi::class, 'jadwal_id', 'id');
     }
 }
