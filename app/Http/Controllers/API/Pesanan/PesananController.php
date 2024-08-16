@@ -190,12 +190,12 @@ class PesananController extends Controller
                 throw new Exception($validator->errors()->first());
             }
 
-            $existJadwal = Jadwal::find($request->jadwal_id);
-            if (!$existJadwal) {
+            $jadwal = Jadwal::find($request->jadwal_id);
+            if (!$jadwal) {
                 throw new Exception('Jadwal tidak ditemukan');
             }
-            $mobilByJadwal = $existJadwal->master_mobil_id;
-            $kursiExist = Kursi::where('master_mobil_id', $mobilByJadwal)->get('nomor_kursi');
+
+            $kursiExist = Kursi::where('jadwal_id', $jadwal->id)->get('nomor_kursi');
             $kursiExist = $kursiExist->map(function ($kursi) {
                 return $kursi->nomor_kursi;
             });
@@ -217,7 +217,7 @@ class PesananController extends Controller
             }
 
             foreach ($request->penumpang as $penumpang) {
-                $kursi = Kursi::where('master_mobil_id', $mobilByJadwal)->where('status','like' ,'%kosong%')->where('nomor_kursi', $penumpang['no_kursi'])->first();
+                $kursi = Kursi::where('jadwal_id', $jadwal->id)->where('status','like' ,'%kosong%')->where('nomor_kursi', $penumpang['no_kursi'])->first();
                 if (!$kursi) {
                     throw new Exception("Kursi " . $penumpang['no_kursi'] . " tidak tersedia");
                 }
