@@ -47,7 +47,7 @@
     </style>
 </head>
 
-<body style="padding: 40px; font-family:'Nunito', sans-serif;">
+<body style="padding: 60px; font-family:'Nunito', sans-serif;">
     <table style="width: 100%;">
         <tr>
             <td>
@@ -156,8 +156,34 @@
             </td>
         </tr>
     </table>
+
+    <!-- Page 2 -->
     <div style="page-break-after: always;"></div>
-    <div><strong>Syarat & Ketentuan</strong></div>
+    <div style="margin-top: 20px;"><strong style="font-size: 18px;">Syarat & Ketentuan</strong></div>
+    <div class="" style="text-align: justify; font-size: 18px">
+        <ol>
+            <li>Anak di atas usia 7 tahun dihitung 1 seat.</li>
+            <li>Pembatalan keberangkatan harus dilaporkan pada loket 3 jam sebelum jangka waktu keberangkatan dan dikenakan biaya 25% dari harga tiket.</li>
+            <li>Apabila bersangkutan tidak berangkat tepat waktunya tanpa pemberitahuan maka ongkos/panjar yang telah dilunasi tidak dapat dikembalikan.</li>
+            <li>Tiket yang telah dimiliki hanya berlaku untuk tanggal dan jam keberangkatan yang dicantumkan.</li>
+            <li>Apabila terjadi kecelakaan di perjalanan, kerusakan atau hilangnya barang-barang/bagasi di luar tanggung jawab perusahaan, jikalau ada korban adalah tanggung jawab PT. Asuransi Kerugian Jasa Raharja (Berdasarkan Undang-undang No. 33/1964).</li>
+            <li>Barang bawaan maksimum 20 kg. Selebihnya dikenakan biaya, barang barang bagasi harus memakai label barang</li>
+            <li>Barang-barang kecil (cabin) dijaga sendiri. Pengangkut tidak bertanggung jawab terhadap uang, perhiasan, dokumen, serta surat berharga atau sejenisnya dan barang pecah belah.</li>
+            <li>Dilarang membawa barang-barang yang cepat busuk/berbau tajam dan binatang.</li>
+            <li>Barang-barang terlarang: Narkotika, Heroin, diluar tanggung jawab perusahaan.</li>
+            <li>Tambahan perongkosan yang diakibatkan karena bencana alam/terputusnya jalan raya tidak menjadi tanggung jawab perusahaan.</li>
+        </ol>
+    </div>
+    <table style="table-layout: auto; margin-top: 50px; width: 100%; border: 2px solid #016DB7; border-radius: 10px; width: 100%; height: 98px;">
+        <tr>
+            <td>
+                <img src="{{ public_path('assets/logo_asuransi.png') }}" alt="logo jasa raharja" style="width: 90px; height: 90px;">
+            </td>
+            <td style="text-align: center;">
+                <p style="font-size: 22px; color:#016DB7">SUDAH TERMASUK PREMI ASURANSU KECELAKAAN PT. JASA RAHARJA UNDANG - UNDANG NO. 33 TAHUN 1964</p>
+            </td>
+        </tr>
+    </table>
 </body>
 
 </html>

@@ -20,7 +20,7 @@ class MasterTitikJemputController extends Controller
     public function index(Request $request)
     {
         try {
-            $data = MasterTitikJemput::query();
+            $data = MasterTitikJemput::with('master_cabang');
             if ($request->cabang) {
                 $cabang = MasterCabang::where('nama', 'like', "%{$request->cabang}%")->first();
                 $data->where('master_cabang_id', $cabang->id);
