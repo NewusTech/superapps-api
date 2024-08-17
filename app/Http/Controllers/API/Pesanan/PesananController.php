@@ -28,7 +28,7 @@ class PesananController extends Controller
     public function index(Request $request)
     {
         try {
-            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user', 'pembayaran')
+            $pesanan = Pesanan::with('pembayaran','jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user', 'pembayaran')
                 ->orderBy('created_at', 'desc');
             if ($request->status) {
                 $pesanan = $pesanan->where('status', 'like',"%$request->status%");
@@ -65,6 +65,7 @@ class PesananController extends Controller
                 $total_uang += $pesanan->jadwal->master_rute->harga;
                 return [
                     'kode_pesanan' => $pesanan->kode_pesanan,
+                    'kode_pembayaran'=> $pesanan->pembayaran->kode_pembayaran ?? null,
                     'nama_pemesan' => $pesanan->user->nama,
                     'rute' => $pesanan->jadwal->master_rute->kota_asal . ' - ' . $pesanan->jadwal->master_rute->kota_tujuan,
                     'jam_berangkat' => date('H:i', strtotime($pesanan->jadwal->waktu_keberangkatan)),
