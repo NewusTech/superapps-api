@@ -15,26 +15,8 @@ class MasterMobil extends Model
         'jumlah_kursi',
         'status',
         'image_url',
-        'available_seats',
         'fasilitas'
     ];
-
-    public static function boot(){
-        parent::boot();
-
-        static::creating(function ($mobil) {
-            $mobil->available_seats = $mobil->jumlah_kursi;
-        });
-        static::created(function ($mobil) {
-            for ($i = 1; $i <= $mobil->jumlah_kursi; $i++) {
-                $mobil->kursi()->create([
-                    'master_mobil_id' => $mobil->id,
-                    'nomor_kursi' => $i,
-                    'status' => 'kosong',
-                ]);
-            }
-        });
-    }
 
     public function kursi()
     {

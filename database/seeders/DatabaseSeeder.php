@@ -33,55 +33,11 @@ class DatabaseSeeder extends Seeder
             Permission::create(['name' => $permission]);
         }
 
-        $cabang = MasterCabang::create([
-            'nama' => 'Lampung',
-        ]);
-
-        // Create seeders for all Master tables
-        $dataSupirSeeder =  [[
-            'nama' => 'Heri',
-            'no_telp' => '0812345678912'
-        ], [
-            'nama' => 'Budi',
-            'no_telp' => '084141512912'
-        ]];
-        foreach ($dataSupirSeeder as $item) {
-            MasterSupir::create($item);
-        };
-
-        $dataRuteSeeder =  [
-            [
-                'kota_asal' => 'Lampung',
-                'kota_tujuan' => 'Palembang',
-                'harga' => 250000,
-            ], [
-                'kota_asal' => 'Palembang',
-                'kota_tujuan' => 'Lampung',
-                'harga' => 250000,
-            ]
-        ];
-        foreach ($dataRuteSeeder as $item) {
-            MasterRute::create($item);
-        }
-
-        $dataMobilSeeder =  [
-            [
-                'nopol' => 'BE7748AB - Dummy',
-                'type' => 'Toyota Hi Ace - Dummy',
-                'jumlah_kursi' => 16,
-                'status' => 'Beroperasi',
-                'image_url' => 'https://www.toyota.astra.co.id/sites/default/files/2023-09/hiace_commuter_2022_0_4.png'
-            ], [
-                'nopol' => 'BE1145CA - Dummy',
-                'type' => 'Toyota Hi Ace - Dummy',
-                'jumlah_kursi' => 16,
-                'status' => 'Beroperasi',
-                'image_url' => 'https://www.toyota.astra.co.id/sites/default/files/2023-09/hiace_commuter_2022_0_4.png'
-            ]
-        ];
-        foreach ($dataMobilSeeder as $item) {
-            MasterMobil::create($item);
-        }
+        $this->call(CabangSeeder::class);
+        $this->call(RuteSeeder::class);
+        $this->call(SupirSeeder::class);
+        $this->call(MobilSeeder::class);
+        $this->call(TitikLokasiSeeder::class);
 
         // Create admin User and assign the role to him.
         $superAdmin = Role::create(['name' => 'Super Admin']);
@@ -97,7 +53,7 @@ class DatabaseSeeder extends Seeder
             'nama' => 'admin',
             'email' => 'admin@mailinator.com',
             'password' => Hash::make('password'),
-            'master_cabang_id' => $cabang->id,
+            'master_cabang_id' => 1,
             'role_id' => $superAdmin->id
         ]);
 

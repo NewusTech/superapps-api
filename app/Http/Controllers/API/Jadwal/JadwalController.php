@@ -68,7 +68,7 @@ class JadwalController extends Controller
                 throw new Exception($validator->errors()->first());
             }
             $date = Carbon::parse($request->date)->format('Y-m-d');
-            $rute = MasterRute::where('kota_asal', $request->from)->where('kota_tujuan', $request->to)->first();
+            $rute = MasterRute::where('kota_asal', 'like', "%$request->from%")->where('kota_tujuan', 'like',  "%$request->to%")->first();
             if (!$rute) {
                 return response()->json([
                     'success' => true,
@@ -76,12 +76,10 @@ class JadwalController extends Controller
                     'message' => 'Rute tidak ditemukan'
                 ], 404);
             }
-
             $jadwal = Jadwal::where('master_rute_id', $rute->id)
                 ->whereDate('tanggal_berangkat', $date)
-                ->whereHas('master_mobil', function ($query) use ($request) {
-                    $query->where('available_seats', '>=', $request->seats);
-                })->orderBy('waktu_keberangkatan', 'asc')
+                ->whereRaw("available_seats >= {$request->seats}")
+                ->orderBy('waktu_keberangkatan', 'asc')
                 ->get([
                     "id",
                     "master_rute_id",
@@ -89,6 +87,7 @@ class JadwalController extends Controller
                     "master_supir_id",
                     "tanggal_berangkat",
                     "waktu_keberangkatan",
+                    "available_seats"
                 ]);
             if (!$jadwal) {
                 return response()->json([
@@ -114,8 +113,8 @@ class JadwalController extends Controller
                 $item->facility = $mobil->fasilitas;
                 $seatTaken = Kursi::where('jadwal_id', $item->id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
                 $item->seatTaken = $seatTaken->map(fn($item) => $item->nomor_kursi);
-                $item->availableSeat = $mobil->available_seats - $seatTaken->count();
-                $item->syarat_dan_ketentuan = SyaratKetentuan::first('description')->description;
+                $item->availableSeat = $item->available_seats - $seatTaken->count();
+                $item->syarat_dan_ketentuan = SyaratKetentuan::first('description')->description ?? null;
             });
             return response()->json([
                 'success' => true,

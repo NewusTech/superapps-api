@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Kursi extends Model
 {
-    use HasFactory;
-
+    use HasFactory, SoftDeletes;
     protected $table = 'kursi';
     protected $fillable = [
         'master_mobil_id',
+        'jadwal_id',
         'status',
         'nomor_kursi'
     ];
@@ -25,13 +25,15 @@ class Kursi extends Model
     public static function boot()
     {
         parent::boot();
-
         self::updated(function ($kursi) {
             if ($kursi->isDirty('status')) {
-                $mobil = MasterMobil::find($kursi->master_mobil_id);
-                $mobil->available_seats = $kursi->where('master_mobil_id', $mobil->id)->where('status','like', '%kosong%')->count();
-                $mobil->save();
+                $kursi->jadwal()->update([
+                    'available_seats' => $kursi->jadwal->kursi->where('status', 'like', '%kosong%')->count()
+                ]);
             }
         });
+    }
+    public function jadwal (){
+        return $this->belongsTo(Jadwal::class, 'jadwal_id','id');
     }
 }
