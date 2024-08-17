@@ -21,7 +21,7 @@ class MasterMobilController extends Controller
     {
 
         try {
-            $master_mobil = MasterMobil::get(['id', 'nopol', 'type', 'jumlah_kursi', 'available_seats', 'fasilitas', 'status', 'created_at']);
+            $master_mobil = MasterMobil::get(['id', 'nopol', 'type', 'jumlah_kursi', 'fasilitas', 'status', 'created_at']);
             return response()->json([
                 'success' => true,
                 'data' => $master_mobil,
@@ -75,7 +75,6 @@ class MasterMobilController extends Controller
                 'jumlah_kursi' => $request->jumlah_kursi,
                 'status' => 'Aktif',
                 'image_url' => $request->image_url,
-                'available_seats' => $request->jumlah_kursi,
                 'fasilitas' => $request->fasilitas
             ]);
 

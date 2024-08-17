@@ -19,6 +19,7 @@ class Jadwal extends Model
         'waktu_keberangkatan',
         'tanggal_berangkat',
         'ketersedian',
+        'available_seats'
     ];
 
     public static function boot()
@@ -35,6 +36,10 @@ class Jadwal extends Model
                     'status' => 'kosong',
                 ]);
             }
+        });
+        static::created(function ($jadwal){
+            $jadwal->available_seats = $jadwal->kursi()->count();
+            $jadwal->save();
         });
     }
 
