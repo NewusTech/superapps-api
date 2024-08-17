@@ -75,7 +75,6 @@ class MasterRuteController extends Controller
             $master_rute->kota_asal = $request->kota_asal;
             $master_rute->kota_tujuan = $request->kota_tujuan;
             $master_rute->harga = $request->harga;
-            $master_rute->waktu_keberangkatan = $request->waktu_keberangkatan;
             $master_rute->save();
 
             return response()->json([
@@ -137,7 +136,6 @@ class MasterRuteController extends Controller
             $data->kota_asal = $request->kota_asal;
             $data->kota_tujuan = $request->kota_tujuan;
             $data->harga = $request->harga;
-            $data->waktu_keberangkatan = $request->waktu_keberangkatan;
             $data->save();
 
             return response()->json([

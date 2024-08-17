@@ -81,7 +81,13 @@ class TiketController extends Controller
             $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode]);
             $role = auth()->user()->roles[0]->name;
             if (str_contains($role, 'Admin')) {
-                return response()->json(['link' => "https://backend-superapps.newus.id/tiket/$paymentCode"]);
+                return response()->json(
+                    [
+                        'success' => true,
+                        'data' => ['link' => "https://backend-superapps.newus.id/tiket/$paymentCode"],
+                        'message' => 'Berhasil get data'
+                    ]
+                );
             }
             return $pdf->download("ORDER-$paymentCode.pdf");
         } catch (\Throwable $th) {
@@ -132,8 +138,8 @@ class TiketController extends Controller
             $data->pembayaran->total_harga = $pembayaran->amount;
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             return $pdf->stream("INVOICE-$paymentCode.pdf");
-        } catch (\Throwable $th) {
-            throw $th;
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
     public function invoiceDownload($paymentCode)
@@ -171,11 +177,17 @@ class TiketController extends Controller
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             $role = auth()->user()->roles[0]->name;
             if (str_contains($role, 'Admin')) {
-                return response()->json(['link' => "https://backend-superapps.newus.id/invoice/$paymentCode"]);
+                return response()->json(
+                    [
+                        'success' => true,
+                        'data' => ['link' => "https://backend-superapps.newus.id/invoice/$paymentCode"],
+                        'message' => 'Berhasil get data'
+                    ]
+                );
             }
             return $pdf->download("INVOICE-$paymentCode.pdf");
-        } catch (\Throwable $th) {
-            throw $th;
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -192,8 +204,8 @@ class TiketController extends Controller
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
             // return view('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
             return $pdf->stream("$paymentCode.pdf");
-        } catch (\Throwable $th) {
-            throw $th;
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
     public function eTiketDownload($paymentCode)
@@ -213,8 +225,8 @@ class TiketController extends Controller
                 return response()->json(['link' => "https://backend-superapps.newus.id/e-tiket/$paymentCode"]);
             }
             return $pdf->download("$paymentCode.pdf");
-        } catch (\Throwable $th) {
-            throw $th;
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }
