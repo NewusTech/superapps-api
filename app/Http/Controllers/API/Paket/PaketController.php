@@ -43,17 +43,20 @@ class PaketController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'nama_pengirim' => 'required',
-                'nama_penerima' => 'required',
                 'alamat_pengirim' => 'required',
-                'alamat_penerima' => 'required',
                 'tanggal_dikirim' => 'required',
-                'jenis_paket' => 'required',
-                'status' => 'required',
-                'biaya' => 'required|numeric',
                 'total_berat' => 'required|numeric',
+                'no_telp_pengirim'=>'required',
+                'tujuan'=>'required',
+                'jenis_paket' => 'required',
+                'biaya' => 'required|numeric',
+                'nama_penerima' => 'required',
+                'alamat_penerima' => 'required',
+                'no_telp_penerima'=>'required',
+                'tanggal_diterima' => 'required',
             ]);
             if ($validator->fails()) {
-                throw new Exception($validator->errors()->first());
+                return response()->json($validator->errors(), 422);
             }
 
             $paket = new Paket();
@@ -64,7 +67,6 @@ class PaketController extends Controller
             $paket->tanggal_dikirim = $request->tanggal_dikirim;
             $paket->tanggal_diterima = $request->tanggal_diterima;
             $paket->jenis_paket = $request->jenis_paket;
-            $paket->status = $request->status;
             $paket->biaya = $request->biaya;
             $paket->total_berat = $request->total_berat;
             $paket->save();

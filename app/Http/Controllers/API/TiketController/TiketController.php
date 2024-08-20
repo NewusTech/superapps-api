@@ -199,10 +199,9 @@ class TiketController extends Controller
                 return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
             }
             $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
-            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
+            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate("https://backend-superapps.newus.id/tiket/$paymentCode"));
 
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
-            // return view('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
             return $pdf->stream("$paymentCode.pdf");
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
@@ -216,7 +215,7 @@ class TiketController extends Controller
                 return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
             }
             $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
-            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
+            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($pesanan->kode_pesanan));
 
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
 
