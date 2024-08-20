@@ -20,6 +20,7 @@ use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
 use App\Http\Controllers\API\Perjalanan\PerjalananController;
+use App\Http\Controllers\API\Rental\RentalController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
 use App\Http\Controllers\API\TiketController\TiketController;
 use Illuminate\Http\Request;
@@ -108,6 +109,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
 Route::group(['middleware' => 'api'], function () {
     Route::resource('pariwisata', PariwisataController::class);
 });
+
+Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
+    Route::resource('rental', RentalController::class);
+    Route::post('process-payment', [RentalController::class, 'processPayment']);
+});
+
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {
     Route::get('list-penumpang', [PerjalananController::class, 'index']);
 });
