@@ -83,6 +83,8 @@ Route::group(['middleware' => 'api', 'prefix' => 'kursi'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
     Route::resource('paket', PaketController::class);
+    Route::post('proses-pembayaran', [PaketController::class, 'prosesPembayaranPaket']);
+    Route::put('status-pembayaran/update', [PaketController::class, 'updateStatusPembayaran']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
@@ -113,6 +115,7 @@ Route::group(['middleware' => 'api'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::resource('rental', RentalController::class);
+    Route::get('riwayat', [RentalController::class, 'riwayat']);
     Route::get('mobil', [RentalController::class, 'getMobil']);
     Route::post('process-payment', [RentalController::class, 'processPayment']);
 });

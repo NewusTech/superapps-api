@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API\Paket;
 
 use App\Http\Controllers\Controller;
+use App\Models\MetodePembayaran;
 use App\Models\Paket;
+use App\Models\PembayaranPaket;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -46,13 +48,13 @@ class PaketController extends Controller
                 'alamat_pengirim' => 'required',
                 'tanggal_dikirim' => 'required',
                 'total_berat' => 'required|numeric',
-                'no_telp_pengirim'=>'required',
-                'tujuan'=>'required',
+                'no_telp_pengirim' => 'required',
+                'tujuan' => 'required',
                 'jenis_paket' => 'required',
                 'biaya' => 'required|numeric',
                 'nama_penerima' => 'required',
                 'alamat_penerima' => 'required',
-                'no_telp_penerima'=>'required',
+                'no_telp_penerima' => 'required',
                 'tanggal_diterima' => 'required',
             ]);
             if ($validator->fails()) {
@@ -81,9 +83,45 @@ class PaketController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function prosesPembayaranPaket(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'paket_id' => 'required',
+                'metode_id' => 'required'
+            ]);
+            if($validator->fails()) {
+                return response()->json($validator->errors(), 422);
+            }
+            $metode = MetodePembayaran::where('kode', $request->metode_id)->first();
+            if ($metode?->kode == 1) {
+                return response()->json(['message' => 'Metode pembayaran tidak ditemukan'], 404);
+            }
+            $pembayaran = PembayaranPaket::where('paket_id', $request->paket_id)->first();
+            if ($pembayaran) {
+                return response()->json(['message' => 'Pembayaran sudah dilakukan'], 404);
+            }
+
+            $paket = Paket::find($request->paket_id);
+            if(!$paket ) {
+                throw new Exception('Paket not found', 404);
+            }
+            $pembayaran = PembayaranPaket::create([
+                'kode_paket' => PembayaranPaket::generateUniqueKodePaket(),
+                'paket_id' => $request->paket_id,
+                'metode_id' => $request->metode_id,
+                'status' => 'Menunggu Pembayaran',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $pembayaran->load('paket', 'metode'),
+                'message' => 'Berhasil created'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => "Unexpected error: {$th->getMessage()}"], 500);
+        }
+    }
+
     public function show(string $id)
     {
         try {
@@ -102,12 +140,22 @@ class PaketController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
+    }
+
+    public function updateStatusPembayaran($id){
+        try {
+            $paket = Paket::find($id)->with('pembayaran')->first();
+            if (!$paket) {
+                throw new Exception('Data not found');
+            }
+            $paket->pembayaran->status = 'Diterima';
+            $paket->pembayaran->save();
+        } catch (Exception $th) {
+            return response()->json(['message' => "Unexpected error: {$th->getMessage()}"], 500);
+        }
     }
 
     /**

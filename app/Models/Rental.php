@@ -24,6 +24,7 @@ class Rental extends Model
         'no_telp',
         'alamat',
         'metode_id',
+        'user_id',
         'all_in',
     ];
 

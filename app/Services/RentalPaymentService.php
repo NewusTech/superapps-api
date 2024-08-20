@@ -21,6 +21,7 @@ class RentalPaymentService
     public function processRentalPayment($request)
     {
         try {
+            $request['user_id'] = auth()->user()->id;
             DB::beginTransaction();
             $metode = MetodePembayaran::where('id', $request['metode_id'])->first('kode');
             if (!$metode) {
