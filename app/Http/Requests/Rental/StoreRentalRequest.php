@@ -35,10 +35,13 @@ class StoreRentalRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
+        $errors = $validator->errors()->all();
+        $errorMessages = implode(' | ', $errors);
+
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Validation errors',
-            'data' => $validator->errors()
+            'data' => $errorMessages,
         ], 422));
     }
 
