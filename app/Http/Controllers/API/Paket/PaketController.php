@@ -125,10 +125,10 @@ class PaketController extends Controller
         }
     }
 
-    public function show(string $id)
+    public function show(string $resi)
     {
         try {
-            $data = Paket::find($id);
+            $data = Paket::where('resi', $resi)->first();
             if (!$data) {
                 throw new Exception('Data not found');
             }
