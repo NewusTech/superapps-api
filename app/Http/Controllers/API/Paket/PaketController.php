@@ -6,16 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\MetodePembayaran;
 use App\Models\Paket;
 use App\Models\PembayaranPaket;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Milon\Barcode\DNS1D;
 
 class PaketController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['downloadLabel']]);
         $this->middleware('check.admin')->only(['update', 'destroy']);
     }
     public function index()
@@ -86,13 +88,14 @@ class PaketController extends Controller
         }
     }
 
-    public function prosesPembayaranPaket(Request $request) {
+    public function prosesPembayaranPaket(Request $request)
+    {
         try {
             $validator = Validator::make($request->all(), [
                 'paket_id' => 'required',
                 'metode_id' => 'required'
             ]);
-            if($validator->fails()) {
+            if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
             $metode = MetodePembayaran::where('kode', $request->metode_id)->first();
@@ -105,7 +108,7 @@ class PaketController extends Controller
             }
 
             $paket = Paket::find($request->paket_id);
-            if(!$paket ) {
+            if (!$paket) {
                 throw new Exception('Paket not found', 404);
             }
             $pembayaran = PembayaranPaket::create([
@@ -148,13 +151,14 @@ class PaketController extends Controller
         //
     }
 
-    public function updateStatusPembayaran($id){
+    public function updateStatusPembayaran($resi)
+    {
         try {
-            $paket = Paket::find($id)->with('pembayaran')->first();
+            $paket = Paket::where('resi', $resi)->with('pembayaran')->first();
             if (!$paket) {
                 throw new Exception('Data not found');
             }
-            $paket->pembayaran->status = 'Diterima';
+            $paket->pembayaran->status = 'Sukses';
             $paket->pembayaran->save();
         } catch (Exception $th) {
             return response()->json(['message' => "Unexpected error: {$th->getMessage()}"], 500);
@@ -212,6 +216,21 @@ class PaketController extends Controller
             ]);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+    public function downloadLabel($resi)
+    {
+        try {
+            $paket = Paket::with('pembayaran')->where('resi', $resi)->with('pembayaran')->first();
+            if (!$paket) {
+                throw new Exception('Data not found');
+            }
+            $barcode = new DNS1D();
+            $barcodeImage = $barcode->getBarcodePNG($resi, 'C128', 1.925, 53);
+            $pdf = Pdf::loadView('label-paket', ['paket' => $paket , 'barcode' => $barcodeImage]);
+            $pdf->setPaper([0, 0, 288, 432], 'potrait');
+            return $pdf->stream("$resi.pdf");
+        } catch (Exception $e) {
         }
     }
 

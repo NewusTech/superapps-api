@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\API\Paket\PaketController;
 use App\Http\Controllers\API\TiketController\TiketController;
+use App\Models\Paket;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,3 +26,4 @@ Route::get('/invoice/{paymentCode}', [TiketController::class, 'invoice']);
 Route::get('/invoice/{paymentCode}/download', [TiketController::class, 'invoiceDownload']);
 Route::get('/e-tiket/{paymentCode}', [TiketController::class, 'eTiket']);
 Route::get('/e-tiket/{paymentCode}/download', [TiketController::class, 'eTiketDownload']);
+Route::get('/paket/label/{resi}', [PaketController::class, 'downloadLabel']);
