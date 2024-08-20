@@ -17,7 +17,7 @@ class PaketController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['downloadLabel']]);
+        $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['update', 'destroy']);
     }
     public function index()
