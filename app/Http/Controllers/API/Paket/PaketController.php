@@ -65,6 +65,9 @@ class PaketController extends Controller
             $paket->nama_pengirim = $request->nama_pengirim;
             $paket->nama_penerima = $request->nama_penerima;
             $paket->alamat_pengirim = $request->alamat_pengirim;
+            $paket->no_telp_penerima = $request->no_telp_penerima;
+            $paket->no_telp_pengirim = $request->no_telp_pengirim;
+            $paket->tujuan = $request->tujuan;
             $paket->alamat_penerima = $request->alamat_penerima;
             $paket->tanggal_dikirim = $request->tanggal_dikirim;
             $paket->tanggal_diterima = $request->tanggal_diterima;
