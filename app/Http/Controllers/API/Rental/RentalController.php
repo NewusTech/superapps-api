@@ -33,6 +33,20 @@ class RentalController extends Controller
         }
     }
 
+    public function riwayat()
+    {
+        try {
+            $data = Rental::get();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     public function getMobil()
     {
         try {

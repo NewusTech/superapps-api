@@ -12,6 +12,7 @@ class Paket extends Model
 
     protected $table = 'paket';
     protected $fillable = [
+        'resi',
         'nama_penerima',
         'nama_pengirim',
         'alamat_pengirim',
@@ -26,4 +27,26 @@ class Paket extends Model
         'total_berat',
         'status',
     ];
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function($model){
+            $model->resi = self::generateUniqueResi();
+            $model->status = 'Menunggu Pembayaran';
+        });
+    }
+
+    public static function generateUniqueResi()
+    {
+        do {
+            $resi = now()->format('YmdHis') . '-' . rand(1000, 9999);
+        } while (self::where('resi', $resi)->exists());
+        return $resi;
+    }
+
+    public function pembayaran()
+    {
+        return $this->hasOne(PembayaranPaket::class, 'paket_id', 'id');
+    }
 }
