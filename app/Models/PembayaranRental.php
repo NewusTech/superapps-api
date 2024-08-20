@@ -20,15 +20,6 @@ class PembayaranRental extends Model
         'payment_link',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function ($pembayaran) {
-            $pembayaran->update(['kode_pembayaran' => self::generateUniqueKodeBayar()]);
-        });
-    }
-
     public static function generateUniqueKodeBayar()
     {
         do {

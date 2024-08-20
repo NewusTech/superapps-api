@@ -26,18 +26,22 @@ class RentalPaymentService
             if (!$metode) {
                 throw new Exception('Metode pembayaran tidak ditemukan');
             }
-            // dd($request);
             $rental = Rental::create($request);
-            $rental->all_in = $request['all_in'] ?? 0;
             $pembayaran = new PembayaranRental();
             $pembayaran->rental_id = $rental->id;
 
-            match ($metode->kode) {
-                1 => $this->handleGatewayPayment($rental, $pembayaran),
-                2 => $this->handleTransferPayment($pembayaran),
-            };
-
+            switch ($metode->kode) {
+                case 1:
+                    $response = $this->handleGatewayPayment($rental, $pembayaran);
+                    break;
+                case 2:
+                    $response = $this->handleTransferPayment($pembayaran);
+                    break;
+                default:
+                    throw new Exception('Metode pembayaran tidak valid');
+            }
             DB::commit();
+            return $response;
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json(['message' => "Payment error: {$e->getMessage()}"], 500);
@@ -47,31 +51,29 @@ class RentalPaymentService
     protected function handleGatewayPayment($rental, $pembayaran)
     {
         $biayaTambahan = MetodePembayaran::where('id', $rental->metode_id)->first('biaya_tambahan');
-        $rental->all_in == 1 ?
-        $pembayaran->nominal = $rental->durasi_sewa * $rental->mobil->biaya_sewa + $biayaTambahan->biaya_tambahan :
-        $pembayaran->nominal = $rental->durasi_sewa * $rental->mobil->biaya_sewa;
-        dd($pembayaran->nominal);
-        $params = array(
-            'transaction_details' => array(
+        $pembayaran->nominal = $this->countNominalBiayaRental($rental, $pembayaran) + $biayaTambahan->biaya_tambahan;
+        $pembayaran->kode_pembayaran = PembayaranRental::generateUniqueKodeBayar();
+
+        $params = [
+            'transaction_details' =>[
                 'order_id' => $pembayaran->kode_pembayaran,
                 'gross_amount' => $pembayaran->nominal,
                 'payment_link_id' => str(rand(1000, 9999)) . time()
-            ),
-            'customer_details' => array(
+            ],
+            'customer_details' => [
                 'first_name' => $rental->nama,
                 'phone' => $rental->no_telp ?? '081234567890',
                 'email' => $rental->email
-            ),
-            'item_details' => array(
-                array(
+            ],
+            'item_details' => [
+                [
                     "name" => "Rental",
                     "price" => $pembayaran->nominal,
                     "quantity" => 1,
-                )
-            ),
+                ]
+            ],
             'usage_limit' => 1
-        );
-
+        ];
 
         $auth = base64_encode($this->midtransEnv['PRODUCTION']['server_key']);
 
@@ -87,9 +89,9 @@ class RentalPaymentService
 
         $response = json_decode($response->body());
         $pembayaran->payment_link = $response->payment_url;
+        $pembayaran->status = 'Menunggu pembayaran';
         $response->kode = 1;
         $pembayaran->save();
-
         return response()->json([
             'success' => true,
             'data' => $response,
@@ -119,6 +121,12 @@ class RentalPaymentService
             'data' => $data,
             'message' => 'Instruksi transfer telah dikirim'
         ]);
+    }
+
+    protected function countNominalBiayaRental($rental, $pembayaran)
+    {
+        $nominal = $rental->durasi_sewa * ($rental->mobil->biaya_sewa + ($rental->all_in ? $rental->mobil->biaya_all_in : 0));
+        return $nominal;
     }
 
     protected function getMidtransEnv()

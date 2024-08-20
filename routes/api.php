@@ -112,6 +112,7 @@ Route::group(['middleware' => 'api'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::resource('rental', RentalController::class);
+    Route::post('process-payment', [RentalController::class, 'processPayment']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {

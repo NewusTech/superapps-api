@@ -23,7 +23,8 @@ class Rental extends Model
         'nik',
         'no_telp',
         'alamat',
-        'metode_id'
+        'metode_id',
+        'all_in',
     ];
 
     public function mobil(){

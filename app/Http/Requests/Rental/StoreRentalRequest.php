@@ -29,7 +29,7 @@ class StoreRentalRequest extends FormRequest
             'no_telp' => 'required|min:8|max:14',
             'alamat' => 'required',
             'metode_id' => 'required|numeric',
-            'all_in' => 'required|numeric',
+            'all_in' => 'nullable|numeric',
         ];
     }
 
