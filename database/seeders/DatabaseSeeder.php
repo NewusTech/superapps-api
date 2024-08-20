@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SupirSeeder::class);
         $this->call(MobilSeeder::class);
         $this->call(TitikLokasiSeeder::class);
+        $this->call(MobilRentalSeeder::class);
 
         // Create admin User and assign the role to him.
         $superAdmin = Role::create(['name' => 'Super Admin']);
