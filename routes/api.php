@@ -19,6 +19,7 @@ use App\Http\Controllers\API\Users\ManageUsersController;
 use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
+use App\Http\Controllers\API\MobilRental\MobilRentalController;
 use App\Http\Controllers\API\Perjalanan\PerjalananController;
 use App\Http\Controllers\API\Rental\RentalController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
@@ -112,6 +113,7 @@ Route::group(['middleware' => 'api'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::resource('rental', RentalController::class);
+    Route::get('mobil', [RentalController::class, 'getMobil']);
     Route::post('process-payment', [RentalController::class, 'processPayment']);
 });
 

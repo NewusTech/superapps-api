@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Rental;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Rental\StoreRentalRequest;
+use App\Models\MobilRental;
 use App\Models\Rental;
 use App\Services\RentalPaymentService;
 use Exception;
@@ -12,7 +13,8 @@ use Illuminate\Http\Request;
 class RentalController extends Controller
 {
     protected $paymentService;
-    public function __construct(RentalPaymentService $paymentService){
+    public function __construct(RentalPaymentService $paymentService)
+    {
         $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
         $this->paymentService = $paymentService;
@@ -25,6 +27,23 @@ class RentalController extends Controller
                 'success' => true,
                 'message' => 'Berhasil get data',
                 'data' => $data
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function getMobil()
+    {
+        try {
+            $data = MobilRental::get();
+            $data->map(function ($mobil) {
+                $mobil->bagasi = "Heatback";
+            });
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => $data,
             ]);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
