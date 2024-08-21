@@ -83,6 +83,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'kursi'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
     Route::resource('paket', PaketController::class);
+    Route::get('status-pembayaran/{kode_paket}', [PaketController::class, 'getStatusPembayaranByKodePaket']);
     Route::post('proses-pembayaran', [PaketController::class, 'prosesPembayaranPaket']);
     Route::get('label/download/{resi}', [PaketController::class, 'label']);
     Route::patch('status-pembayaran/update/{resi}', [PaketController::class, 'updateStatusPembayaran']);
