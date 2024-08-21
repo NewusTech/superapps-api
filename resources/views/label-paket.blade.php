@@ -63,49 +63,62 @@
             <td><strong style="font-size: 12px;">No. {{$paket->resi}}</strong></td>
         </tr>
     </table>
-    <table style="width: 100%; border: 1px solid #000000; border-top: none; padding:3px">
+    <table style=" border: 1px solid #000000; border-top: none; padding:3px">
         <div><strong style="font-size: 14px;">DETAIL PENGIRIM</strong></div>
         <tr>
-            <td>
-                <div><strong style="font-size: 12px;">Nama</strong></div>
-                <div><strong style="font-size: 12px;">Nomor Telepon</strong></div>
-                <div><strong style="font-size: 12px;">Alamat</strong></div>
-                <div><strong style="font-size: 12px;">Tujuan</strong></div>
-                <div><strong style="font-size: 12px;">Tanggal Dikirim</strong></div>
-                <div><strong style="font-size: 12px;">Jenis</strong></div>
-                <div><strong style="font-size: 12px;">Total Berat</strong></div>
-                <div><strong style="font-size: 12px;">Biaya</strong></div>
-            </td>
-            <td>
-                <div style="font-size:12px">{{$paket->nama_pengirim}}</div>
-                <div style="font-size:12px">{{$paket->no_telp_pengirim ?? '-'}}</div>
-                <div style="font-size:12px">{{$paket->alamat_pengirim ?? '-'}}</div>
-                <div style="font-size:12px">{{$paket->tujuan}}</div>
-                <div style="font-size:12px">{{$paket->tanggal_dikirim}}</div>
-                <div style="font-size:12px">{{$paket->jenis_paket}}</div>
-                <div style="font-size:12px">{{$paket->total_berat}}</div>
-                <div style="font-size:12px">{{$paket->biaya}}</div>
-            </td>
+            <td style="width: 45%"><strong style="font-size: 12px;">Nama</strong></td>
+            <td style="font-size:12px">{{$paket->nama_pengirim}}</td>
         </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Nomor Telepon</strong></td>
+            <td style="font-size:12px">{{$paket->no_telp_pengirim ?? '-'}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Alamat</strong></td>
+            <td style="font-size:12px">{{$paket->alamat_pengirim ?? '-'}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Tujuan</strong></td>
+            <td style="font-size:12px">{{$paket->tujuan ?? '-'}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Tanggal Dikirim</strong></td>
+            <td style="font-size:12px">{{$paket->tanggal_dikirim}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Jenis</strong></td>
+            <td style="font-size:12px">{{$paket->jenis_paket}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Total Berat</strong></td>
+            <td style="font-size:12px">{{$paket->total_berat}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Biaya</strong></td>
+            <td style="font-size:12px">{{$paket->biaya}}</td>
+        </tr>
+
     </table>
-    <table style="width: 100%; border: 1px solid #000000; margin-top: 3px; padding:3px">
+    <table style="background-color: #f2f2f2; width: 100%; border: 1px solid #000000; margin-top: 3px; padding:3px; margin-bottom: 3px">
         <div><strong style="font-size: 14px;">DETAIL PENERIMA</strong></div>
         <tr>
-            <td>
-                <div><strong style="font-size: 12px;">Nama</strong></div>
-                <div><strong style="font-size: 12px;">Nomor Telepon</strong></div>
-                <div><strong style="font-size: 12px;">Alamat</strong></div>
-                <div><strong style="font-size: 12px;">Estimasi Tanggal Diterima</strong></div>
-            </td>
-            <td>
-                <div style="font-size:12px">{{$paket->nama_penerima}}</div>
-                <div style="font-size:12px">{{$paket->no_telp_penerima}}</div>
-                <div style="font-size:12px">{{$paket->alamat_penerima}}</div>
-                <div style="font-size:12px">{{$paket->tanggal_diterima}}</div>
-            </td>
+            <td style="width: 45%"><strong style="font-size: 12px;">Nama</strong></td>
+            <td style="font-size:12px">{{$paket->nama_penerima}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Nomor Telepon</strong></td>
+            <td style="font-size:12px">{{$paket->no_telp_penerima ?? '-'}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Alamat</strong></td>
+            <td style="font-size:12px">{{$paket->alamat_penerima}}</td>
+        </tr>
+        <tr>
+            <td><strong style="font-size: 12px;">Estimasi Tanggal Diterima</strong></td>
+            <td style="font-size:12px">{{$paket->tanggal_diterima ?? '-'}}</td>
         </tr>
     </table>
-    <div style="text-align: center; padding: 10px">
+    <div style="text-align: center;">
         <img src="data:image/png;base64,{{ $barcode}}" alt="barcode">
     </div>
 </body>

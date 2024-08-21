@@ -238,10 +238,6 @@ class PaketController extends Controller
             if (!$pembayaran) {
                 throw new Exception('Data not found');
             }
-            $barcode = new DNS1D();
-            $barcodeImage = $barcode->getBarcodePNG($paymentCode, 'C128', 1.925, 53);
-            $pdf = Pdf::loadView('label-paket', ['paket' => $pembayaran, 'barcode' => $barcodeImage]);
-            $pdf->setPaper([0, 0, 288, 432], 'potrait');
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data',
@@ -256,12 +252,14 @@ class PaketController extends Controller
     {
         try {
             $pembayaran = PembayaranPaket::where('kode_paket', $paymentCode)->first();
+            $paket = Paket::where('id', $pembayaran->paket_id)->first();
+            // dd($paket);
             if (!$pembayaran) {
                 throw new Exception('Data not found');
             }
             $barcode = new DNS1D();
-            $barcodeImage = $barcode->getBarcodePNG($paymentCode, 'C128', 1.925, 53);
-            $pdf = Pdf::loadView('label-paket', ['paket' => $pembayaran, 'barcode' => $barcodeImage]);
+            $barcodeImage = $barcode->getBarcodePNG($paymentCode, 'C128', 1.45, 53);
+            $pdf = Pdf::loadView('label-paket', ['paket' => $paket, 'barcode' => $barcodeImage]);
             $pdf->setPaper([0, 0, 288, 432], 'potrait');
             return $pdf->stream("{$paymentCode}.pdf");
         } catch (Exception $e) {
