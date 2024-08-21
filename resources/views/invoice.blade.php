@@ -35,7 +35,8 @@
             color: #8C8D89;
         }
 
-        p,h1 {
+        p,
+        h1 {
             margin: 0;
             margin-top: 5px;
         }
@@ -72,21 +73,27 @@
                                 <p><strong>Invoice</strong></p>
                                 <p>{{$data->pesanan->invoice}}</p>
                             </div>
-
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0;">
+                            <div>
+                                <p><strong>Nama Pemesan</strong></p>
+                                <p>{{$data->pesanan->nama}}</p>
+                            </div>
                             <div style="margin-top: 10px;">
                                 <p><strong>Metode Pembayaran</strong></p>
                                 <p>{{$data->pesanan->metode_pembayaran}}</p>
                             </div>
                         </td>
                         <td style="padding:0;">
-                            <div>
-                                <p><strong>Nama Pemesan</strong></p>
-                                <p>{{$data->pesanan->nama}}</p>
-                            </div>
-
                             <div style="margin-top: 10px;">
                                 <p><strong>No. Telepon</strong></p>
                                 <p>{{$data->pesanan->no_telp}}</p>
+                            </div>
+                            <div>
+                                <p><strong>Tanggal</strong></p>
+                                <p>{{$data->pembayaran->tanggal}}</p>
                             </div>
                         </td>
                     </tr>

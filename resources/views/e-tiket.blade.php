@@ -74,17 +74,30 @@
                 <div style="margin-top: 20px; margin-bottom: 10px;"> <strong>Detail Pemesan</strong></div>
                 <table style="table-layout: auto; width: 100%;">
                     <tr>
-                        <td style="padding:0;">
-                            <div>
-                                <p style="margin-bottom: 10px; font-size: 14px;">Nama</p>
-                                <p style="margin-bottom: 10px;"><strong>{{$data->nama}}</strong></p>
-                            </div>
-
-                            <div>
-                                <p style="margin-bottom: 10px; font-size: 14px;">No. Telepon</p>
-                                <p style="margin-bottom: 10px;"><strong>{{$data->no_telp}}</strong></p>
-                            </div>
-                        </td>
+                        <table>
+                            <tr style="padding:0;margin:0;">
+                                <td style="padding:0;">
+                                    <div>
+                                        <p style="margin-bottom: 10px; font-size: 14px;">No.Pemesan</p>
+                                        <p style="margin-bottom: 10px;"><strong>{{$data->kode_pesanan}}</strong></p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:0;">
+                                    <div>
+                                        <p style="margin-bottom: 10px; font-size: 14px;">Nama</p>
+                                        <p style="margin-bottom: 10px;"><strong>{{$data->nama}}</strong></p>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <p style="margin-bottom: 10px; font-size: 14px;">No. Telepon</p>
+                                        <p style="margin-bottom: 10px;"><strong>{{$data->no_telp}}</strong></p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                         <td style=" text-align: right; padding-right:30px">
                             <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 150px; height: 150px;">
                         </td>

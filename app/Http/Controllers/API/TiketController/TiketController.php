@@ -7,6 +7,7 @@ use App\Models\Pembayaran;
 use App\Models\Penumpang;
 use App\Models\Pesanan;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -36,6 +37,7 @@ class TiketController extends Controller
             $data = [];
             $penumpang->map(function ($penumpang) use (&$data) {
                 $data[] = [
+                    'kode' => $penumpang->pesanan->kode_pesanan,
                     'nama' => $penumpang->nama,
                     'email' => $penumpang->email,
                     'nik' => $penumpang->nik,
@@ -48,7 +50,7 @@ class TiketController extends Controller
             });
 
             $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
-            $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode]);
+            $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode])->setPaper('a4','portrait');
             return $pdf->stream("ORDER-$paymentCode.pdf");
         } catch (\Throwable $th) {
             throw $th;
@@ -134,6 +136,7 @@ class TiketController extends Controller
 
             $data->pembayaran = new stdClass();
             $data->pembayaran->jumlah_tiket = $pesanan->penumpang->count();
+            $data->pembayaran->tanggal = Carbon::parse($pembayaran->created_at)->format('d-m-Y');
             $data->pembayaran->harga_tiket = $pembayaran->amount / $data->pembayaran->jumlah_tiket;
             $data->pembayaran->total_harga = $pembayaran->amount;
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
@@ -200,7 +203,7 @@ class TiketController extends Controller
             }
             $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
             $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate("https://backend-superapps.newus.id/tiket/$paymentCode"));
-
+                // dd($pesanan);
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
             return $pdf->stream("$paymentCode.pdf");
         } catch (Exception $e) {
