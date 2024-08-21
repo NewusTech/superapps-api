@@ -28,7 +28,7 @@
         }
 
 
-        .field >p{
+        .field>p {
             color: #8C8D89;
         }
 
@@ -55,7 +55,7 @@
                                     </td>
                                     <td>
                                         <h1 style="font-weight: bold;">RAMA TRANZ</h1>
-                                        <p >PT. RASYA MANDIRI TRANZ</p>
+                                        <p>PT. RASYA MANDIRI TRANZ</p>
                                     </td>
                                 </tr>
                             </table>
@@ -64,54 +64,68 @@
                 </table>
                 <table style="table-layout: auto;">
                     <tr>
-                        <td style="width: 18rem;">
-                            <div id="orderData" class="">
-                                <div class="grid grid-cols-2">
-                                    <div class="mb-4 text-sm space-y-1">
-                                        <div class="field">
-                                            <p>Nama:</p>
-                                            <strong>{{$penumpang['nama']}}</strong>
-                                        </div>
-                                        <div class="field">
-                                            <p>No Identitas:</p>
-                                            <strong>{{$penumpang['nik']}}</strong>
-                                        </div>
-                                        <div class="field">
-                                            <p>No Telepon:</p>
-                                            <strong>{{$penumpang['no_telp']}}</strong>
-                                        </div>
-                                        <div class="field">
-                                            <p>Keberangkatan:</p>
-                                            <strong>{{$penumpang['keberangkatan']}}</strong>
-                                        </div>
-                                    </div>
-                                </div>
+                        <td>
+                            <div class="field">
+                                <p>No. Pesanan:</p>
+                                <strong>{{$penumpang['kode']}}</strong>
                             </div>
                         </td>
                         <td>
-                            <div class="mb-4 text-sm space-y-1">
-                                <div class="field">
-                                    <p>Email:</p>
-                                    <strong>{{$penumpang['email']}}</strong>
-                                </div>
-                                <div class="field">
-                                    <p>No Kursi:</p>
-                                    <strong>{{$penumpang['kursi']}}</strong>
-                                </div>
-                                <div class="field">
-                                    <p>Tipe Mobil:</p>
-                                    <strong>{{$penumpang['mobil']}}</strong>
-                                </div>
-                                <div class="field">
-                                    <p>Tiba:</p>
-                                    <strong>{{$penumpang['tiba']}}</strong>
-                                </div>
+                            <div class="field">
+                                <p>Nama:</p>
+                                <strong>{{$penumpang['nama']}}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field">
+                                <p>No Identitas:</p>
+                                <strong>{{$penumpang['nik']}}</strong>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="field">
+                                <p>No Telepon:</p>
+                                <strong>{{$penumpang['no_telp']}}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field">
+                                <p>Email:</p>
+                                <strong>{{$penumpang['email']}}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field">
+                                <p>No Kursi:</p>
+                                <strong>{{$penumpang['kursi']}}</strong>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="field">
+                                <p>Tipe Mobil:</p>
+                                <strong>{{$penumpang['mobil']}}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field">
+                                <p>Keberangkatan:</p>
+                                <strong>{{$penumpang['keberangkatan']}}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="field">
+                                <p>Tiba:</p>
+                                <strong>{{$penumpang['tiba']}}</strong>
                             </div>
                         </td>
                     </tr>
                 </table>
             </td>
-            <td style="padding-left: 70px; padding-top:15px;">
+            <td style="padding-left: 40px; padding-top:15px;">
                 <div id="qrcode">
                     <div style="text-align: center;">Qr Code</div>
                     <div class="flex justify-center">

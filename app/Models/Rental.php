@@ -31,4 +31,8 @@ class Rental extends Model
     public function mobil(){
         return $this->belongsTo(MobilRental::class, 'mobil_rental_id', 'id');
     }
+
+    public function pembayaran(){
+        return $this->belongsTo(PembayaranRental::class, 'id', 'rental_id');
+    }
 }
