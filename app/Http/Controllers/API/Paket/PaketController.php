@@ -7,6 +7,7 @@ use App\Models\MetodePembayaran;
 use App\Models\Paket;
 use App\Models\PembayaranPaket;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -133,6 +134,40 @@ class PaketController extends Controller
             ]);
         } catch (\Throwable $th) {
             return response()->json(['message' => "Unexpected error: {$th->getMessage()}"], 500);
+        }
+    }
+    protected function getPembayaran($kode_paket)
+    {
+        $pembayaran = PembayaranPaket::with([
+            'paket' => function ($query) {
+                $query->select('id', 'resi', 'biaya');
+            },
+            'metode' => function ($query) {
+                $query->select('id', 'metode');
+            },
+        ])->where('kode_paket', $kode_paket)->first(['paket_id', 'metode_id', 'status', 'kode_paket', 'created_at']);
+
+        if ($pembayaran) {
+            $pembayaran->waktu = Carbon::parse($pembayaran->created_at)->format('H:i');
+            $pembayaran->tanggal = Carbon::parse($pembayaran->created_at)->format('d-m-Y');
+        }
+
+        return $pembayaran;
+    }
+    public function getStatusPembayaranByKodePaket($kode_paket)
+    {
+        try {
+            $pembayaran = $this->getPembayaran($kode_paket);
+            if (!$pembayaran) {
+                throw new Exception('Pembayaran not found');
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => $pembayaran,
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
