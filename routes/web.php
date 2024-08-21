@@ -26,4 +26,4 @@ Route::get('/invoice/{paymentCode}', [TiketController::class, 'invoice']);
 Route::get('/invoice/{paymentCode}/download', [TiketController::class, 'invoiceDownload']);
 Route::get('/e-tiket/{paymentCode}', [TiketController::class, 'eTiket']);
 Route::get('/e-tiket/{paymentCode}/download', [TiketController::class, 'eTiketDownload']);
-Route::get('/paket/label/{resi}', [PaketController::class, 'downloadLabel']);
+Route::get('/paket/label/{paymentCode}', [PaketController::class, 'downloadLabel']);

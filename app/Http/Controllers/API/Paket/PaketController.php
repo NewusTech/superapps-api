@@ -17,7 +17,7 @@ class PaketController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['downloadLabel']]);
         $this->middleware('check.admin')->only(['update', 'destroy']);
     }
     public function index(Request $request)
@@ -231,19 +231,41 @@ class PaketController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    public function downloadLabel($resi)
+    public function label($paymentCode)
     {
         try {
-            $paket = Paket::with('pembayaran')->where('resi', $resi)->with('pembayaran')->first();
-            if (!$paket) {
+            $pembayaran = PembayaranPaket::where('kode_paket', $paymentCode)->first();
+            if (!$pembayaran) {
                 throw new Exception('Data not found');
             }
             $barcode = new DNS1D();
-            $barcodeImage = $barcode->getBarcodePNG($resi, 'C128', 1.925, 53);
-            $pdf = Pdf::loadView('label-paket', ['paket' => $paket, 'barcode' => $barcodeImage]);
+            $barcodeImage = $barcode->getBarcodePNG($paymentCode, 'C128', 1.925, 53);
+            $pdf = Pdf::loadView('label-paket', ['paket' => $pembayaran, 'barcode' => $barcodeImage]);
             $pdf->setPaper([0, 0, 288, 432], 'potrait');
-            return $pdf->stream("$resi.pdf");
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => ['link' => "https://backend-superapps.newus.id/paket/label/$paymentCode"]
+            ]);
         } catch (Exception $e) {
+            return response()->json(['message' => "Unexpected error: {$e->getMessage()}"], 500);
+        }
+    }
+
+    public function downloadLabel($paymentCode)
+    {
+        try {
+            $pembayaran = PembayaranPaket::where('kode_paket', $paymentCode)->first();
+            if (!$pembayaran) {
+                throw new Exception('Data not found');
+            }
+            $barcode = new DNS1D();
+            $barcodeImage = $barcode->getBarcodePNG($paymentCode, 'C128', 1.925, 53);
+            $pdf = Pdf::loadView('label-paket', ['paket' => $pembayaran, 'barcode' => $barcodeImage]);
+            $pdf->setPaper([0, 0, 288, 432], 'potrait');
+            return $pdf->stream("{$paymentCode}.pdf");
+        } catch (Exception $e) {
+            return response()->json(['message' => "Unexpected error: {$e->getMessage()}"], 500);
         }
     }
 
