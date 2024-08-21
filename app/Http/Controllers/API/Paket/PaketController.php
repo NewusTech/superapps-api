@@ -20,10 +20,18 @@ class PaketController extends Controller
         $this->middleware('auth:api');
         $this->middleware('check.admin')->only(['update', 'destroy']);
     }
-    public function index()
+    public function index(Request $request)
     {
         try {
             $data = Paket::all();
+            if ($request->search) {
+                $fields = ['resi', 'nama_pengirim', 'nama_penerima'];
+                $data = Paket::where(function ($query) use ($fields, $request) {
+                    foreach ($fields as $field) {
+                        $query->orWhere($field, 'like', "%$request->search%");
+                    }
+                })->get();
+            }
             return response()->json([
                 'success' => true,
                 'data' => $data,
@@ -160,6 +168,11 @@ class PaketController extends Controller
             }
             $paket->pembayaran->status = 'Sukses';
             $paket->pembayaran->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil update data',
+                'data' => $paket->pembayaran
+            ]);
         } catch (Exception $th) {
             return response()->json(['message' => "Unexpected error: {$th->getMessage()}"], 500);
         }
@@ -227,7 +240,7 @@ class PaketController extends Controller
             }
             $barcode = new DNS1D();
             $barcodeImage = $barcode->getBarcodePNG($resi, 'C128', 1.925, 53);
-            $pdf = Pdf::loadView('label-paket', ['paket' => $paket , 'barcode' => $barcodeImage]);
+            $pdf = Pdf::loadView('label-paket', ['paket' => $paket, 'barcode' => $barcodeImage]);
             $pdf->setPaper([0, 0, 288, 432], 'potrait');
             return $pdf->stream("$resi.pdf");
         } catch (Exception $e) {
