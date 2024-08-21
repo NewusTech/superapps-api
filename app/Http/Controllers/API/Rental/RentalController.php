@@ -67,6 +67,35 @@ class RentalController extends Controller
         }
     }
 
+    public function detailRental($paymentCode){
+        try {
+            $data = Rental::with('pembayaran', 'metode', 'mobil')->whereHas('pembayaran', function ($q) use ($paymentCode) {
+                $q->where('kode_pembayaran', $paymentCode);
+            })->first();
+
+            $response =  [
+                    'created_at' => $data->created_at,
+                    'kode_pembayaran' => $data->pembayaran->kode_pembayaran,
+                    'mobil_type' => $data->mobil->type,
+                    'metode' => $data->metode->metode,
+                    'nominal' => $data->pembayaran->nominal,
+                    'area' => $data->area,
+                    'tanggal_awal_sewa' => $data->tanggal_mulai_sewa,
+                    'tanggal_akhir_sewa' => $data->tanggal_akhir_sewa,
+                    'status' => $data->pembayaran->status,
+                    'durasi_sewa' => $data->durasi_sewa,
+                    'alamat_keberangkatan' => $data->alamat_keberangkatan,
+                ];
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => $response
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
     public function getMobil()
     {
         try {

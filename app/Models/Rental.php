@@ -35,4 +35,8 @@ class Rental extends Model
     public function pembayaran(){
         return $this->belongsTo(PembayaranRental::class, 'id', 'rental_id');
     }
+
+    public function metode(){
+        return $this->belongsTo(MetodePembayaran::class, 'metode_id', 'id');
+    }
 }
