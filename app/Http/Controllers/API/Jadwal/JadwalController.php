@@ -142,6 +142,7 @@ class JadwalController extends Controller
                     'master_mobil_id' => 'required',
                     'master_supir_id' => 'required',
                     'waktu_keberangkatan' => 'required',
+                    'waktu_tiba' => 'required',
                     'tanggal_berangkat' => 'required',
                 ]);
 
@@ -165,6 +166,7 @@ class JadwalController extends Controller
                 $jadwal->master_supir_id = $data['master_supir_id'];
                 $jadwal->tanggal_berangkat = $data['tanggal_berangkat'];
                 $jadwal->waktu_keberangkatan = $data['waktu_keberangkatan'];
+                $jadwal->waktu_tiba= $data['waktu_tiba'];
                 $jadwal->ketersediaan = $data['ketersediaan'] ?? 'Tersedia';
                 $jadwal->save();
 

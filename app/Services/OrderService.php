@@ -47,13 +47,21 @@ class OrderService
             $pesanan = $this->pesanan->where('kode_pesanan', $orderCode)->first();
         } else {
             $pesanan = $this->pesanan
-                ->where('user_id', $user->id)
-                ->where('kode_pesanan', $orderCode)
-                ->first();
+            ->where('user_id', $user->id)
+            ->where('kode_pesanan', $orderCode)
+            ->first();
         }
         if (!$pesanan) {
             return $pesanan;
         }
+        $waktuKeberangkatan = Carbon::parse($pesanan->jadwal->waktu_keberangkatan);
+        $waktuTiba = Carbon::parse($pesanan->jadwal->waktu_tiba);
+        if ($waktuTiba->lt($waktuKeberangkatan)) {
+            $waktuTiba->addDay();
+        }
+
+        $estimasi = $waktuKeberangkatan->diff($waktuTiba);
+        $estimasi = $estimasi->h;
 
         $seatTaken = [];
         $data = [
@@ -80,7 +88,9 @@ class OrderService
             'pesanan' => [
                 'mobil' => $pesanan->jadwal->master_mobil->type,
                 'kode_pesanan' => $pesanan->kode_pesanan,
-                'jam' => $pesanan->jadwal->waktu_keberangkatan,
+                'jam_berangkat' => $pesanan->jadwal->waktu_keberangkatan,
+                'estimasi' => $estimasi,
+                'jam_tiba' => $pesanan->jadwal->waktu_tiba,
                 'tanggal' => $pesanan->jadwal->tanggal_berangkat,
                 'kota_asal' => $pesanan->jadwal->master_rute->kota_asal,
                 'kota_tujuan' => $pesanan->jadwal->master_rute->kota_tujuan,
