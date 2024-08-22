@@ -17,6 +17,7 @@ class Jadwal extends Model
         'master_mobil_id',
         'master_supir_id',
         'waktu_keberangkatan',
+        'waktu_tiba',
         'tanggal_berangkat',
         'ketersedian',
         'available_seats'
