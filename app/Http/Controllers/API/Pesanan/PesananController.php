@@ -89,9 +89,10 @@ class PesananController extends Controller
         }
     }
 
-    public function getAllHistoryPesanan(){
+    public function getAllHistoryPesanan(Request $request){
         try {
-            $data = $this->orderService->getAllOrders();
+            $status = $request->input('status');
+            $data = $this->orderService->getAllOrders($status);
             return response()->json([
                 'success' => true,
                 'data' => $data,

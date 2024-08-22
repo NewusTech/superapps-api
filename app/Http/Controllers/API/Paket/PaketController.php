@@ -26,7 +26,7 @@ class PaketController extends Controller
         try {
             $data = Paket::all();
             if ($request->search) {
-                $fields = ['resi', 'nama_pengirim', 'nama_penerima'];
+                $fields = ['resi', 'nama_pengirim', 'nama_penerima', 'alamat_pengirim', 'alamat_penerima'];
                 $data = Paket::where(function ($query) use ($fields, $request) {
                     foreach ($fields as $field) {
                         $query->orWhere($field, 'like', "%$request->search%");

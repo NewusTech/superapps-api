@@ -12,10 +12,12 @@ class OrderService
     {
         $this->pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user', 'pembayaran', 'penumpang.kursi');
     }
-    public function getAllOrders()
+    public function getAllOrders($status)
     {
-        $pesanan = $this->pesanan->where('user_id', auth()->user()->id)->orderBy('created_at', 'desc')->get();
-        $data = $pesanan->map(function ($order) {
+        $query = $this->pesanan->newQuery();
+        $this->isAdmin() ? $query = $query->where('status', $status) : $query = $query->where('user_id', auth()->user()->id)->where('status', $status);
+        $query = $query->orderBy('created_at', 'desc')->get();
+        $data = $query->map(function ($order) {
             return [
                 'created_at' => $order->created_at,
                 'kode_pesanan' => $order->kode_pesanan,
@@ -28,6 +30,10 @@ class OrderService
         });
 
         return $data->toArray();
+    }
+
+    protected function isAdmin(){
+        return str_contains(auth()->user()->roles->first()->name, 'Admin');
     }
 
     public function getOrderDetails($orderCode)
