@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\API\Pembayaran;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kursi;
 use App\Models\MetodePembayaran;
 use App\Models\Pembayaran;
-use App\Models\Penumpang;
+use App\Models\PembayaranRental;
 use App\Models\Pesanan;
 use App\Models\User;
 use App\Services\PaymentService;
@@ -177,12 +176,15 @@ class PembayaranController extends Controller
                 'order_id' => 'required',
                 'transaction_status' => 'required',
             ]);
+
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
+
             $data = $request->all();
             $paymentCode = $data['order_id'];
             $status = $data['transaction_status'];
+
             // Extract the payment code from the order id
             $paymentIdParts = explode("-", $paymentCode);
             $formattedPaymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
@@ -202,10 +204,10 @@ class PembayaranController extends Controller
             $status = $response->transaction_status; // Update status from get midtrans
 
             $pembayaran = Pembayaran::where('kode_pembayaran', $formattedPaymentCode)->first();
-            $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+            $pembayaranRental = PembayaranRental::where('kode_pembayaran', $formattedPaymentCode)->first(); // Find pembayaran_rental
 
-            if (!$pembayaran) {
-                return response()->json(['message' => 'pembayaran tidak ditemukan'], 404);
+            if (!$pembayaran && !$pembayaranRental) {
+                return response()->json(['message' => 'pembayaran atau pembayaran_rental tidak ditemukan'], 404);
             }
 
             $statusMapping = [
@@ -219,22 +221,32 @@ class PembayaranController extends Controller
             ];
             $convertedStatus = $statusMapping[$status] ?? 'Gagal';
 
-            $pembayaran->update([
-                'status' => $convertedStatus,
-            ]);
+            if ($pembayaran) {
+                $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+                $pembayaran->update([
+                    'status' => $convertedStatus,
+                ]);
+                $pesanan->update([
+                    'status' => $convertedStatus,
+                ]);
+                $this->paymentService->handleCancelPayment($pembayaran, $pesanan);
+            }
 
-            $pesanan->update([
-                'status' => $convertedStatus,
-            ]);
-            $this->paymentService->handleCancelPayment($pembayaran, $pesanan);
+            if ($pembayaranRental) {
+                $pembayaranRental->update([
+                    'status' => $convertedStatus,
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
-                'data' => $pembayaran,
-                'message' => 'Berhasil update data'
+                'message' => 'Berhasil update data',
             ]);
+
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
+
     }
     public function getStatusPembayaran($paymentCode)
     {

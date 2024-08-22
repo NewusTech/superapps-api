@@ -23,7 +23,7 @@ class PembayaranRental extends Model
     public static function generateUniqueKodeBayar()
     {
         do {
-            $kode = 'RENT-INV-' . now()->format('YmdHis') . '-' . rand(1000, 9999);
+            $kode = 'INV-' . now()->format('YmdHis') . '-' . rand(1000, 9999);
         } while (self::where('kode_pembayaran', $kode)->exists());
 
         return $kode;
