@@ -15,7 +15,10 @@ class OrderService
     public function getAllOrders($status)
     {
         $query = $this->pesanan->newQuery();
-        $this->isAdmin() ? $query = $query->where('status', $status) : $query = $query->where('user_id', auth()->user()->id)->where('status', $status);
+        $this->isAdmin() ? $query = $query->where('status', $status) : $query = $query->where('user_id', auth()->user()->id);
+        if ($status) {
+            $query = $query->where('status', 'like', "%$status%");
+        }
         $query = $query->orderBy('created_at', 'desc')->get();
         $data = $query->map(function ($order) {
             return [
@@ -32,7 +35,8 @@ class OrderService
         return $data->toArray();
     }
 
-    protected function isAdmin(){
+    protected function isAdmin()
+    {
         return str_contains(auth()->user()->roles->first()->name, 'Admin');
     }
 
