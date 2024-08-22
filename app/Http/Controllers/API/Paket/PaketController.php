@@ -33,6 +33,11 @@ class PaketController extends Controller
                     }
                 })->get();
             }
+            if ($request->startDate && $request->endDate) {
+                $startDate = date('Y-m-d 00:00:00', strtotime($request->startDate));
+                $endDate = date('Y-m-d 23:59:59', strtotime($request->endDate));
+                $data = Paket::whereBetween('tanggal_dikirim', [$startDate, $endDate])->get();
+            }
             return response()->json([
                 'success' => true,
                 'data' => $data,
