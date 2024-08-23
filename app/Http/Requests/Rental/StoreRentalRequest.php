@@ -22,6 +22,7 @@ class StoreRentalRequest extends FormRequest
             'tanggal_mulai_sewa' => 'required',
             'tanggal_akhir_sewa' => 'required',
             'alamat_keberangkatan' => 'required',
+            'jam_keberangkatan' => 'required',
             'nama' => 'required',
             'email' => 'required|email',
             'mobil_rental_id' => 'required|numeric',
