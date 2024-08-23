@@ -7,6 +7,7 @@ use App\Http\Requests\Rental\StoreRentalRequest;
 use App\Models\MobilRental;
 use App\Models\Rental;
 use App\Services\RentalPaymentService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -79,6 +80,8 @@ class RentalController extends Controller
                     'mobil_type' => $data->mobil->type,
                     'metode' => $data->metode->metode,
                     'nominal' => $data->pembayaran->nominal,
+                    'payment_link' => $data->pembayaran->payment_link,
+                    'expired_at' => Carbon::parse($data->pembayaran->created_at)->addMinutes(15) ?? null,
                     'area' => $data->area,
                     'tanggal_awal_sewa' => $data->tanggal_mulai_sewa,
                     'tanggal_akhir_sewa' => $data->tanggal_akhir_sewa,
@@ -96,22 +99,6 @@ class RentalController extends Controller
         }
     }
 
-    public function getMobil()
-    {
-        try {
-            $data = MobilRental::get();
-            $data->map(function ($mobil) {
-                $mobil->bagasi = "Heatback";
-            });
-            return response()->json([
-                'success' => true,
-                'message' => 'Berhasil get data',
-                'data' => $data,
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
-    }
 
 
     public function create()
