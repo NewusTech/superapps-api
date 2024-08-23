@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,6 +18,7 @@ class Rental extends Model
         'tanggal_mulai_sewa',
         'tanggal_akhir_sewa',
         'alamat_keberangkatan',
+        'jam_keberangkatan',
         'nama',
         'email',
         'mobil_rental_id',
@@ -27,6 +29,15 @@ class Rental extends Model
         'user_id',
         'all_in',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('order', function (Builder $builder) {
+            $builder->orderBy('created_at', 'desc');
+        });
+    }
 
     public function mobil(){
         return $this->belongsTo(MobilRental::class, 'mobil_rental_id', 'id');
