@@ -184,7 +184,6 @@ class PembayaranController extends Controller
             $data = $request->all();
             $paymentCode = $data['order_id'];
             $status = $data['transaction_status'];
-
             // Extract the payment code from the order id
             $paymentIdParts = explode("-", $paymentCode);
             $formattedPaymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
@@ -201,7 +200,7 @@ class PembayaranController extends Controller
             }
 
             $response = json_decode($response->body());
-            $status = $response->transaction_status; // Update status from get midtrans
+            $status = $response->transaction_status;
 
             $pembayaran = Pembayaran::where('kode_pembayaran', $formattedPaymentCode)->first();
             $pembayaranRental = PembayaranRental::where('kode_pembayaran', $formattedPaymentCode)->first(); // Find pembayaran_rental
@@ -233,6 +232,10 @@ class PembayaranController extends Controller
             }
 
             if ($pembayaranRental) {
+                $statusMapping = [
+                    'Kadaluarsa' => 'Kadaluwarsa',
+                ];
+                $convertedStatus = $statusMapping[$convertedStatus] ?? 'Gagal';
                 $pembayaranRental->update([
                     'status' => $convertedStatus,
                 ]);

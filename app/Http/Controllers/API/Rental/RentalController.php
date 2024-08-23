@@ -38,8 +38,10 @@ class RentalController extends Controller
     public function riwayat(Request $request)
     {
         try {
-            $data = Rental::with('pembayaran', 'mobil')
-                ->where('user_id', Auth::user()->id);
+            $data = Rental::with('pembayaran', 'mobil');
+            if(str_contains(auth()->user()->roles->first()->name, 'Customer')) {
+                $data = $data->where('user_id', Auth::user()->id);
+            }
 
             if ($request->has('status')) {
                 $response = $data->whereHas('pembayaran', function ($q) use ($request) {
@@ -49,12 +51,14 @@ class RentalController extends Controller
             $data = $data->get();
             $response = $data->map(function ($rental) {
                 return [
+                    'nama' => $rental->nama,
                     'created_at' => $rental->created_at,
                     'kode_pembayaran' => $rental->pembayaran->kode_pembayaran,
                     'mobil_type' => $rental->mobil->type,
                     'area' => $rental->area,
                     'tanggal_awal_sewa' => $rental->tanggal_mulai_sewa,
                     'tanggal_akhir_sewa' => $rental->tanggal_akhir_sewa,
+                    'harga' => (int)$rental->pembayaran->nominal,
                     'status' => $rental->pembayaran->status,
                 ];
             });

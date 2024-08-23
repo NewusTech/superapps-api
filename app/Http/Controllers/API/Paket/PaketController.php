@@ -179,7 +179,7 @@ class PaketController extends Controller
     public function show(string $resi)
     {
         try {
-            $data = Paket::where('resi', $resi)->first();
+            $data = Paket::with('pembayaran')->where('resi', $resi)->first();
             if (!$data) {
                 throw new Exception('Data not found');
             }
