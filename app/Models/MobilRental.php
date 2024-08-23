@@ -17,6 +17,7 @@ class MobilRental extends Model
         'fasilitas',
         'image_url',
         'biaya_sewa',
+        'deskripsi',
         'mesin',
         'transmisi',
         'kapasitas_bagasi',
