@@ -191,7 +191,6 @@ class PesananController extends Controller
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
             }
-
             $jadwal = Jadwal::find($request->jadwal_id);
             if (!$jadwal) {
                 throw new Exception('Jadwal tidak ditemukan');

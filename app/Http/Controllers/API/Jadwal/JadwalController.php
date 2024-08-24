@@ -113,7 +113,7 @@ class JadwalController extends Controller
                 $item->facility = $mobil->fasilitas;
                 $seatTaken = Kursi::where('jadwal_id', $item->id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
                 $item->seatTaken = $seatTaken->map(fn($item) => $item->nomor_kursi);
-                $item->availableSeat = $item->available_seats - $seatTaken->count();
+                $item->availableSeat = $item->available_seats;
                 $item->syarat_dan_ketentuan = SyaratKetentuan::first('description')->description ?? null;
             });
             return response()->json([
