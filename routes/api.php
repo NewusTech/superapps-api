@@ -117,6 +117,7 @@ Route::group(['middleware' => 'api'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::resource('rental', RentalController::class);
+    Route::patch('status-pembayaran/update/{paymentCode}', [RentalController::class, 'updateStatusPembayaran']);
     Route::get('riwayat', [RentalController::class, 'riwayat']);
     Route::get('riwayat/{paymentCode}', [RentalController::class, 'detailRental']);
     Route::resource('mobil', MobilRentalController::class);
