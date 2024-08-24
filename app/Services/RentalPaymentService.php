@@ -49,6 +49,14 @@ class RentalPaymentService
         }
     }
 
+    public function updatePaymentStatus($paymentCode){
+        $pembayaran = PembayaranRental::where('kode_pembayaran', $paymentCode)->first();
+        $pembayaran->update([
+            'status' => 'Sukses',
+        ]);
+        return $pembayaran;
+    }
+
     protected function handleGatewayPayment($rental, $pembayaran)
     {
         $biayaTambahan = MetodePembayaran::where('id', $rental->metode_id)->first('biaya_tambahan');
@@ -102,19 +110,20 @@ class RentalPaymentService
 
     protected function handleTransferPayment($pembayaran)
     {
-        $metodeId = Pesanan::where('id', $pembayaran->pesanan_id)->first()->metode_id;
-        $metode = MetodePembayaran::where('id', $metodeId)->first();
+        $pembayaran->status = 'Menunggu Pembayaran';
+        $pembayaran->kode_pembayaran = PembayaranRental::generateUniqueKodeBayar();
+        $pembayaran->nominal = $this->countNominalBiayaRental($pembayaran->rental, $pembayaran);
+        $metode = MetodePembayaran::where('id', $pembayaran->rental->metode_id)->first();
         $rekening = explode('-', $metode->metode);
         $norek = explode(':', $metode->keterangan);
         $data = [
             'kode_pembayaran' => $pembayaran->kode_pembayaran,
-            'harga' => $pembayaran->amount,
+            'harga' => $pembayaran->nominal,
             'metode' => $rekening[0],
             'bank' => $rekening[1],
             'nomor_rekening' => trim($norek[1]),
             'kode' => 2
         ];
-        $pembayaran->status = 'Menunggu Pembayaran';
         $pembayaran->save();
 
         return response()->json([

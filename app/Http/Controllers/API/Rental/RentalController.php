@@ -35,23 +35,51 @@ class RentalController extends Controller
         }
     }
 
+    private function applySearchFilter($query, $request, $fields)
+    {
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($query) use ($fields, $search) {
+                foreach ($fields as $field) {
+                    $query->orWhere($field, 'like', "%$search%");
+                }
+            });
+        }
+    }
+    private function applyFilters($query, $request)
+    {
+        if (str_contains(auth()->user()->roles->first()->name, 'Customer')) {
+            $query->where('user_id', Auth::user()->id);
+        }
+
+        if ($request->has('status')) {
+            $query->whereHas('pembayaran', function ($q) use ($request) {
+                $q->whereRaw('LOWER(status) LIKE ?', ["%{$request->status}%"]);
+            });
+        }
+
+        $fields = [ 'area', 'nama', 'alamat'];
+        $this->applySearchFilter($query, $request, $fields);
+
+        if ($request->has('startDate') && $request->has('endDate')) {
+            $tanggalAwal = $request->startDate;
+            $tanggalAkhir = $request->endDate;
+            $query->whereBetween('tanggal_mulai_sewa', [$tanggalAwal, $tanggalAkhir]);
+        }
+
+        return $query;
+    }
+
     public function riwayat(Request $request)
     {
         try {
             $data = Rental::with('pembayaran', 'mobil');
-            if(str_contains(auth()->user()->roles->first()->name, 'Customer')) {
-                $data = $data->where('user_id', Auth::user()->id);
-            }
-
-            if ($request->has('status')) {
-                $response = $data->whereHas('pembayaran', function ($q) use ($request) {
-                    $q->whereRaw('LOWER(status) LIKE ?', ["%{$request->status}%"]);
-                });
-            }
+            $data = $this->applyFilters($data, $request);
             $data = $data->get();
             $response = $data->map(function ($rental) {
                 return [
                     'nama' => $rental->nama,
+                    'durasi_sewa' => $rental->durasi_sewa,
                     'created_at' => $rental->created_at,
                     'kode_pembayaran' => $rental->pembayaran->kode_pembayaran,
                     'mobil_type' => $rental->mobil->type,
@@ -72,27 +100,28 @@ class RentalController extends Controller
         }
     }
 
-    public function detailRental($paymentCode){
+    public function detailRental($paymentCode)
+    {
         try {
             $data = Rental::with('pembayaran', 'metode', 'mobil')->whereHas('pembayaran', function ($q) use ($paymentCode) {
                 $q->where('kode_pembayaran', $paymentCode);
             })->first();
 
             $response =  [
-                    'created_at' => $data->created_at,
-                    'kode_pembayaran' => $data->pembayaran->kode_pembayaran,
-                    'mobil_type' => $data->mobil->type,
-                    'metode' => $data->metode->metode,
-                    'nominal' => $data->pembayaran->nominal,
-                    'payment_link' => $data->pembayaran->payment_link,
-                    'expired_at' => Carbon::parse($data->pembayaran->created_at)->addMinutes(15) ?? null,
-                    'area' => $data->area,
-                    'tanggal_awal_sewa' => $data->tanggal_mulai_sewa,
-                    'tanggal_akhir_sewa' => $data->tanggal_akhir_sewa,
-                    'status' => $data->pembayaran->status,
-                    'durasi_sewa' => $data->durasi_sewa,
-                    'alamat_keberangkatan' => $data->alamat_keberangkatan,
-                ];
+                'created_at' => $data->created_at,
+                'kode_pembayaran' => $data->pembayaran->kode_pembayaran,
+                'mobil_type' => $data->mobil->type,
+                'metode' => $data->metode->metode,
+                'nominal' => $data->pembayaran->nominal,
+                'payment_link' => $data->pembayaran->payment_link,
+                'expired_at' => Carbon::parse($data->pembayaran->created_at)->addMinutes(15) ?? null,
+                'area' => $data->area,
+                'tanggal_awal_sewa' => $data->tanggal_mulai_sewa,
+                'tanggal_akhir_sewa' => $data->tanggal_akhir_sewa,
+                'status' => $data->pembayaran->status,
+                'durasi_sewa' => $data->durasi_sewa,
+                'alamat_keberangkatan' => $data->alamat_keberangkatan,
+            ];
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data',
@@ -124,7 +153,20 @@ class RentalController extends Controller
         }
     }
 
-
+    public function updateStatusPembayaran($paymentCode){
+        try {
+            $pembayaran = $this->paymentService->updatePaymentStatus($paymentCode);
+            return response()->json(
+                [
+                    'success' => true,
+                    'message' => 'Berhasil update data',
+                    'data' => $pembayaran
+                ]
+            );
+        } catch (Exception $th) {
+            return response()->json(['message' => "Unxecepted error: {$th->getMessage()}"], 500);
+        }
+    }
     public function show(string $id)
     {
         //

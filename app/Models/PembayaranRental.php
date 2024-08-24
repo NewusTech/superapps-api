@@ -28,4 +28,9 @@ class PembayaranRental extends Model
 
         return $kode;
     }
+
+    public function rental()
+    {
+        return $this->belongsTo(Rental::class, 'rental_id', 'id');
+    }
 }
