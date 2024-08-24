@@ -27,13 +27,15 @@ class Kursi extends Model
         parent::boot();
         self::updated(function ($kursi) {
             if ($kursi->isDirty('status')) {
-                $kursi->jadwal()->update([
-                    'available_seats' => $kursi->jadwal->kursi->where('status', 'like', '%kosong%')->count()
-                ]);
+                $jadwal = $kursi->jadwal;
+                $availableSeats = $jadwal->kursi()->where('status', 'kosong')->count();
+                $jadwal->available_seats = $availableSeats;
+                $jadwal->save();
             }
         });
     }
-    public function jadwal (){
-        return $this->belongsTo(Jadwal::class, 'jadwal_id','id');
+    public function jadwal()
+    {
+        return $this->belongsTo(Jadwal::class, 'jadwal_id', 'id');
     }
 }
