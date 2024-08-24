@@ -49,7 +49,16 @@ class MobilRentalController extends Controller
 
     public function show(string $id)
     {
-        //
+        try {
+            $data = MobilRental::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => $data,
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     /**
