@@ -2,18 +2,28 @@
 
 namespace App\Http\Controllers\API\Perjalanan;
 
+use App\Helpers\FilterHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
-use App\Models\MasterMobil;
 use App\Models\Pesanan;
 use Exception;
 use Illuminate\Http\Request;
 
 class PerjalananController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
         try {
-            $perjalanan = Jadwal::with('master_rute', 'master_mobil', 'master_supir')->get();
+            $perjalanan = Jadwal::query()->with('master_rute', 'master_mobil', 'master_supir')
+            ->whereHas('pemesanan');
+            if ($request->has('search')) {
+                FilterHelper::applySearch($perjalanan, $request->search, ['master_rute.kota_asal', 'master_rute.kota_tujuan', 'master_mobil.type', 'master_supir.nama']);
+            }
+            if ($request->has('startDate') && $request->has('endDate')) {
+                $startDate = date('Y-m-d 00:00:00', strtotime($request->startDate));
+                $endDate = date('Y-m-d 23:59:59', strtotime($request->endDate));
+                $perjalanan = $perjalanan->whereBetween('tanggal_berangkat', [$startDate, $endDate]);
+            }
+            $perjalanan = $perjalanan->get();
             if (!$perjalanan) {
                 return response()->json([
                     'success' => false,
@@ -27,7 +37,7 @@ class PerjalananController extends Controller
                     'supir' => $item->master_supir->nama,
                     'rute' => $item->master_rute->kota_asal . ' - ' . $item->master_rute->kota_tujuan,
                     'jam_berangkat' => $item->waktu_keberangkatan,
-                    'tanggal_berangkat' => $item->tanggal_keberangkatan,
+                    'tanggal_berangkat' => $item->tanggal_berangkat,
                     'mobil' => $item->master_mobil->type . ' - ' . $item->master_mobil->nopol,
                 ];
             });

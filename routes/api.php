@@ -91,7 +91,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
     Route::resource('jadwal', JadwalController::class);
-    Route::get('jadwal-per-tanggal', [JadwalController::class, 'getJadwalPerTanggal']);
+    Route::get('{tanggal}', [JadwalController::class, 'getJadwalPerTanggal']);
     Route::get('dropdown-jadwal', [JadwalController::class, 'dropdownJadwal']);
     Route::get('jadwal_by_rute', [JadwalController::class, 'getJadwalByRute']);
 });
