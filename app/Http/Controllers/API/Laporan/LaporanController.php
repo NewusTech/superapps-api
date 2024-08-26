@@ -57,6 +57,7 @@ class LaporanController extends Controller
                     'rute' => $jadwal->master_rute->kota_asal . ' - ' . $jadwal->master_rute->kota_tujuan,
                     'mobil' => $jadwal->master_mobil->type,
                     'jam_berangkat' => $jadwal->waktu_keberangkatan,
+                    'tanggal_berangkat' => $jadwal->tanggal_berangkat,
                     'jumlah_penumpang' => $jadwal->jumlah_penumpang,
                     'jumlah_harga' => $jadwal->total_harga
                 ];
