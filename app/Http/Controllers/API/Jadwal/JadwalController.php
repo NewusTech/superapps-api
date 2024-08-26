@@ -38,14 +38,12 @@ class JadwalController extends Controller
         }
     }
 
-    public function getJadwalPerTanggal(){
+    public function getJadwalPerTanggal($tanggal){
         try {
-            $jadwal = Jadwal::with('master_rute', 'master_mobil.kursi', 'master_supir')->get();
-            $groupedJadwal = $jadwal->groupBy('tanggal_berangkat');
-
+            $jadwal = Jadwal::with('master_rute', 'master_mobil', 'master_supir')->whereDate('tanggal_berangkat', $tanggal)->get();
             return response()->json([
                 'success' => true,
-                'data' => $groupedJadwal,
+                'data' => $jadwal,
                 'message' => 'Berhasil get data'
             ]);
 
