@@ -82,11 +82,15 @@ class OrderService
                     'nama' => $penumpang->nama,
                     'nik' => $penumpang->nik,
                     'no_telp' => $penumpang->no_telp,
+                    'email' => $penumpang->email,
                     'kursi' => $penumpang->kursi->nomor_kursi,
                 ];
             }),
             'pesanan' => [
+                'nama' => $pesanan->nama,
+                'no_telp' => $pesanan->no_telp,
                 'mobil' => $pesanan->jadwal->master_mobil->type,
+                'supir' => $pesanan->jadwal->master_supir->nama,
                 'kode_pesanan' => $pesanan->kode_pesanan,
                 'jam_berangkat' => $pesanan->jadwal->waktu_keberangkatan,
                 'estimasi' => $estimasi,
