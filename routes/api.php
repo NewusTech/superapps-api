@@ -141,8 +141,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'roles'], function () {
 });
 Route::group(['middleware' => 'api', 'prefix' => 'laporan'], function () {
     Route::get('laporan_per_mobil', [LaporanController::class, 'laporanPesananPerMobil']);
-    Route::get('laporan_per_rute', [LaporanController::class, 'laporanPesananPerRute']);
-    Route::get('list_penumpang', [LaporanController::class, 'listPenumpang']);
+    Route::get('laporan', [LaporanController::class, 'laporanPesananPerRute']);
+    Route::get('/', [LaporanController::class, 'laporanPesananPerRute']);
+    Route::get('/{id}', [LaporanController::class, 'detail']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {

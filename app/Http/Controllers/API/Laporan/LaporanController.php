@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\API\Laporan;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jadwal;
+use App\Models\MasterRute;
 use App\Models\Pesanan;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -13,46 +14,44 @@ class LaporanController extends Controller
     public function laporanPesananPerRute()
     {
         try {
-            $pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir')->where('status', 'Sukses')->get();
+            $jadwals = Jadwal::whereHas('pemesanan', function ($query) {
+                return $query->where('status', 'Sukses');
+            })->get();
+
+
+            $jadwals->map(function ($item) {
+                $pesanans = Pesanan::with('penumpang', 'pembayaran')
+                    ->where('status', 'Sukses')
+                    ->where('jadwal_id', $item->id)
+                    ->get();
+
+                $item->jumlah_penumpang = $pesanans->sum(function ($pesanan) {
+                    return $pesanan->penumpang->count();
+                });
+
+                $item->total_harga = $pesanans->sum(function ($pesanan) {
+                    return $pesanan->pembayaran->amount;
+                });
+                return $item;
+            });
+
 
             $laporan = [];
             $totalPenumpang = 0;
             $totalHarga = 0;
-            foreach ($pesanan as $item) {
-                $rute = $item->jadwal->master_rute->kota_asal . ' - ' . $item->jadwal->master_rute->kota_tujuan;
-                $jamBerangkat = $item->jadwal->waktu_keberangkatan;
 
-                if (!isset($laporan[$rute])) {
-                    $laporan[$rute] = [];
-                }
+            foreach ($jadwals as $jadwal) {
+                $laporan[] = [
+                    'id'=> $jadwal->id,
+                    'rute' => $jadwal->master_rute->kota_asal . ' - ' . $jadwal->master_rute->kota_tujuan,
+                    'mobil' => $jadwal->master_mobil->type,
+                    'jam_berangkat' => $jadwal->waktu_keberangkatan,
+                    'jumlah_penumpang' => $jadwal->jumlah_penumpang,
+                    'jumlah_harga' => $jadwal->total_harga
+                ];
 
-                if (!isset($laporan[$rute][$jamBerangkat])) {
-                    $laporan[$rute][$jamBerangkat] = [
-                        'jumlah_mobil' => 0,
-                        'jumlah_penumpang' => 0,
-                        'jumlah_harga' => 0
-                    ];
-                }
-
-                $laporan[$rute][$jamBerangkat]['jumlah_mobil'] += 1;
-                $laporan[$rute][$jamBerangkat]['jumlah_penumpang'] += 1;
-                $laporan[$rute][$jamBerangkat]['jumlah_harga'] += $item->jadwal->master_rute->harga;
-
-                $totalPenumpang += 1;
-                $totalHarga += $item->jadwal->master_rute->harga;
-            }
-
-            $formattedLaporan = [];
-            foreach ($laporan as $rute => $jadwal) {
-                foreach ($jadwal as $jamBerangkat => $data) {
-                    $formattedLaporan[] = [
-                        'rute' => $rute,
-                        'jam_berangkat' => $jamBerangkat,
-                        'jumlah_mobil' => $data['jumlah_mobil'],
-                        'jumlah_penumpang' => $data['jumlah_penumpang'],
-                        'jumlah_harga' => $data['jumlah_harga']
-                    ];
-                }
+                $totalPenumpang += $jadwal->jumlah_penumpang;
+                $totalHarga += $jadwal->total_harga;
             }
 
             return response()->json([
@@ -60,7 +59,7 @@ class LaporanController extends Controller
                 'data' => [
                     'total_penumpang' => $totalPenumpang,
                     'total_harga' => $totalHarga,
-                    'laporan' => $formattedLaporan
+                    'laporan' => $laporan
                 ],
                 'message' => 'Berhasil get data'
             ]);
