@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Laporan;
 
+use App\Helpers\FilterHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
 use App\Models\MasterRute;
@@ -11,12 +12,22 @@ use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
-    public function laporanPesananPerRute()
+    public function laporanPesananPerRute(Request $request)
     {
         try {
-            $jadwals = Jadwal::whereHas('pemesanan', function ($query) {
+            $jadwals = Jadwal::with('master_rute', 'master_mobil', 'master_supir')->whereHas('pemesanan', function ($query) {
                 return $query->where('status', 'Sukses');
-            })->get();
+            });
+            if ($request->has('search')) {
+                FilterHelper::applySearch($jadwals, $request->search, ['master_rute.kota_asal', 'master_rute.kota_tujuan', 'master_mobil.type', 'master_supir.nama']);
+            }
+            if ($request->has('startDate') && $request->has('endDate')) {
+                $startDate = date('Y-m-d 00:00:00', strtotime($request->startDate));
+                $endDate = date('Y-m-d 23:59:59', strtotime($request->endDate));
+                $jadwals = $jadwals->whereBetween('tanggal_berangkat', [$startDate, $endDate]);
+            }
+
+            $jadwals= $jadwals->get();
 
 
             $jadwals->map(function ($item) {
@@ -46,6 +57,7 @@ class LaporanController extends Controller
                     'rute' => $jadwal->master_rute->kota_asal . ' - ' . $jadwal->master_rute->kota_tujuan,
                     'mobil' => $jadwal->master_mobil->type,
                     'jam_berangkat' => $jadwal->waktu_keberangkatan,
+                    'tanggal_berangkat' => $jadwal->tanggal_berangkat,
                     'jumlah_penumpang' => $jadwal->jumlah_penumpang,
                     'jumlah_harga' => $jadwal->total_harga
                 ];
