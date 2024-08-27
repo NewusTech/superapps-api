@@ -181,14 +181,23 @@ class MasterRuteController extends Controller
                     'message' => 'ID tidak ditemukan'
                 ]);
             }
-            $data = MasterRute::whereHas('jadwal')->find($id);
-            if ($data->jadwal) {
+            $data = MasterRute::find($id);
+            if (!$data) {
                 return response()->json([
                     'success' => false,
-                    'data' => '',
-                    'message' => 'Data ini sedang digunakan pada jadwal. Hapus jadwal terlebih dahulu.'
-                ]);
+                    'message' => 'Data tidak ditemukan.'
+                ], 404);
             }
+
+            $hasJadwal = $data->jadwal()->exists();
+            if ($hasJadwal) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data ini sedang digunakan pada jadwal. Hapus jadwal terlebih dahulu.',
+                    'data' => $data
+                ], 409);
+            }
+
             $data->delete();
 
             return response()->json([
