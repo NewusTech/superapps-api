@@ -60,8 +60,16 @@ class PariwisataController extends Controller
             if ($validator->fails()) {
                 return response()->json([ 'message' => $validator->errors()->first()], 400);
             }
-
-            $pariwisata = Pariwisata::create($request->all());
+            $data = $request->all();
+            if ($request->hasFile('image_url')) {
+                $file = $request->file('image_url');
+                $gambarPath = $file->store('superapps/artikel', 's3');
+                $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
+                $data['image_url'] = $fullUrl;
+            } else {
+                $data['image_url'] = null;
+            }
+            $pariwisata = Pariwisata::create($data);
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data',
