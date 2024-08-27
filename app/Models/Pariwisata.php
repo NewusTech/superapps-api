@@ -28,13 +28,13 @@ class Pariwisata extends Model
 
         static::created(function ($pariwisata) {
             $pariwisata->slug = self::generateSlug($pariwisata->judul);
+            $pariwisata->save();
         });
     }
     public static function generateSlug($judul)
     {
-        $slug = preg_replace('/[^a-zA-Z0-9]/', '-', $judul);
-        $slug = strtolower($slug);
-        $slug = trim($slug, '-');
+        $slug = strtolower($judul);
+        $slug = str_replace(' ', '-', $judul);
         return $slug;
     }
 }
