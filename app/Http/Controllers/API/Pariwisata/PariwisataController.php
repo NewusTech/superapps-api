@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pariwisata;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PariwisataController extends Controller
 {
@@ -48,6 +49,18 @@ class PariwisataController extends Controller
     public function store(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'judul' => 'required',
+                'image_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:500',
+                'lokasi' => 'required',
+                'sub_judul' => 'required',
+                'deskripsi' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([ 'message' => $validator->errors()->first()], 400);
+            }
+
             $pariwisata = Pariwisata::create($request->all());
             return response()->json([
                 'success' => true,

@@ -20,6 +20,7 @@ use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
 use App\Http\Controllers\API\MobilRental\MobilRentalController;
+use App\Http\Controllers\API\Penginapan\PenginapanController;
 use App\Http\Controllers\API\Perjalanan\PerjalananController;
 use App\Http\Controllers\API\Rental\RentalController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
@@ -56,6 +57,10 @@ Route::group(['middleware' => 'api','prefix' => 'rute'], function () {
     Route::resource('master_rute', MasterRuteController::class);
     Route::post('master_rute/{id}', [MasterRuteController::class, 'update']);
     Route::get('dropdown', [MasterRuteController::class, 'dropdown']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'penginapan'], function () {
+    Route::resource('penginapan', PenginapanController::class);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'mobil'], function () {
