@@ -54,7 +54,7 @@ class PariwisataController extends Controller
                 'image_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:500',
                 'lokasi' => 'required',
                 'sub_judul' => 'required',
-                'deskripsi' => 'required',
+                'konten' => 'required',
             ]);
 
             if ($validator->fails()) {
