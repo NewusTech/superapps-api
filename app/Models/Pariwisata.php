@@ -16,7 +16,7 @@ class Pariwisata extends Model
         'judul',
         'slug',
         'lokasi',
-        'sub-judul',
+        'sub_judul',
         'rating',
         'konten',
         'image_url'
