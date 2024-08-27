@@ -80,11 +80,11 @@ class MasterRuteController extends Controller
                 $data['image_url'] = null;
             }
             $master_rute = new MasterRute();
-            $master_rute->kota_asal = $request->kota_asal;
-            $master_rute->kota_tujuan = $request->kota_tujuan;
-            $master_rute->harga = $request->harga;
-            $master_rute->deskripsi = $request->deskripsi;
-            $master_rute->image_url = $request->image_url;
+            $master_rute->kota_asal = $data['kota_asal'];
+            $master_rute->kota_tujuan = $data['kota_tujuan'];
+            $master_rute->harga = $data['harga'];
+            $master_rute->deskripsi = $data['deskripsi'];
+            $master_rute->image_url = $data['image_url'];
             $master_rute->save();
 
             return response()->json([
@@ -141,13 +141,22 @@ class MasterRuteController extends Controller
                     'message' => 'ID tidak ditemukan'
                 ]);
             }
+            $reqData = $request->all();
+            if ($request->hasFile('image_url')) {
+                $file = $request->file('image_url');
+                $gambarPath = $file->store('superapps/artikel', 's3');
+                $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
+                $reqData['image_url'] = $fullUrl;
+            } else {
+                $reqData['image_url'] = null;
+            }
 
             $data = MasterRute::find($id);
-            $data->kota_asal = $request->kota_asal;
-            $data->kota_tujuan = $request->kota_tujuan;
-            $data->harga = $request->harga;
-            $data->deskripsi = $request->deskripsi;
-            $data->image_url = $request->image_url;
+            $data->kota_asal = $reqData['kota_asal'];
+            $data->kota_tujuan = $reqData['kota_tujuan'];
+            $data->harga = $reqData['harga'];
+            $data->deskripsi = $reqData['deskripsi'];
+            $data->image_url = $reqData['image_url'];
             $data->save();
 
             return response()->json([
