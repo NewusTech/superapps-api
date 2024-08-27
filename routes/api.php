@@ -54,6 +54,7 @@ Route::group([
 
 Route::group(['middleware' => 'api','prefix' => 'rute'], function () {
     Route::resource('master_rute', MasterRuteController::class);
+    Route::post('master_rute/{id}', [MasterRuteController::class, 'update']);
     Route::get('dropdown', [MasterRuteController::class, 'dropdown']);
 });
 
