@@ -16,7 +16,7 @@ class PariwisataController extends Controller
         try {
             $pariwisata = Pariwisata::query();
             if ($request->has('search')) {
-                FilterHelper::applySearch($pariwisata, $request->search, ['judul', 'slug', 'lokasi', 'sub-judul']);
+                FilterHelper::applySearch($pariwisata, $request->search, ['judul', 'slug', 'lokasi', 'sub_judul']);
             }
             $pariwisata = $pariwisata->get();
             return response()->json([
