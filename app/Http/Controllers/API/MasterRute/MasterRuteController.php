@@ -75,6 +75,8 @@ class MasterRuteController extends Controller
             $master_rute->kota_asal = $request->kota_asal;
             $master_rute->kota_tujuan = $request->kota_tujuan;
             $master_rute->harga = $request->harga;
+            $master_rute->deskripsi = $request->deskripsi;
+            $master_rute->image_url = $request->image_url;
             $master_rute->save();
 
             return response()->json([
@@ -136,6 +138,8 @@ class MasterRuteController extends Controller
             $data->kota_asal = $request->kota_asal;
             $data->kota_tujuan = $request->kota_tujuan;
             $data->harga = $request->harga;
+            $data->deskripsi = $request->deskripsi;
+            $data->image_url = $request->image_url;
             $data->save();
 
             return response()->json([
