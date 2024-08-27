@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Pariwisata;
 
+use App\Helpers\FilterHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Pariwisata;
 use Exception;
@@ -9,10 +10,14 @@ use Illuminate\Http\Request;
 
 class PariwisataController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $pariwisata = Pariwisata::all();
+            $pariwisata = Pariwisata::query();
+            if ($request->has('search')) {
+                FilterHelper::applySearch($pariwisata, $request->search, ['judul', 'slug', 'lokasi', 'sub-judul']);
+            }
+            $pariwisata = $pariwisata->get();
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data',
