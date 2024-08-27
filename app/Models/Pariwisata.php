@@ -16,9 +16,25 @@ class Pariwisata extends Model
         'judul',
         'slug',
         'lokasi',
-        'sub_judul',
+        'sub-judul',
         'rating',
         'konten',
         'image_url'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($pariwisata) {
+            $pariwisata->slug = Pariwisata::generateSlug($pariwisata->judul);
+        });
+    }
+    public function generateSlug($judul)
+    {
+        $slug = preg_replace('/[^a-zA-Z0-9]/', '-', $judul);
+        $slug = strtolower($slug);
+        $slug = trim($slug, '-');
+        return $slug;
+    }
 }
