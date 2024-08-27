@@ -27,10 +27,10 @@ class Pariwisata extends Model
         parent::boot();
 
         static::created(function ($pariwisata) {
-            $pariwisata->slug = Pariwisata::generateSlug($pariwisata->judul);
+            $pariwisata->slug = self::generateSlug($pariwisata->judul);
         });
     }
-    public function generateSlug($judul)
+    public static function generateSlug($judul)
     {
         $slug = preg_replace('/[^a-zA-Z0-9]/', '-', $judul);
         $slug = strtolower($slug);
