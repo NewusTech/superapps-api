@@ -70,7 +70,15 @@ class MasterRuteController extends Controller
             if ($existingData) {
                 throw new Exception('Data dengan kota_asal dan kota_tujuan yang sama sudah ada.');
             }
-
+            $data = $request->all();
+            if ($request->hasFile('image_url')) {
+                $file = $request->file('image_url');
+                $gambarPath = $file->store('superapps/artikel', 's3');
+                $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
+                $data['image_url'] = $fullUrl;
+            } else {
+                $data['image_url'] = null;
+            }
             $master_rute = new MasterRute();
             $master_rute->kota_asal = $request->kota_asal;
             $master_rute->kota_tujuan = $request->kota_tujuan;
@@ -164,7 +172,7 @@ class MasterRuteController extends Controller
                     'message' => 'ID tidak ditemukan'
                 ]);
             }
-            $data = MasterRute::with('jadwal')->find($id);
+            $data = MasterRute::whereHas('jadwal')->find($id);
             if ($data->jadwal) {
                 return response()->json([
                     'success' => false,
