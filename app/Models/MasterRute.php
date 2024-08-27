@@ -14,6 +14,8 @@ class MasterRute extends Model
         'kota_asal',
         'kota_tujuan',
         'waktu_keberangkatan',
+        'deskripsi',
+        'image_url',
         'harga'
     ];
 
