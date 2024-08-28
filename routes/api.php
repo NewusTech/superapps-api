@@ -22,6 +22,7 @@ use App\Http\Controllers\API\Banner\BannerController;
 use App\Http\Controllers\API\MobilRental\MobilRentalController;
 use App\Http\Controllers\API\Penginapan\PenginapanController;
 use App\Http\Controllers\API\Perjalanan\PerjalananController;
+use App\Http\Controllers\API\Printer\PrinterController;
 use App\Http\Controllers\API\Rental\RentalController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
 use App\Http\Controllers\API\TiketController\TiketController;
@@ -97,7 +98,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'paket'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'jadwal'], function () {
     Route::resource('jadwal', JadwalController::class);
-    Route::get('{tanggal}', [JadwalController::class, 'getJadwalPerTanggal']);
+    Route::get('tanggal/{tanggal}', [JadwalController::class, 'getJadwalPerTanggal']);
     Route::get('dropdown-jadwal', [JadwalController::class, 'dropdownJadwal']);
     Route::get('jadwal_by_rute', [JadwalController::class, 'getJadwalByRute']);
 });
@@ -171,4 +172,9 @@ Route::group(['middleware' => 'api', 'prefix' => 'artikel'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'banner'], function () {
     Route::resource('banner', BannerController::class);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'printer'], function () {
+    // Route::post('print', [PrinterController::class, 'print']);
+    Route::post('print/{paymentCode}', [PrinterController::class, 'print']);
 });
