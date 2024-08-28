@@ -19,8 +19,7 @@ class PenginapanController extends Controller
     {
         try {
             $data = Penginapan::query()->with([
-                'fasilitas:id,nama',
-                'kebijakan:id,title,deskripsi'
+                'image:id,image',
             ]);
 
             if ($request->has('tipe')) {
@@ -34,6 +33,7 @@ class PenginapanController extends Controller
                 'message' => 'Berhasil get data'
             ]);
         } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }
