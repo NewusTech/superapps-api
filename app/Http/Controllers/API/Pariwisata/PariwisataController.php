@@ -63,7 +63,7 @@ class PariwisataController extends Controller
             $data = $request->all();
             if ($request->hasFile('image_url')) {
                 $file = $request->file('image_url');
-                $gambarPath = $file->store('superapps/artikel', 's3');
+                $gambarPath = $file->store('superapps/pariwisata', 's3');
                 $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
                 $data['image_url'] = $fullUrl;
             } else {

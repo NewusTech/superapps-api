@@ -16,6 +16,7 @@ class Penginapan extends Model
         'lokasi',
         'jumlah_kamar',
         'luas_ruangan',
+        'deskripsi',
         'rating',
         'harga',
         'tipe',

@@ -73,7 +73,7 @@ class MasterRuteController extends Controller
             $data = $request->all();
             if ($request->hasFile('image_url')) {
                 $file = $request->file('image_url');
-                $gambarPath = $file->store('superapps/artikel', 's3');
+                $gambarPath = $file->store('superapps/rute', 's3');
                 $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
                 $data['image_url'] = $fullUrl;
             } else {
@@ -144,7 +144,7 @@ class MasterRuteController extends Controller
             $reqData = $request->all();
             if ($request->hasFile('image_url')) {
                 $file = $request->file('image_url');
-                $gambarPath = $file->store('superapps/artikel', 's3');
+                $gambarPath = $file->store('superapps/rute', 's3');
                 $fullUrl = 'https://'. env('AWS_BUCKET').'.'.'s3'.'.'.env('AWS_DEFAULT_REGION').'.'.'amazonaws.com/'. $gambarPath;
                 $reqData['image_url'] = $fullUrl;
             } else {
