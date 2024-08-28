@@ -63,7 +63,7 @@
             <td><strong style="font-size: 12px;">No. {{$paket->resi}}</strong></td>
         </tr>
     </table>
-    <table style=" border: 1px solid #000000; border-top: none; padding:3px">
+    <table style=" width: 100%;  border: 1px solid #000000; border-top: none; padding:3px">
         <div><strong style="font-size: 14px;">DETAIL PENGIRIM</strong></div>
         <tr>
             <td style="width: 45%"><strong style="font-size: 12px;">Nama</strong></td>
