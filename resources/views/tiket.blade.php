@@ -28,10 +28,6 @@
         }
 
 
-        .field>p {
-            color: #8C8D89;
-        }
-
         p,
         h1 {
             margin: 0;
@@ -40,7 +36,7 @@
     </style>
 </head>
 
-<body style="padding: 10px; font-family:'Nunito', sans-serif;">
+<body style="padding: 10px; padding-left: 30px; font-family:'Nunito', sans-serif;">
     @foreach ($data as $penumpang)
     <table>
         <tr>

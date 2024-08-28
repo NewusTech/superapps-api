@@ -12,7 +12,14 @@ class Penginapan extends Model
 
     protected $table = 'penginapan';
     protected $fillable = [
-        'title', 'lokasi', 'jumlah_kamar', 'luas_ruangan', 'rating', 'harga', 'tipe', 'status'
+        'title',
+        'lokasi',
+        'jumlah_kamar',
+        'luas_ruangan',
+        'rating',
+        'harga',
+        'tipe',
+        'status'
     ];
 
     public function fasilitas()
@@ -22,6 +29,9 @@ class Penginapan extends Model
 
     public function kebijakan()
     {
-    return $this->belongsToMany(Kebijakan::class, 'kebijakan_penginapan', 'penginapan_id', 'kebijakan_id');
+        return $this->belongsToMany(Kebijakan::class, 'kebijakan_penginapan', 'penginapan_id', 'kebijakan_id');
+    }
+    public function image(){
+        return $this->belongsToMany(Image::class, 'image_penginapan', 'penginapan_id', 'image_id');
     }
 }

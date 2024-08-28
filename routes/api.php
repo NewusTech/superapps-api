@@ -59,7 +59,7 @@ Route::group(['middleware' => 'api','prefix' => 'rute'], function () {
     Route::get('dropdown', [MasterRuteController::class, 'dropdown']);
 });
 
-Route::group(['middleware' => 'api', 'prefix' => 'penginapan'], function () {
+Route::group(['middleware' => 'api', 'prefix' => 'master_penginapan'], function () {
     Route::resource('penginapan', PenginapanController::class);
 });
 
