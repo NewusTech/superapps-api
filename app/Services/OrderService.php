@@ -23,6 +23,7 @@ class OrderService
         $data = $query->map(function ($order) {
             return [
                 'created_at' => $order->created_at,
+                'expired_at' => $order->expired_at,
                 'kode_pesanan' => $order->kode_pesanan,
                 'kota_asal' => $order->jadwal->master_rute->kota_asal,
                 'kota_tujuan' => $order->jadwal->master_rute->kota_tujuan,

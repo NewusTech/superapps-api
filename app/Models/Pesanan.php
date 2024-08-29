@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,6 +21,7 @@ class Pesanan extends Model
         'nama',
         'email',
         'nik',
+        'expired_at',
         'no_telp',
         'master_titik_jemput_id',
         'titik_antar_id',
@@ -62,9 +65,16 @@ class Pesanan extends Model
     protected static function boot()
     {
         parent::boot();
+        static::addGlobalScope('order', function (Builder $builder) {
+            $builder->orderBy('created_at', 'desc');
+        });
 
         static::creating(function ($pesanan) {
             $pesanan->kode_pesanan = self::generateUniqueKodePesanan();
+        });
+        static::created(function ($pesanan) {
+            $pesanan->expired_at = Carbon::parse($pesanan->created_at)->addMinutes(15);
+            $pesanan->save();
         });
     }
 

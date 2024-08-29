@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,6 +16,7 @@ class Pembayaran extends Model
         'kode_pembayaran',
         'pesanan_id',
         'amount',
+        'expired_at',
         'payment_link',
         'status'
     ];
@@ -21,6 +24,17 @@ class Pembayaran extends Model
     public function pesanan()
     {
         return $this->belongsTo(Pesanan::class, 'pesanan_id', 'id');
+    }
+    protected static function boot()
+    {
+        parent::boot();
+        static::addGlobalScope('order', function (Builder $builder) {
+            $builder->orderBy('created_at', 'desc');
+        });
+        static::created(function ($pembayaran) {
+            $pembayaran->expired_at = Carbon::parse($pembayaran->created_at)->addMinutes(15);
+            $pembayaran->save();
+        });
     }
 
     public static function generateUniqueKodeBayar()

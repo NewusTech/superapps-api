@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Pesanan;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CancelOrder;
 use App\Models\Pesanan;
 use App\Models\Jadwal;
 use App\Models\Kursi;
@@ -13,6 +14,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class PesananController extends Controller
@@ -234,6 +236,7 @@ class PesananController extends Controller
             }
 
             DB::commit();
+            CancelOrder::dispatch($pesanan)->delay(now()->addMinutes(15));
             return response()->json([
                 'success' => true,
                 'data' => $pesanan,

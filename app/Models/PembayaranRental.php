@@ -16,6 +16,7 @@ class PembayaranRental extends Model
         'rental_id',
         'nominal',
         'status',
+        'expired_at',
         'kode_pembayaran',
         'payment_link',
     ];

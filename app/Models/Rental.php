@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,7 @@ class Rental extends Model
         'jam_keberangkatan',
         'nama',
         'email',
+        'expired_at',
         'mobil_rental_id',
         'nik',
         'no_telp',
@@ -36,6 +38,10 @@ class Rental extends Model
 
         static::addGlobalScope('order', function (Builder $builder) {
             $builder->orderBy('created_at', 'desc');
+        });
+        static::created(function ($rental) {
+            $rental->expired_at = Carbon::parse($rental->created_at)->addMinutes(15);
+            $rental->save();
         });
     }
 
