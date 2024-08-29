@@ -76,7 +76,6 @@ class JadwalController extends Controller
             }
             $jadwal = Jadwal::where('master_rute_id', $rute->id)
                 ->whereDate('tanggal_berangkat', $date)
-                ->whereRaw("available_seats >= {$request->seats}")
                 ->orderBy('waktu_keberangkatan', 'asc')
                 ->get([
                     "id",
