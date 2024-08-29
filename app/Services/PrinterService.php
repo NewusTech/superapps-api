@@ -66,28 +66,40 @@ class PrinterService
     {
         $command = "pdftoppm -r 195 -jpeg $pdfPath $imagePath";
         shell_exec($command);
-        shell_exec("convert $imagePath-1.jpg -rotate -90 $imagePath-1.jpg");
+        $images = [];
+        $i = 1;
+        while (file_exists("$imagePath-$i.jpg")) {
+            $imageFilePath = "$imagePath-$i.jpg";
+            shell_exec("convert $imageFilePath -rotate -90 $imageFilePath");
 
-        return "$imagePath-1.jpg";
+            $images[] = $imageFilePath;
+            $i++;
+        }
+        return $images;
     }
+
 
     public function print($paymentCode)
     {
         try {
             $pdfPath = $this->generatePdf($paymentCode);
-
-            $imgPath = $this->convertPdfToImage($pdfPath, public_path("assets/tiket/$paymentCode"));
+            $imgPaths = $this->convertPdfToImage($pdfPath, public_path("assets/tiket/$paymentCode"));
 
             $connector = new CupsPrintConnector('TP806L');
             $printer = new Printer($connector);
-            $image = EscposImage::load($imgPath, false);
 
-            $printer->bitImage($image);
-            $printer->cut();
+            foreach ($imgPaths as $imgPath) {
+                $image = EscposImage::load($imgPath, false);
+                $printer->bitImage($image);
+                $printer->cut();
+            }
+
             $printer->close();
 
             unlink($pdfPath);
-            unlink($imgPath);
+            foreach ($imgPaths as $imgPath) {
+                unlink($imgPath);
+            }
 
             return response()->json(['message' => 'Success'], 200);
         } catch (\Throwable $th) {
