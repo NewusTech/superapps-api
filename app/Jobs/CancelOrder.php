@@ -28,11 +28,6 @@ class CancelOrder implements ShouldQueue
             $this->pesanan->status = 'Kadaluarsa';
             $this->pesanan->save();
 
-            if ($this->pesanan->pembayaran()) {
-                $this->pesanan->pembayaran->status = 'Kadaluarsa';
-                $this->pesanan->pembayaran->save();
-            }
-
            $penumpangs = $this->pesanan->penumpang();
            $penumpangs->each(function ($penumpang) {
               $kursi = Kursi::where('id', $penumpang->kursi_id)->first();
