@@ -106,7 +106,7 @@ class PaymentService
         $pembayaran->payment_link = $response->payment_url;
         $response->kode = 1;
         $pembayaran->save();
-        CancelPayment::dispatch($pembayaran)->delay(now()->addMinutes(1));
+        CancelPayment::dispatch($pembayaran)->delay(now()->addMinutes(15));
 
         return response()->json([
             'success' => true,
