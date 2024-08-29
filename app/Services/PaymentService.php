@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\CancelPayment;
 use App\Models\Kursi;
 use App\Models\MetodePembayaran;
 use App\Models\Pesanan;
@@ -105,6 +106,7 @@ class PaymentService
         $pembayaran->payment_link = $response->payment_url;
         $response->kode = 1;
         $pembayaran->save();
+        CancelPayment::dispatch($pembayaran)->delay(now()->addMinutes(1));
 
         return response()->json([
             'success' => true,
@@ -129,7 +131,7 @@ class PaymentService
         ];
         $pembayaran->status = 'Menunggu Pembayaran';
         $pembayaran->save();
-
+        CancelPayment::dispatch($pembayaran)->delay(now()->addMinutes(2));
         return response()->json([
             'success' => true,
             'data' => $data,
