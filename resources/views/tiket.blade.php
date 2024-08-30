@@ -6,17 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Tiket</title>
     <style>
-        @font-face {
-            font-family: "Nunito";
-            font-style: normal;
-            src: url('{{ public_path("assets/font/Nunito-Regular.ttf") }}') format('truetype');
+        .field>p {
+            font-size: 13px;
         }
 
-        @font-face {
-            font-family: 'Nunito';
-            src: url('{{ public_path("assets/font/Nunito-SemiBold.ttf") }}') format('truetype');
-            font-weight: 600;
-            font-style: semibold;
+        .td-field {
+            padding: 7px 4px
+        }
+
+        .field>strong {
+            font-size: 15px;
+        }
+
+        table,
+        tr,
+        td {
+            padding: 0px;
+            margin: 0px;
         }
 
         @page {
@@ -36,102 +42,107 @@
     </style>
 </head>
 
-<body style="padding: 10px; padding-left: 30px; font-family:'Nunito', sans-serif;">
+<body style="padding: 20px 0px;  font-family:'Nunito', sans-serif; background-color: #3572EF">
     @foreach ($data as $penumpang)
-    <table>
+    <table style="background-color: white; width: 100%;">
         <tr>
             <td>
-                <table style="table-layout: auto;">
+                <table style="width: 100%;">
                     <tr>
+                        <td style="width: 75px;">
+                            <img src="{{ public_path('assets/Icon.png') }}" alt="Logo" style="width: 99px; height: 66px">
+                        </td>
                         <td>
-                            <table style="table-layout: auto; width: 100%;">
-                                <tr>
-                                    <td style="width: 75px;">
-                                        <img src="{{ public_path('assets/Icon.png') }}" alt="Logo" style="width: 90px; height: 90px">
-                                    </td>
-                                    <td>
-                                        <h1 style="font-weight: bold;">RAMA TRANZ</h1>
-                                        <p>PT. RASYA MANDIRI TRANZ</p>
-                                    </td>
-                                </tr>
-                            </table>
+                            <strong style="font-weight: bold; font-size: 22px">RAMA TRANZ</strong>
+                            <p style="font-size: 13px">PT. RASYA MANDIRI TRANZ</p>
                         </td>
                     </tr>
                 </table>
-                <table style="table-layout: auto;">
+                <table style="width: 100%; padding: 5px">
                     <tr>
-                        <td>
+                        <td class="td-field">
                             <div class="field">
-                                <p>No. Pesanan:</p>
-                                <strong>{{$penumpang['kode']}}</strong>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="field">
-                                <p>Nama:</p>
+                                <p>Nama</p>
                                 <strong>{{$penumpang['nama']}}</strong>
                             </div>
                         </td>
-                        <td>
+                        <td class="td-field">
                             <div class="field">
-                                <p>No Identitas:</p>
-                                <strong>{{$penumpang['nik']}}</strong>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="field">
-                                <p>No Telepon:</p>
+                                <p>No Telepon</p>
                                 <strong>{{$penumpang['no_telp']}}</strong>
                             </div>
                         </td>
-                        <td>
+                        <td class="td-field">
                             <div class="field">
-                                <p>Email:</p>
-                                <strong>{{$penumpang['email']}}</strong>
+                                <p>No. Pesanan</p>
+                                <strong>{{$penumpang['kode']}}</strong>
                             </div>
                         </td>
-                        <td>
+                        <td class="td-field">
                             <div class="field">
-                                <p>No Kursi:</p>
+                                <p>No Kursi</p>
                                 <strong>{{$penumpang['kursi']}}</strong>
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td>
+                        <td class="td-field">
                             <div class="field">
-                                <p>Tipe Mobil:</p>
+                                <p>No Identitas</p>
+                                <strong>{{$penumpang['nik']}}344</strong>
+                            </div>
+                        </td>
+                        <td class="td-field">
+                            <div class="field">
+                                <p>Email</p>
+                                <strong>{{$penumpang['email']}}</strong>
+                            </div>
+                        </td>
+                        <td class="td-field">
+                            <div class="field">
+                                <p>Tipe Mobil</p>
                                 <strong>{{$penumpang['mobil']}}</strong>
                             </div>
                         </td>
-                        <td>
+                    </tr>
+                    <tr>
+                        <td class="td-field" >
                             <div class="field">
-                                <p>Keberangkatan:</p>
+                                <p>Hari</p>
+                                <strong>{{$penumpang['hari']}}</strong>
+                            </div>
+                        </td>
+                        <td class="td-field">
+                            <div class="field">
+                                <p>Waktu Berangkat</p>
+                                <strong>{{$penumpang['jam']}} WIB</strong>
+                            </div>
+                        </td>
+                        <td class="td-field">
+                            <div class="field">
+                                <p>Keberangkatan</p>
                                 <strong>{{$penumpang['keberangkatan']}}</strong>
                             </div>
                         </td>
-                        <td>
+                        <td class="td-field">
                             <div class="field">
-                                <p>Tiba:</p>
+                                <p>Perkiraan Tiba</p>
                                 <strong>{{$penumpang['tiba']}}</strong>
                             </div>
                         </td>
                     </tr>
                 </table>
             </td>
-            <td style="padding-left: 40px; padding-top:15px;">
+            <td>
+                <div style="text-align: center;">BOARDING PASS</div>
                 <div id="qrcode">
-                    <div style="text-align: center;">Qr Code</div>
-                    <div class="flex justify-center">
-                        <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 200px; height: 200px;">
+                    <div style="padding-left: 10px; padding-top: 10px">
+                        <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 150px; height: 150px;">
                     </div>
                 </div>
             </td>
         </tr>
     </table>
-    <hr>
     @endforeach
 </body>
 
