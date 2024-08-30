@@ -21,7 +21,7 @@ class PembayaranController extends Controller
     public function __construct(PaymentService $paymentService)
     {
         $this->middleware('auth:api', ['except' => ['handleMidtransNotification']]);
-        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran','updateStatusPembayaran']);
+        $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran', 'updateStatusPembayaran']);
         $this->paymentService = $paymentService;
     }
     private function getMidtransEnv()
@@ -204,11 +204,6 @@ class PembayaranController extends Controller
 
             $pembayaran = Pembayaran::where('kode_pembayaran', $formattedPaymentCode)->first();
             $pembayaranRental = PembayaranRental::where('kode_pembayaran', $formattedPaymentCode)->first(); // Find pembayaran_rental
-
-            if (!$pembayaran && !$pembayaranRental) {
-                return response()->json(['message' => 'pembayaran atau pembayaran_rental tidak ditemukan'], 404);
-            }
-
             $statusMapping = [
                 'capture' => 'Sukses',
                 'settlement' => 'Sukses',
@@ -232,10 +227,10 @@ class PembayaranController extends Controller
             }
 
             if ($pembayaranRental) {
-                $statusMapping = [
-                    'Kadaluarsa' => 'Kadaluwarsa',
-                ];
-                $convertedStatus = $statusMapping[$convertedStatus] ?? 'Gagal';
+
+                if ($convertedStatus == 'Kadaluarsa') {
+                    $convertedStatus = 'Kadaluwarsa';
+                }
                 $pembayaranRental->update([
                     'status' => $convertedStatus,
                 ]);
@@ -245,11 +240,9 @@ class PembayaranController extends Controller
                 'success' => true,
                 'message' => 'Berhasil update data',
             ]);
-
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
-
     }
     public function getStatusPembayaran($paymentCode)
     {
