@@ -44,12 +44,14 @@ class TiketController extends Controller
                     'kursi' => $penumpang->kursi->nomor_kursi,
                     'no_telp' => $penumpang->no_telp,
                     'mobil' => $penumpang->pesanan->jadwal->master_mobil->type,
-                    'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
-                    'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                    'jam' => Carbon::parse($penumpang->pesanan->jadwal->waktu_keberangkatan)->format('H:i'),
+                    'hari' => Carbon::parse($penumpang->pesanan->jadwal->tanggal_berangkat)->translatedFormat('l'),
+                    'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ';' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                    'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ';' . $penumpang->pesanan->jadwal->tanggal_berangkat,
                 ];
             });
 
-            $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
+            $qrcode = base64_encode(QrCode::format('png')->size(110)->margin(0)->generate($paymentCode));
             $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode])->setPaper([0, 0, 226.77, 641.89],'landscape');
             return $pdf->stream("ORDER-$paymentCode.pdf");
         } catch (\Throwable $th) {
@@ -136,6 +138,8 @@ class TiketController extends Controller
 
             $data->pembayaran = new stdClass();
             $data->pembayaran->jumlah_tiket = $pesanan->penumpang->count();
+            $data->pembayaran->metode = $pesanan->metode->metode;
+            $data->pembayaran->jam = Carbon::parse($pembayaran->created_at)->format('H:i');
             $data->pembayaran->tanggal = Carbon::parse($pembayaran->created_at)->format('d-m-Y');
             $data->pembayaran->harga_tiket = $pembayaran->amount / $data->pembayaran->jumlah_tiket;
             $data->pembayaran->total_harga = $pembayaran->amount;
@@ -202,8 +206,10 @@ class TiketController extends Controller
                 return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
             }
             $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
+            $pesanan->hari = Carbon::parse($pesanan->created_at)->translatedFormat('l');
+            $pesanan->waktu_pemesanan = Carbon::parse($pesanan->created_at)->translatedFormat('d/m/Y H:i');
+            $pesanan->jam = Carbon::parse($pesanan->jadwal->waktu_keberangkatan)->translatedFormat('H:i');
             $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate("https://backend-superapps.newus.id/tiket/$paymentCode"));
-                // dd($pesanan);
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);
             return $pdf->stream("$paymentCode.pdf");
         } catch (Exception $e) {
