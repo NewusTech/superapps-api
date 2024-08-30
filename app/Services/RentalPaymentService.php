@@ -7,6 +7,7 @@ use App\Models\PembayaranRental;
 use App\Models\Pesanan;
 use App\Models\Rental;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
@@ -17,7 +18,20 @@ class RentalPaymentService
     {
         $this->midtransEnv = $this->getMidtransEnv();
     }
-
+    private function handleImageUpload($request)
+    {
+        if ($request['image_ktp'] && $request['image_swafoto']) {
+            $ktp = $request['image_ktp'];
+            $swafoto = $request['image_swafoto'];
+            $gambarPathKtp = $ktp->store('superapps/rental', 's3');
+            $gambarPathSwafoto = $swafoto->store('superapps/rental', 's3');
+            $fullUrlKtp = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPathKtp;
+            $fullUrlswafoto = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPathSwafoto;
+            $request['image_ktp'] = $fullUrlKtp;
+            $request['image_swafoto'] = $fullUrlswafoto;
+        }
+        return $request;
+    }
     public function processRentalPayment($request)
     {
         try {
@@ -27,6 +41,7 @@ class RentalPaymentService
             if (!$metode) {
                 throw new Exception('Metode pembayaran tidak ditemukan');
             }
+            $request = $this->handleImageUpload($request);
             $rental = Rental::create($request);
             $pembayaran = new PembayaranRental();
             $pembayaran->rental_id = $rental->id;
@@ -49,7 +64,8 @@ class RentalPaymentService
         }
     }
 
-    public function updatePaymentStatus($paymentCode){
+    public function updatePaymentStatus($paymentCode)
+    {
         $pembayaran = PembayaranRental::where('kode_pembayaran', $paymentCode)->first();
         $pembayaran->update([
             'status' => 'Sukses',
@@ -64,7 +80,7 @@ class RentalPaymentService
         $pembayaran->kode_pembayaran = PembayaranRental::generateUniqueKodeBayar();
 
         $params = [
-            'transaction_details' =>[
+            'transaction_details' => [
                 'order_id' => $pembayaran->kode_pembayaran,
                 'gross_amount' => $pembayaran->nominal,
                 'payment_link_id' => str(rand(1000, 9999)) . time()
