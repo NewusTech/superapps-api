@@ -210,7 +210,7 @@ class PembayaranController extends Controller
                 'pending' => 'Menunggu pembayaran',
                 'deny' => 'Gagal',
                 'cancel' => 'Gagal',
-                'expire' => 'Kadaluarsa',
+                'expire' => 'Gagal',
                 'failure' => 'Gagal',
             ];
             $convertedStatus = $statusMapping[$status] ?? 'Gagal';
@@ -227,10 +227,6 @@ class PembayaranController extends Controller
             }
 
             if ($pembayaranRental) {
-
-                if ($convertedStatus == 'Kadaluarsa') {
-                    $convertedStatus = 'Kadaluwarsa';
-                }
                 $pembayaranRental->update([
                     'status' => $convertedStatus,
                 ]);
