@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\TiketController;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pembayaran;
+use App\Models\PembayaranRental;
 use App\Models\Penumpang;
 use App\Models\Pesanan;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
@@ -17,7 +18,7 @@ class TiketController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['template', 'invoice', 'eTiket']]);
+        $this->middleware('auth:api', ['except' => ['template', 'invoice', 'eTiket', 'rentalTiket']]);
     }
     public function template($paymentCode)
     {
@@ -233,6 +234,38 @@ class TiketController extends Controller
                 return response()->json(['link' => "https://backend-superapps.newus.id/e-tiket/$paymentCode"]);
             }
             return $pdf->download("$paymentCode.pdf");
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function rentalTiket($paymentCode){
+        try {
+            $pembayaran = PembayaranRental::with('rental.mobil')->where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pembayaran) {
+                return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
+            }
+            $pembayaran->rental->waktu_pemesanan = Carbon::parse($pembayaran->rental->created_at)->translatedFormat('l, d/m/Y, H:i') . ' WIB';
+            $pembayaran->rental->tanggal_mulai_sewa = Carbon::parse($pembayaran->rental->tanggal_mulai_sewa)->translatedFormat('d F Y');
+            $pembayaran->rental->jam_keberangkatan = Carbon::parse($pembayaran->rental->jam_keberangkatan)->translatedFormat('H:i');
+            $pdf = FacadePdf::loadView('rental/e-tiket', ['data' => $pembayaran]);
+            return $pdf->stream("E-TIKET-$paymentCode.pdf");
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function rentalInvoice($paymentCode){
+        try {
+            $pembayaran = PembayaranRental::with('rental.mobil')->where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            if (!$pembayaran) {
+                return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
+            }
+            $pembayaran->rental->waktu_pemesanan = Carbon::parse($pembayaran->rental->created_at)->translatedFormat('l, d/m/Y, H:i') . ' WIB';
+            $pembayaran->rental->tanggal_mulai_sewa = Carbon::parse($pembayaran->rental->tanggal_mulai_sewa)->translatedFormat('d F Y');
+            $pembayaran->rental->jam_keberangkatan = Carbon::parse($pembayaran->rental->jam_keberangkatan)->translatedFormat('H:i');
+            $pdf = FacadePdf::loadView('rental/invoice', ['data' => $pembayaran]);
+            return $pdf->stream("INVOICE-$paymentCode.pdf");
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
