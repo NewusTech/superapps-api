@@ -20,6 +20,8 @@ class Paket extends Model
         'tanggal_dikirim',
         'tanggal_diterima',
         'tujuan',
+        'catatan',
+        'jumlah_barang',
         'no_telp_penerima',
         'no_telp_pengirim',
         'jenis_paket',

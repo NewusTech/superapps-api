@@ -66,6 +66,7 @@ class PaketController extends Controller
                 'total_berat' => 'required|numeric',
                 'no_telp_pengirim' => 'required',
                 'tujuan' => 'required',
+                'catatan' => 'required',
                 'jenis_paket' => 'required',
                 'biaya' => 'required|numeric',
                 'nama_penerima' => 'required',
@@ -84,6 +85,8 @@ class PaketController extends Controller
             $paket->no_telp_penerima = $request->no_telp_penerima;
             $paket->no_telp_pengirim = $request->no_telp_pengirim;
             $paket->tujuan = $request->tujuan;
+            $paket->catatan = $request->catatan;
+            $paket->jumlah_barang = $request->jumlah_barang;
             $paket->alamat_penerima = $request->alamat_penerima;
             $paket->tanggal_dikirim = $request->tanggal_dikirim;
             $paket->tanggal_diterima = $request->tanggal_diterima;
