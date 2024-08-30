@@ -14,6 +14,7 @@ class Rental extends Model
 
     protected $table = 'rental';
     protected $fillable = [
+        'kode_pesanan',
         'durasi_sewa',
         'area',
         'tanggal_mulai_sewa',
@@ -46,6 +47,7 @@ class Rental extends Model
         });
         static::created(function ($rental) {
             $rental->expired_at = Carbon::parse($rental->created_at)->addMinutes(15);
+            $rental->kode_pesanan = self::generateUniqueKodePesanan();
             $rental->save();
         });
     }
@@ -60,5 +62,13 @@ class Rental extends Model
 
     public function metode(){
         return $this->belongsTo(MetodePembayaran::class, 'metode_id', 'id');
+    }
+    private static function generateUniqueKodePesanan()
+    {
+        do {
+            $kode = now()->format('YmdHis') . '-' . rand(1000, 9999);
+        } while (self::where('kode_pesanan', $kode)->exists());
+
+        return $kode;
     }
 }
