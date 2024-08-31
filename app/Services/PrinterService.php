@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Pembayaran;
 use App\Models\Penumpang;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\ImagickEscposImage;
 use Mike42\Escpos\Printer;
@@ -45,8 +46,10 @@ class PrinterService
                 'kursi' => $penumpang->kursi->nomor_kursi,
                 'no_telp' => $penumpang->no_telp,
                 'mobil' => $penumpang->pesanan->jadwal->master_mobil->type,
-                'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
-                'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                'jam' => Carbon::parse($penumpang->pesanan->jadwal->waktu_keberangkatan)->format('H:i'),
+                'hari' => Carbon::parse($penumpang->pesanan->jadwal->tanggal_berangkat)->translatedFormat('l'),
+                'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ';' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ';' . $penumpang->pesanan->jadwal->tanggal_berangkat,
             ];
         });
 

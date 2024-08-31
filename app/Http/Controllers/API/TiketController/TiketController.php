@@ -18,7 +18,7 @@ class TiketController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['template', 'invoice', 'eTiket', 'rentalTiket']]);
+        $this->middleware('auth:api', ['except' => ['template', 'invoice', 'eTiket', 'rentalTiket', 'rentalInvoice']]);
     }
     public function template($paymentCode)
     {
@@ -257,13 +257,15 @@ class TiketController extends Controller
 
     public function rentalInvoice($paymentCode){
         try {
-            $pembayaran = PembayaranRental::with('rental.mobil')->where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
+            $pembayaran = PembayaranRental::with('rental.mobil', 'rental.metode')->where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
             if (!$pembayaran) {
                 return response()->json(['message' => 'E-Tiket tidak ditemukan'], 404);
             }
-            $pembayaran->rental->waktu_pemesanan = Carbon::parse($pembayaran->rental->created_at)->translatedFormat('l, d/m/Y, H:i') . ' WIB';
-            $pembayaran->rental->tanggal_mulai_sewa = Carbon::parse($pembayaran->rental->tanggal_mulai_sewa)->translatedFormat('d F Y');
+            $pembayaran->waktu_pembayaran = Carbon::parse($pembayaran->created_at)->translatedFormat('H:i') . ' WIB';
+            $pembayaran->tanggal_pembayaran = Carbon::parse($pembayaran->created_at)->translatedFormat('l, d F Y');
             $pembayaran->rental->jam_keberangkatan = Carbon::parse($pembayaran->rental->jam_keberangkatan)->translatedFormat('H:i');
+            $pembayaran->rental->tanggal_mulai_sewa = Carbon::parse($pembayaran->rental->tanggal_mulai_sewa)->translatedFormat('d F');
+            $pembayaran->rental->tanggal_akhir_sewa = Carbon::parse($pembayaran->rental->tanggal_akhir_sewa)->translatedFormat('d F Y');
             $pdf = FacadePdf::loadView('rental/invoice', ['data' => $pembayaran]);
             return $pdf->stream("INVOICE-$paymentCode.pdf");
         } catch (Exception $e) {

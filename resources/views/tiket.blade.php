@@ -11,11 +11,11 @@
         }
 
         .td-field {
-            padding: 7px 4px
+            padding: 7px 2px
         }
 
         .field>strong {
-            font-size: 15px;
+            font-size: 14px;
         }
 
         table,
@@ -89,7 +89,7 @@
                         <td class="td-field">
                             <div class="field">
                                 <p>No Identitas</p>
-                                <strong>{{$penumpang['nik']}}344</strong>
+                                <strong>{{$penumpang['nik']}}</strong>
                             </div>
                         </td>
                         <td class="td-field">
@@ -134,10 +134,10 @@
                 </table>
             </td>
             <td>
-                <div style="text-align: center;">BOARDING PASS</div>
+                <div style="text-align: center; font-size: 14px; margin-top: 70px">BOARDING PASS</div>
                 <div id="qrcode">
                     <div style="padding-left: 10px; padding-top: 10px">
-                        <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 150px; height: 150px;">
+                        <img src="data:image/png;base64,{{ $qrcode }}" alt="QR Code" style="width: 130px; height: 130px;">
                     </div>
                 </div>
             </td>

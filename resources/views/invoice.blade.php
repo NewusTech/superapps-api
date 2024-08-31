@@ -57,7 +57,7 @@
 </head>
 
 <body style="font-family:'Nunito', sans-serif;">
-    <div style="width: 100%; height: 69px; background-color: #3572EF">
+    <div style="width: 100%; height: 69px; background-color: #3572EF; margin-top:30px">
         <div style="text-align: center; padding-top: 25px; font-size: 17px; color:white">Invoice Keberangkatan Travel</div>
     </div>
     <div style="padding:0px 40px;">
