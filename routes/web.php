@@ -27,3 +27,8 @@ Route::get('/invoice/{paymentCode}/download', [TiketController::class, 'invoiceD
 Route::get('/e-tiket/{paymentCode}', [TiketController::class, 'eTiket']);
 Route::get('/e-tiket/{paymentCode}/download', [TiketController::class, 'eTiketDownload']);
 Route::get('/paket/label/{paymentCode}', [PaketController::class, 'downloadLabel']);
+
+Route::group(['prefix' => 'rental'], function () {
+    Route::get('/e-tiket/{paymentCode}', [TiketController::class, 'rentalTiket']);
+    Route::get('/invoice/{paymentCode}', [TiketController::class, 'rentalInvoice']);
+});
