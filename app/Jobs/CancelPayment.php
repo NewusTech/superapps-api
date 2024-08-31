@@ -29,10 +29,11 @@ class CancelPayment implements ShouldQueue
     public function handle(): void
     {
         if ($this->pembayaran->status == 'Menunggu Pembayaran') {
-            $this->pembayaran->status = 'Kadaluarsa';
+            $this->pembayaran->status = 'Gagal';
             $this->pembayaran->save();
 
-            CancelOrder::dispatch($this->pembayaran->pesanan);
+            $this->pembayaran->pesanan->status = 'Gagal';
+            $this->pembayaran->pesanan->save();
         }
     }
 }
