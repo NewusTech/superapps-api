@@ -113,6 +113,8 @@ class RentalController extends Controller
                 'kode_pembayaran' => $data->pembayaran->kode_pembayaran,
                 'mobil_type' => $data->mobil->type,
                 'metode' => $data->metode->metode,
+                'link_tiket' => "https://backend-superapps.newus.id/rental/e-tiket/{$data->pembayaran?->kode_pembayaran}",
+                'link_invoice' => "https://backend-superapps.newus.id/rental/invoice/{$data->pembayaran?->kode_pembayaran}",
                 'nominal' => $data->pembayaran->nominal,
                 'payment_link' => $data->pembayaran->payment_link,
                 'expired_at' => Carbon::parse($data->expired_at) ?? null,
