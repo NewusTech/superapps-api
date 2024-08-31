@@ -47,8 +47,8 @@ class TiketController extends Controller
                     'mobil' => $penumpang->pesanan->jadwal->master_mobil->type,
                     'jam' => Carbon::parse($penumpang->pesanan->jadwal->waktu_keberangkatan)->format('H:i'),
                     'hari' => Carbon::parse($penumpang->pesanan->jadwal->tanggal_berangkat)->translatedFormat('l'),
-                    'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ';' . $penumpang->pesanan->jadwal->tanggal_berangkat,
-                    'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ';' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                    'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ', ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                    'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ', ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
                 ];
             });
 

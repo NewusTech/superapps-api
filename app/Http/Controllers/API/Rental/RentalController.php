@@ -107,12 +107,13 @@ class RentalController extends Controller
             $data = Rental::with('pembayaran', 'metode', 'mobil')->whereHas('pembayaran', function ($q) use ($paymentCode) {
                 $q->where('kode_pembayaran', $paymentCode);
             })->first();
-
+            $norek = explode(':', $data->metode->keterangan);
             $response =  [
                 'created_at' => $data->created_at,
                 'kode_pembayaran' => $data->pembayaran->kode_pembayaran,
                 'mobil_type' => $data->mobil->type,
                 'metode' => $data->metode->metode,
+                'no_rek' => $data->metode->kode == 2 ? trim($norek[1]) : "-",
                 'link_tiket' => "https://backend-superapps.newus.id/rental/e-tiket/{$data->pembayaran?->kode_pembayaran}",
                 'link_invoice' => "https://backend-superapps.newus.id/rental/invoice/{$data->pembayaran?->kode_pembayaran}",
                 'nominal' => $data->pembayaran->nominal,
