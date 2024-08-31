@@ -6,19 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice</title>
     <style>
-        @font-face {
-            font-family: "Nunito";
-            font-style: normal;
-            src: url('{{ public_path("assets/font/Nunito-Regular.ttf") }}') format('truetype');
-        }
-
-        @font-face {
-            font-family: 'Nunito';
-            src: url('{{ public_path("assets/font/Nunito-SemiBold.ttf") }}') format('truetype');
-            font-weight: 600;
-            font-style: semibold;
-        }
-
         @page {
             margin: 0px;
         }
@@ -57,8 +44,8 @@
 </head>
 
 <body style="font-family:'Nunito', sans-serif;">
-    <div style="width: 100%; height: 69px; background-color: #3572EF">
-        <div style="text-align: center; padding-top: 25px; font-size: 17px; color:white">Invoice Keberangkatan Travel</div>
+    <div style="width: 100%; height: 69px; background-color: #3572EF; margin-top:30px">
+        <div style="text-align: center; padding-top: 25px; font-size: 17px; color:white">E-Voucher Rental</div>
     </div>
     <div style="padding:0px 40px;">
         <table style="width: 100%;">
@@ -83,20 +70,34 @@
                         </tr>
                     </table>
                     <hr>
-                    <div style="font-size: 20px; font-weight: bold; padding:20px 0px">Invoice Tiket Travel</div>
+                    <div style="font-size: 20px; font-weight: bold; padding:20px 0px">Invoice Pemesanan Rental</div>
                     <!-- BODY -->
                     <table style="table-layout: auto; width: 100%;">
                         <tr>
                             <td style="padding-top:15px;">
                                 <div>
                                     <p><strong>Nama Pemesan</strong></p>
-                                    <p>{{$data->pesanan->nama}}</p>
+                                    <p>{{$data->rental->nama}}</p>
                                 </div>
                             </td>
                             <td style="padding-top:15px;">
                                 <div>
                                     <p><strong>No. Telepon</strong></p>
-                                    <p>{{$data->pesanan->no_telp}}</p>
+                                    <p>{{$data->rental->no_telp}}</p>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding-top:15px;">
+                                <div>
+                                    <p><strong>No. Identitas</strong></p>
+                                    <p>{{$data->rental->nik}}</p>
+                                </div>
+                            </td>
+                            <td style=" padding-top:15px;">
+                                <div>
+                                    <p><strong>Email</strong></p>
+                                    <p>{{$data->rental->email}}</p>
                                 </div>
                             </td>
                         </tr>
@@ -104,13 +105,13 @@
                             <td style="padding-top:15px;">
                                 <div>
                                     <p><strong>No. Invoice</strong></p>
-                                    <p>{{$data->pesanan->invoice}}</p>
+                                    <p>{{$data->kode_pembayaran}}</p>
                                 </div>
                             </td>
                             <td style=" padding-top:15px;">
                                 <div>
                                     <p><strong>Metode Pembayaran</strong></p>
-                                    <p>{{$data->pembayaran->metode}}</p>
+                                    <p>{{$data->rental->metode->metode}}</p>
                                 </div>
                             </td>
                         </tr>
@@ -118,13 +119,13 @@
                             <td style="padding-top:15px;">
                                 <div>
                                     <p><strong>Waktu Pembayaran</strong></p>
-                                    <p>{{$data->pembayaran->jam}}</p>
+                                    <p>{{$data->waktu_pembayaran}}</p>
                                 </div>
                             </td>
                             <td style=" padding-top:15px;">
                                 <div>
                                     <p><strong>Tanggal Pembayaran</strong></p>
-                                    <p>{{$data->pembayaran->tanggal}}</p>
+                                    <p>{{$data->tanggal_pembayaran}}</p>
                                 </div>
                             </td>
                         </tr>
@@ -137,48 +138,27 @@
         <table class="table-data" style="table-layout: auto; width: 100%; margin-bottom: 20px; ">
             <thead>
                 <tr style="background-color: #3572EF;">
-                    <td><strong>Nama</strong></td>
-                    <td><strong>NIK</strong></td>
-                    <td><strong>Email</strong></td>
-                    <td><strong>No. Tlp</strong></td>
-                    <td><strong>No. Kursi</strong></td>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($data->penumpang as $penumpang)
-                <tr>
-                    <td>{{$penumpang->nama}}</td>
-                    <td>{{$penumpang->nik}}</td>
-                    <td>{{$penumpang->email}}</td>
-                    <td>{{$penumpang->no_telp}}</td>
-                    <td>{{$penumpang->kursi}}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <!-- DETAIL PENUMPANG -->
-        <hr>
-        <div style="font-size: 20px; font-weight: bold; padding:20px 0px">Detail Pembayaran</div>
-        <table class="table-data" style="table-layout: auto; width: 100%;">
-            <thead>
-                <tr style="background-color: #3572EF">
-                    <td style="text-align: center">
-                        <strong>Jumlah Tiket</strong>
-                    </td>
-                    <td style="text-align: center">
-                        <strong>Harga Tiket</strong>
-                    </td>
+                    <td><strong>Tipe Mobil</strong></td>
+                    <td><strong>Area Sewa</strong></td>
+                    <td><strong>Tanggal Sewa</strong></td>
+                    <td><strong>Durasi</strong></td>
+                    <td><strong>Harga</strong></td>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td style="text-align: center">{{$data->pembayaran->jumlah_tiket}}</td>
-                    <td style="text-align: center">Rp.{{number_format($data->pembayaran->harga_tiket,0,',','.')}}</td>
+                    <td>{{$data->rental->mobil->type}}</td>
+                    <td>{{$data->rental->area}}</td>
+                    <td>{{$data->rental->tanggal_mulai_sewa}} - {{$data->rental->tanggal_akhir_sewa}}</td>
+                    <td>{{$data->rental->durasi_sewa}} Hari</td>
+                    <td>Rp. {{number_format($data->rental->mobil->biaya_sewa, 0, ',', '.')}}</td>
                 </tr>
                 <tr>
-                    <td style="text-align: center"><strong>Total Harga</strong></td>
-                    <td style="text-align: center">Rp.{{number_format($data->pembayaran->total_harga,0,',','.')}}</td>
+                    <td colspan="3"><strong>All In</strong></td>
+                    <td colspan="2">{{$data->rental->all_in ? $data->rental->mobil->biaya_all_in : '-'}}</td>
+                </tr><tr>
+                    <td colspan="3"><strong>Total Harga</strong></td>
+                    <td colspan="2">Rp. {{number_format($data->nominal, 0, ',', '.')}}</td>
                 </tr>
             </tbody>
         </table>
