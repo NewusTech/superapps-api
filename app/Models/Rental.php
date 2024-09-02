@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\Rental\CancelRentalOrder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -49,6 +50,13 @@ class Rental extends Model
             $rental->expired_at = Carbon::parse($rental->created_at)->addMinutes(15);
             $rental->kode_pesanan = self::generateUniqueKodePesanan();
             $rental->save();
+
+            $delay = Carbon::now()->diffInSeconds(Carbon::parse($rental->expired_at), false);
+            if ($delay > 0) {
+                CancelRentalOrder::dispatch($rental)->delay(now()->addSeconds($delay));
+            } else {
+                CancelRentalOrder::dispatch($rental);
+            }
         });
     }
 
