@@ -34,9 +34,11 @@ class PaymentService
             return response()->json(['message' => $validator->errors()->first()], 422);
         }
 
-        $pesanan = Pesanan::with(['jadwal.master_rute', 'penumpang'])->where('kode_pesanan', $request->orderCode)->first();
+        $pesanan = Pesanan::with(['jadwal.master_rute', 'penumpang', 'pembayaran'])->where('kode_pesanan', $request->orderCode)->first();
         if (!$pesanan) {
             throw new Exception('Pesanan tidak ditemukan');
+        } else if ($pesanan->pembayaran) {
+            throw new Exception('Pembayaran sudah dilakukan. Silahkan Selesaikan Pembayaran sebelumnya', 422);
         }
         $kodePembayaran = MetodePembayaran::where('id', $request->metode_id)->first();
         $user = User::where('id', $pesanan->user_id)->get(['id', 'nama', 'no_telp', 'email'])->first();
