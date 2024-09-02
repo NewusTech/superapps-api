@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\Auth\PasswordResetController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\Jadwal\JadwalController;
 use App\Http\Controllers\API\Kursi\KursiController;
@@ -52,9 +53,11 @@ Route::group([
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::resource('/user-profile', UserController::class);
     Route::put('/update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
+    Route::post('/lupa-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+    Route::post('password/reset', [PasswordResetController::class, 'reset']);
 });
 
-Route::group(['middleware' => 'api','prefix' => 'rute'], function () {
+Route::group(['middleware' => 'api', 'prefix' => 'rute'], function () {
     Route::resource('master_rute', MasterRuteController::class);
     Route::post('master_rute/{id}', [MasterRuteController::class, 'update']);
     Route::get('dropdown', [MasterRuteController::class, 'dropdown']);

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pariwisata;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 
 class PariwisataController extends Controller
@@ -18,6 +19,7 @@ class PariwisataController extends Controller
             if ($request->has('search')) {
                 FilterHelper::applySearch($pariwisata, $request->search, ['judul', 'slug', 'lokasi', 'sub_judul']);
             }
+            Password::sendResetLink($request->only('email'));
             $pariwisata = $pariwisata->get();
             return response()->json([
                 'success' => true,
