@@ -58,7 +58,7 @@ class RentalController extends Controller
             });
         }
 
-        $fields = [ 'area', 'nama', 'alamat'];
+        $fields = ['area', 'nama', 'alamat'];
         $this->applySearchFilter($query, $request, $fields);
 
         if ($request->has('startDate') && $request->has('endDate')) {
@@ -101,6 +101,36 @@ class RentalController extends Controller
         }
     }
 
+    public function getBookedDates()
+    {
+        try {
+            $rental = Rental::whereHas('pembayaran')->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
+
+            $bookedDates = []; // collection booked dates
+
+            $rental->map(function ($rental) use (&$bookedDates) {
+                $startDate = Carbon::parse($rental->tanggal_mulai_sewa);
+                $endDate = Carbon::parse($rental->tanggal_akhir_sewa);
+
+                while ($startDate <= $endDate) {
+                    $bookedDates[] = $startDate->toDateString(); // collect booked dates
+                    $startDate->addDay();
+                }
+            });
+
+            $bookedDates = array_unique($bookedDates); // remove duplicate data
+            $bookedDates = array_values($bookedDates); // reindex array
+            sort($bookedDates); // sort array
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data',
+                'data' => $bookedDates,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
     public function detailRental($paymentCode)
     {
         try {
@@ -157,7 +187,8 @@ class RentalController extends Controller
         }
     }
 
-    public function updateStatusPembayaran($paymentCode){
+    public function updateStatusPembayaran($paymentCode)
+    {
         try {
             $pembayaran = $this->paymentService->updatePaymentStatus($paymentCode);
             return response()->json(
