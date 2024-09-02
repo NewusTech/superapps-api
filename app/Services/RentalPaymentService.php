@@ -43,10 +43,13 @@ class RentalPaymentService
                 throw new Exception('Metode pembayaran tidak ditemukan');
             }
 
-            $rentalExists = Rental::where(function ($query) use ($request) {
-                $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
-                ->where('tanggal_akhir_sewa', '>=', Carbon::parse($request['tanggal_mulai_sewa']));
-            })->exists();
+            $rentalExists = Rental::whereHas('pembayaran', function ($query) {
+                $query->where('status', 'Sukses');
+            })
+                ->where(function ($query) use ($request) {
+                    $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
+                        ->where('tanggal_akhir_sewa', '>=', Carbon::parse($request['tanggal_mulai_sewa']));
+                })->exists();
 
             if ($rentalExists) {
                 throw new Exception('Tanggal tersebut sudah dibooking.');
