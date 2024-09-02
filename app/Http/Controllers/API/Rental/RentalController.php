@@ -104,7 +104,9 @@ class RentalController extends Controller
     public function getBookedDates()
     {
         try {
-            $rental = Rental::whereHas('pembayaran')->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
+            $rental = Rental::whereHas('pembayaran', function($query){
+                $query->where('status', 'Sukses');
+            })->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
 
             $bookedDates = []; // collection booked dates
 
