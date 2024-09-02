@@ -31,13 +31,26 @@ class PasswordResetController extends Controller
             'password' => 'required|confirmed',
         ]);
 
-        $response = Password::reset($request->only('email', 'password', 'token'), function ($user, $password) {
-            $user->password = Hash::make($password);
-            $user->save();
-        });
+        $response = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->password = Hash::make($password);
+                $user->save();
+            }
+        );
 
-        return $response == Password::PASSWORD_RESET
-            ? response()->json(['message' => __('passwords.reset')], 200)
-            : response()->json(['error' => __('passwords.token')], 400);
+        if ($response == Password::INVALID_TOKEN) {
+            return response()->json(['message' => 'Invalid token provided'], 400);
+        }
+
+        if ($response == Password::INVALID_USER) {
+            return response()->json(['message' => 'Invalid user'], 400);
+        }
+
+        if ($response == Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Password has been reset successfully'], 200);
+        }
+
+        return response()->json(['message' => 'Password reset failed'], 500);
     }
 }
