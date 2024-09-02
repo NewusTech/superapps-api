@@ -6,6 +6,7 @@ use App\Models\MetodePembayaran;
 use App\Models\PembayaranRental;
 use App\Models\Pesanan;
 use App\Models\Rental;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -35,14 +36,26 @@ class RentalPaymentService
     public function processRentalPayment($request)
     {
         try {
-            $request['user_id'] = auth()->user()->id;
             DB::beginTransaction();
+
             $metode = MetodePembayaran::where('id', $request['metode_id'])->first('kode');
             if (!$metode) {
                 throw new Exception('Metode pembayaran tidak ditemukan');
             }
+
+            $rentalExists = Rental::where(function ($query) use ($request) {
+                $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
+                ->where('tanggal_akhir_sewa', '>=', Carbon::parse($request['tanggal_mulai_sewa']));
+            })->exists();
+
+            if ($rentalExists) {
+                throw new Exception('Tanggal tersebut sudah dibooking.');
+            }
+            $request['user_id'] = auth()->user()->id;
             $request = $this->handleImageUpload($request);
+
             $rental = Rental::create($request);
+
             $pembayaran = new PembayaranRental();
             $pembayaran->rental_id = $rental->id;
 

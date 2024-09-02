@@ -129,6 +129,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::get('riwayat/{paymentCode}', [RentalController::class, 'detailRental']);
     Route::resource('mobil', MobilRentalController::class);
     Route::post('process-payment', [RentalController::class, 'processPayment']);
+    Route::get('booked-dates', [RentalController::class, 'getBookedDates']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {
