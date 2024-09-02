@@ -25,7 +25,7 @@ class CancelOrder implements ShouldQueue
     {
         Log::info("CancelOrder jobs started");
         if ($this->pesanan->status == 'Menunggu Pembayaran') {
-            $this->pesanan->status = 'Kadaluarsa';
+            $this->pesanan->status = 'Gagal';
             $this->pesanan->save();
 
            $penumpangs = $this->pesanan->penumpang();
