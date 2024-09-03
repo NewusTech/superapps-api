@@ -31,4 +31,8 @@ class FilterHelper
 
         return $query;
     }
+
+    public static function applyLimit(Builder $query, $limit): Builder
+    {
+        return $query->limit($limit);}
 }

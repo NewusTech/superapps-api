@@ -17,6 +17,7 @@ class CancelRentalOrder implements ShouldQueue
     protected $pesanan;
     public function __construct(Rental $pesanan)
     {
+        Log::info("CancelRentalOrder class jobs started");
         $this->pesanan = $pesanan;
     }
 
@@ -25,10 +26,20 @@ class CancelRentalOrder implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info("CancelRentalOrder jobs started");
+      try {
+        Log::info("Handle CancelRentalOrder jobs started");
+
         if ($this->pesanan->pembayaran->status == 'Menunggu Pembayaran') {
             $this->pesanan->pembayaran->status = 'Gagal';
             $this->pesanan->pembayaran->save();
+
+            Log::info("CancelRentalOrder jobs Success");
         }
+      } catch (\Throwable $th) {
+          Log::error("CancelRentalOrder jobs error: {$th->getMessage()}");
+          throw $th;
+      } finally{
+          Log::info("CancelRentalOrder jobs ended");
+      }
     }
 }

@@ -19,7 +19,9 @@ class PariwisataController extends Controller
             if ($request->has('search')) {
                 FilterHelper::applySearch($pariwisata, $request->search, ['judul', 'slug', 'lokasi', 'sub_judul']);
             }
-            Password::sendResetLink($request->only('email'));
+            if ($request->has('limit')) {
+                $pariwisata = FilterHelper::applyLimit($pariwisata, $request->limit);
+            }
             $pariwisata = $pariwisata->get();
             return response()->json([
                 'success' => true,
