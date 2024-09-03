@@ -56,6 +56,7 @@ Route::group([
     Route::put('/update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
     Route::post('/lupa-password', [PasswordResetController::class, 'sendResetLinkEmail']);
     Route::post('password/reset', [PasswordResetController::class, 'reset']);
+    Route::patch('/change-password', [AuthController::class, 'changePassword']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'rute'], function () {
