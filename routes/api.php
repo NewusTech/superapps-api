@@ -52,7 +52,7 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::resource('/user-profile', UserController::class);
-    Route::patch('/profile-photo/update', [UserController::class, 'profilePhotoUpdate']);
+    Route::post('/profile-photo/update', [UserController::class, 'profilePhotoUpdate']);
     Route::put('/update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
     Route::post('/lupa-password', [PasswordResetController::class, 'sendResetLinkEmail']);
     Route::post('password/reset', [PasswordResetController::class, 'reset']);
