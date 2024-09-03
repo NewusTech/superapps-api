@@ -105,7 +105,7 @@ class RentalController extends Controller
     {
         try {
             $rental = Rental::whereHas('pembayaran', function($query){
-                $query->where('status', 'Sukses');
+                $query->where('status', 'not like', "%Gagal%");
             })->where('mobil_rental_id', $request->mobil_id)->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
 
             $bookedDates = []; // collection booked dates
