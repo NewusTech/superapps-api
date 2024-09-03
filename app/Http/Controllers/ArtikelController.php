@@ -12,7 +12,7 @@ class ArtikelController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['index', 'rekomendasi']]);
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
     }
 
