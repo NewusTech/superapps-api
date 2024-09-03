@@ -290,6 +290,8 @@ class PembayaranController extends Controller
                     'id' => $item->id,
                     'nama' => $item->metode,
                     'keterangan' => $item->keterangan,
+                    'no_rek' => $item->no_rek,
+                    'bank' => $item->bank,
                     'kode' => $item->kode,
                     'img' => $item->img
                 ];
@@ -327,12 +329,8 @@ class PembayaranController extends Controller
             if ($validator->fails()) {
                 return response()->json($validator->errors(), 422);
             }
-            $data = new MetodePembayaran();
-            $data->metode = $request->metode;
-            $data->keterangan = $request->keterangan;
-            $data->kode = $request->kode;
-            $data->img = $request->image;
-            $data->save();
+
+            $data = MetodePembayaran::create($request->all());
             return response()->json([
                 'success' => true,
                 'data' => $data,

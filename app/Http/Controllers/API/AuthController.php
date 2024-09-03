@@ -95,6 +95,42 @@ class AuthController extends Controller
         }
     }
 
+    public function changePassword(Request $request){
+        try {
+            $user = auth()->user();
+            $user = User::findOrFail($user->id);
+            $request->validate([
+                'password' => 'required|string|min:6',
+                'new_password' => 'required|string|min:6',
+                'confirm_password' => 'required|string|min:6',
+            ]);
+
+            if (!$user) {
+                throw new Exception('User not found');
+            }
+
+            if (!Hash::check($request->password, $user->password)) {
+                throw new Exception('Password not match');
+            }
+
+            if ($request->new_password !== $request->confirm_password) {
+                throw new Exception('Confirm Password not match');
+            }
+
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+            return response()->json([
+                'success' => true,
+                'data' => $user,
+                'message' => 'Berhasil change password'
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
+
     public function forgotPassword(Request $request){
         try {
             $validator = Validator::make($request->all(), [
