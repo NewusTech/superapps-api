@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API\Penumpang;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jadwal;
 use App\Models\Penumpang;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class PenumpangController extends Controller

@@ -6,6 +6,8 @@ use App\Helpers\FilterHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Jadwal;
 use App\Models\Pesanan;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -60,6 +62,20 @@ class PerjalananController extends Controller
             ]);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function suratJalan($jadwalId){
+        try {
+            $perjalanan = Jadwal::query()->with('pemesanan.penumpang.kursi', 'pemesanan.titikJemput','master_rute', 'master_mobil', 'master_supir')
+            ->whereHas('pemesanan.penumpang.kursi')->where('id', $jadwalId)->first();
+            $perjalanan->tanggal_berangkat = Carbon::parse($perjalanan->tanggal_berangkat)->format('d-m-Y');
+            $perjalanan->waktu_keberangkatan= Carbon::parse($perjalanan->waktu_keberangkatan)->format('H:i');
+            $pdf = Pdf::loadView('surat-jalan', ['data' => $perjalanan])->setPaper('a4', 'potrait');
+            // return view('surat-jalan', ['data' => $perjalanan]);
+            return $pdf->stream("Surat-Jalan{$jadwalId}.pdf");
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
         }
     }
 

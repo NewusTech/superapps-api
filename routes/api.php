@@ -139,6 +139,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
 
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {
     Route::get('list-penumpang', [PerjalananController::class, 'index']);
+    Route::get('list-penumpang/{id}', [PerjalananController::class, 'detail']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'penumpang'], function () {

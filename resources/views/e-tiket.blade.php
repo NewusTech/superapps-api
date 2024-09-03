@@ -97,7 +97,7 @@
                                     <td style="padding:0;">
                                         <div>
                                             <p style="margin-bottom: 10px; font-size: 14px;">Hari Keberangkatan</p>
-                                            <p style="margin-bottom: 10px;"><strong>{{"Kamis"}}</strong></p>
+                                            <p style="margin-bottom: 10px;"><strong>{{$data->hari_keberangkatan}}</strong></p>
                                         </div>
                                     </td>
                                 </tr>
