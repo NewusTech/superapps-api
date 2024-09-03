@@ -44,7 +44,7 @@ class RentalPaymentService
             }
 
             $rentalExists = Rental::whereHas('pembayaran', function ($query) {
-                $query->where('status', 'Sukses');
+                $query->where('status', 'not like', "%Gagal%");
             })
                 ->where(function ($query) use ($request) {
                     $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
@@ -52,7 +52,7 @@ class RentalPaymentService
                 })->exists();
 
             if ($rentalExists) {
-                throw new Exception('Tanggal tersebut sudah dibooking.');
+                throw new Exception('Tanggal tersebut sudah dibooking.', 409);
             }
             $request['user_id'] = auth()->user()->id;
             $request = $this->handleImageUpload($request);
