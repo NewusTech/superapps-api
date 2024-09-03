@@ -146,14 +146,12 @@ class RentalPaymentService
         $pembayaran->kode_pembayaran = PembayaranRental::generateUniqueKodeBayar();
         $pembayaran->nominal = $this->countNominalBiayaRental($pembayaran->rental, $pembayaran);
         $metode = MetodePembayaran::where('id', $pembayaran->rental->metode_id)->first();
-        $rekening = explode('-', $metode->metode);
-        $norek = explode(':', $metode->keterangan);
         $data = [
             'kode_pembayaran' => $pembayaran->kode_pembayaran,
             'harga' => $pembayaran->nominal,
-            'metode' => $rekening[0],
-            'bank' => $rekening[1],
-            'nomor_rekening' => trim($norek[1]),
+            'metode' => $metode->metode,
+            'bank' => $metode->bank,
+            'nomor_rekening' => $metode->no_rek,
             'kode' => 2
         ];
         $pembayaran->save();
