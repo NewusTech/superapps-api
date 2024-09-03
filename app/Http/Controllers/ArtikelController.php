@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FilterHelper;
 use App\Models\artikel;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,10 +16,14 @@ class ArtikelController extends Controller
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = artikel::all();
+            $data = artikel::query();
+            if ($request->has('limit')) {
+                $pariwisata = FilterHelper::applyLimit($data, $request->limit);
+            }
+            $data = $data->get();
             return response()->json([
                 'success' => true,
                 'data' => $data,
