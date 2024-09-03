@@ -101,12 +101,12 @@ class RentalController extends Controller
         }
     }
 
-    public function getBookedDates()
+    public function getBookedDates(Request $request)
     {
         try {
             $rental = Rental::whereHas('pembayaran', function($query){
                 $query->where('status', 'Sukses');
-            })->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
+            })->where('mobil_rental_id', $request->mobil_id)->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
 
             $bookedDates = []; // collection booked dates
 
