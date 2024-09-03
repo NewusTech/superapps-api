@@ -214,7 +214,8 @@ class JadwalController extends Controller
     public function dropdownJadwal()
     {
         try {
-            $rute = MasterRute::get(['id', 'kota_asal', 'kota_tujuan'])->orderBy('kota_asal', 'asc');
+            $rute = MasterRute::orderBy('kota_asal', 'asc')->get(['id', 'kota_asal', 'kota_tujuan']);
+
             $rute = $rute->map(function ($item) {
                 return [
                     'id' => $item->id,
