@@ -61,12 +61,13 @@ class UserController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
             }
+
 
             $user = auth()->user();
             $user = User::findOrFail($user->id);
@@ -88,7 +89,7 @@ class UserController extends Controller
                 'message' => 'Berhasil update profile photo'
             ]);
         } catch (\Throwable $th) {
-            //throw $th;
+            return response()->json(['message' => $th->getMessage()], 500);
         }
     }
 
