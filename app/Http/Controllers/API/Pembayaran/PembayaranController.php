@@ -144,13 +144,47 @@ class PembayaranController extends Controller
         }
     }
 
-    public function updateStatusPembayaran($orderCode)
+    public function uploadBuktiPembayaran(Request $request, $paymentCode)
     {
         try {
-            $pesanan = Pesanan::where('kode_pesanan', $orderCode)->first();
-            $pembayaran = Pembayaran::where('pesanan_id', $pesanan->id)->first();
-            // dd($pesanan, $pembayaran);
-            if (!$pembayaran) {
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            if  (!$pembayaran) throw new Exception('Pembayaran tidak ditemukan', 404);
+
+            $validator = Validator::make($request->all(), [
+                'bukti' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+            if ($validator->fails()) return response()->json($validator->errors(), 422);
+
+            $data = $request->all();
+            if ($request->hasFile('bukti')) {
+                $file = $request->file('bukti');
+                $gambarPath = $file->store('superapps/pembayaran/travel', 's3');
+                $fullUrl = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPath;
+                $data['bukti'] = $fullUrl;
+            } else {
+                $data['bukti'] = null;
+            }
+
+            $pembayaran->bukti_url = $data['bukti'];
+            $pembayaran->save();
+
+            return response()->json([
+                'success' => true,
+                'data' => $pembayaran,
+                'message' => 'Berhasil update data'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
+
+    public function updateStatusPembayaran($paymentCode)
+    {
+        try {
+            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
+            $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+
+            if (!$pesanan) {
                 return response()->json(['message' => 'Pembayaran Tidak ditemukan'], 404);
             }
 

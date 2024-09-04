@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class RentalController extends Controller
 {
@@ -150,6 +151,7 @@ class RentalController extends Controller
                 'link_invoice' => "https://backend-superapps.newus.id/rental/invoice/{$data->pembayaran?->kode_pembayaran}",
                 'nominal' => $data->pembayaran->nominal,
                 'payment_link' => $data->pembayaran->payment_link,
+                'bukti_url' => $data->pembayaran?->bukti_url ?? null,
                 'expired_at' => Carbon::parse($data->expired_at) ?? null,
                 'area' => $data->area,
                 'tanggal_awal_sewa' => $data->tanggal_mulai_sewa,
@@ -202,6 +204,24 @@ class RentalController extends Controller
             );
         } catch (Exception $th) {
             return response()->json(['message' => "Unxecepted error: {$th->getMessage()}"], 500);
+        }
+    }
+
+    public function uploadBuktiPembayaran(Request $request, $paymentCode)
+    {
+        try {
+            $validator = Validator::make($request->all(), ['bukti' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048']);
+            if ($validator->fails()) return response()->json($validator->errors(), 422);
+
+            $pembayaran = $this->paymentService->uploadRentalPaymentProof($request, $paymentCode);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil update data',
+                'data' => $pembayaran
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
         }
     }
     public function show(string $id)
