@@ -131,7 +131,7 @@ class PaymentService
         ];
         $pembayaran->status = 'Menunggu Pembayaran';
         $pembayaran->save();
-        CancelPayment::dispatch($pembayaran)->delay(now()->addMinutes(2));
+        CancelPayment::dispatch($pembayaran)->delay(now()->addMinutes(15));
         return response()->json([
             'success' => true,
             'data' => $data,
