@@ -222,7 +222,7 @@ class PesananController extends Controller
             foreach ($request->penumpang as $penumpang) {
                 $kursi = Kursi::where('jadwal_id', $jadwal->id)->where('status','like' ,'%kosong%')->where('nomor_kursi', $penumpang['no_kursi'])->first();
                 if (!$kursi) {
-                    throw new Exception("Kursi " . $penumpang['no_kursi'] . " tidak tersedia");
+                    throw new Exception("Kursi " . $penumpang['no_kursi'] . " tidak tersedia", 409);
                 }
                 Penumpang::create([
                     'nama' => $penumpang['nama'],

@@ -27,10 +27,7 @@ class MobilTravelImagesController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -40,22 +37,31 @@ class MobilTravelImagesController extends Controller
         try {
             $validatedData = Validator::make($request->all(), [
                 'master_mobil_id' => 'required',
-                'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image_url' => 'required|array',
             ]);
             if ($validatedData->fails()) return response()->json($validatedData->errors());
 
             $data = $request->all();
 
             if ($request->hasFile('image_url')) {
-                $file = $request->file('image_url');
-                $gambarPath = $file->store('superapps/travel/mobil', 's3');
-                $fullUrl = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPath;
+                $imageUrls = [];
+                $files = $request->file('image_url');
+                foreach ($files as $file) {
+                    $gambarPath = $file->store('superapps/travel/mobil', 's3');
+                    $fullUrl = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPath;
+                    $imageUrls[] = $fullUrl;
+                }
                 $data['image_url'] = $fullUrl;
             } else {
-                $data['image_url'] = null;
+                $data['image_url'] = [];
             }
 
-            $data = MobilTravelImages::create($data);
+            foreach ($imageUrls as $url) {
+                $data = new MobilTravelImages();
+                $data->master_mobil_id = $request->master_mobil_id;
+                $data->image_url = $url;
+                $data->save();
+            }
             return response()->json([
                 'success' => true,
                 'data' => $data,
