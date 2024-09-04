@@ -40,21 +40,32 @@ class MobilRentalImagesContrller extends Controller
         try {
             $validatedData = Validator::make($request->all(), [
                 'mobil_rental_id' => 'required',
-                'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image_url' => 'required|array',
             ]);
             if ($validatedData->fails()) return response()->json($validatedData->errors());
 
             $data = $request->all();
+
             if ($request->hasFile('image_url')) {
-                $file = $request->file('image_url');
-                $gambarPath = $file->store('superapps/travel/mobil', 's3');
-                $fullUrl = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPath;
+                $imageUrls = [];
+                $files = $request->file('image_url');
+                foreach ($files as $file) {
+                    $gambarPath = $file->store('superapps/travel/mobil', 's3');
+                    $fullUrl = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPath;
+                    $imageUrls[] = $fullUrl;
+                }
                 $data['image_url'] = $fullUrl;
             } else {
-                $data['image_url'] = null;
+                $data['image_url'] = [];
             }
 
-            $data = MobilRentalImages::create($data);
+            foreach ($imageUrls as $url) {
+                $data = new MobilRentalImages();
+                $data->mobil_rental_id = $request->mobil_rental_id;
+                $data->image_url = $url;
+                $data->save();
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $data,
