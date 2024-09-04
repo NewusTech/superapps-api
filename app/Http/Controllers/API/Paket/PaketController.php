@@ -24,20 +24,22 @@ class PaketController extends Controller
     public function index(Request $request)
     {
         try {
-            $data = Paket::all();
-            if ($request->search) {
+            $data = Paket::with('pembayaran');
+            if ($request->has('search')) {
                 $fields = ['resi', 'nama_pengirim', 'nama_penerima', 'alamat_pengirim', 'alamat_penerima'];
-                $data = Paket::where(function ($query) use ($fields, $request) {
+                $data = $data->where(function ($query) use ($fields, $request) {
                     foreach ($fields as $field) {
                         $query->orWhere($field, 'like', "%$request->search%");
                     }
-                })->get();
+                });
             }
             if ($request->startDate && $request->endDate) {
                 $startDate = date('Y-m-d 00:00:00', strtotime($request->startDate));
                 $endDate = date('Y-m-d 23:59:59', strtotime($request->endDate));
-                $data = Paket::whereBetween('tanggal_dikirim', [$startDate, $endDate])->get();
+                $data = $data->whereBetween('tanggal_dikirim', [$startDate, $endDate]);
             }
+
+            $data = $data->orderBy('created_at', 'desc')->get();
             return response()->json([
                 'success' => true,
                 'data' => $data,
