@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Kursi;
 use App\Models\Pembayaran;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,6 +35,14 @@ class CancelPayment implements ShouldQueue
 
             $this->pembayaran->pesanan->status = 'Gagal';
             $this->pembayaran->pesanan->save();
+
+            $penumpangs = $this->pembayaran->pesanan->penumpang();
+            $penumpangs->each(function ($penumpang) {
+                $kursi = Kursi::where('id', $penumpang->kursi_id)->first();
+                $kursi->update([
+                    'status' => 'kosong',
+                ]);
+            });
         }
     }
 }
