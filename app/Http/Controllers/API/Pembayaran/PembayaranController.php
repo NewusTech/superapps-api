@@ -178,11 +178,11 @@ class PembayaranController extends Controller
         }
     }
 
-    public function updateStatusPembayaran($paymentCode)
+    public function updateStatusPembayaran($orderCode)
     {
         try {
-            $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
-            $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+            $pesanan = Pesanan::where('kode_pesanan', $orderCode)->first();
+            $pembayaran = Pembayaran::where('pesanan_id', $pesanan->id)->first();
 
             if (!$pesanan) {
                 return response()->json(['message' => 'Pembayaran Tidak ditemukan'], 404);
