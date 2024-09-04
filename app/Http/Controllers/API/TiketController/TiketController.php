@@ -53,7 +53,7 @@ class TiketController extends Controller
             });
 
             $qrcode = base64_encode(QrCode::format('png')->size(110)->margin(0)->generate($paymentCode));
-            $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode])->setPaper([0, 0, 226.77, 641.89],'landscape');
+            $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode])->setPaper([0, 0, 226.77, 641.89], 'landscape');
             return $pdf->stream("ORDER-$paymentCode.pdf");
         } catch (\Throwable $th) {
             return response()->json(['message' => $th->getMessage()], 500);
@@ -165,11 +165,12 @@ class TiketController extends Controller
             $pesanan = Pesanan::with('penumpang', 'metode', 'jadwal.master_rute', 'penumpang.kursi')
                 ->where('id', $pembayaran->pesanan_id)
                 ->first();
+
             $data->pesanan = new stdClass();
             $data->pesanan->nama = $pesanan->nama;
-            $data->pesanan->no_telp = $pesanan->no_telp;
             $data->pesanan->invoice = $pesanan->pembayaran->kode_pembayaran;
             $data->pesanan->metode_pembayaran = $pesanan->metode->metode;
+            $data->pesanan->no_telp = $pesanan->no_telp;
             $data->penumpang = [];
             $pesanan->penumpang->map(function ($penumpang) use (&$data) {
                 $penumpangData = new stdClass();
@@ -183,8 +184,11 @@ class TiketController extends Controller
 
             $data->pembayaran = new stdClass();
             $data->pembayaran->jumlah_tiket = $pesanan->penumpang->count();
-            $data->pembayaran->harga_tiket = $pesanan->jadwal->master_rute->harga;
-            $data->pembayaran->total_harga = $data->pembayaran->harga_tiket * $data->pembayaran->jumlah_tiket;
+            $data->pembayaran->metode = $pesanan->metode->metode;
+            $data->pembayaran->jam = Carbon::parse($pembayaran->created_at)->format('H:i');
+            $data->pembayaran->tanggal = Carbon::parse($pembayaran->created_at)->format('d-m-Y');
+            $data->pembayaran->harga_tiket = $pembayaran->amount / $data->pembayaran->jumlah_tiket;
+            $data->pembayaran->total_harga = $pembayaran->amount;
             $pdf = FacadePdf::loadView('invoice', ['data' => $data]);
             $role = auth()->user()->roles[0]->name;
             if (str_contains($role, 'Admin')) {
@@ -243,7 +247,8 @@ class TiketController extends Controller
         }
     }
 
-    public function rentalTiket($paymentCode){
+    public function rentalTiket($paymentCode)
+    {
         try {
             $pembayaran = PembayaranRental::with('rental.mobil')->where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
             if (!$pembayaran) {
@@ -259,7 +264,8 @@ class TiketController extends Controller
         }
     }
 
-    public function rentalInvoice($paymentCode){
+    public function rentalInvoice($paymentCode)
+    {
         try {
             $pembayaran = PembayaranRental::with('rental.mobil', 'rental.metode')->where('kode_pembayaran', $paymentCode)->where('status', 'Sukses')->first();
             if (!$pembayaran) {
