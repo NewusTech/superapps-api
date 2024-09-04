@@ -56,7 +56,7 @@ class TiketController extends Controller
             $pdf = FacadePdf::loadView('tiket', ['data' => $data, 'qrcode' => $qrcode])->setPaper([0, 0, 226.77, 641.89],'landscape');
             return $pdf->stream("ORDER-$paymentCode.pdf");
         } catch (\Throwable $th) {
-            throw $th;
+            return response()->json(['message' => $th->getMessage()], 500);
         }
     }
 
@@ -72,14 +72,17 @@ class TiketController extends Controller
             $data = [];
             $penumpang->map(function ($penumpang) use (&$data) {
                 $data[] = [
+                    'kode' => $penumpang->pesanan->kode_pesanan,
                     'nama' => $penumpang->nama,
                     'email' => $penumpang->email,
                     'nik' => $penumpang->nik,
                     'kursi' => $penumpang->kursi->nomor_kursi,
                     'no_telp' => $penumpang->no_telp,
                     'mobil' => $penumpang->pesanan->jadwal->master_mobil->type,
-                    'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
-                    'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ' - ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                    'jam' => Carbon::parse($penumpang->pesanan->jadwal->waktu_keberangkatan)->format('H:i'),
+                    'hari' => Carbon::parse($penumpang->pesanan->jadwal->tanggal_berangkat)->translatedFormat('l'),
+                    'keberangkatan' => $penumpang->pesanan->jadwal->master_rute->kota_asal . ', ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
+                    'tiba' => $penumpang->pesanan->jadwal->master_rute->kota_tujuan . ', ' . $penumpang->pesanan->jadwal->tanggal_berangkat,
                 ];
             });
             $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate($paymentCode));
