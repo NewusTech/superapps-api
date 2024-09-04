@@ -62,7 +62,16 @@ class SyaratKetentuanController extends Controller
 
     public function show(string $id)
     {
-        //
+        try {
+            $data = SyaratKetentuan::findOrFail($id);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
 
