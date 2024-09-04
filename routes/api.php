@@ -135,10 +135,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::resource('mobil', MobilRentalController::class);
     Route::post('process-payment', [RentalController::class, 'processPayment']);
     Route::get('booked-dates', [RentalController::class, 'getBookedDates']);
+    Route::post('pembayaran/upload-bukti/{paymentCode}', [RentalController::class, 'uploadBuktiPembayaran']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {
     Route::get('list-penumpang', [PerjalananController::class, 'index']);
+    Route::get('list-penumpang/{id}', [PerjalananController::class, 'detail']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'penumpang'], function () {
@@ -169,6 +171,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'pembayaran'], function () {
     Route::post('metode-pembayaran', [PembayaranController::class, 'storeMetodePembayaran']);
     Route::delete('metode-pembayaran/{id}', [PembayaranController::class, 'deleteMetodePembayaran']);
     Route::post('midtrans-notification', [PembayaranController::class, 'handleMidtransNotification']);
+    Route::post('upload-bukti/{paymentCode}', [PembayaranController::class, 'uploadBuktiPembayaran']);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'artikel'], function () {

@@ -80,6 +80,29 @@ class RentalPaymentService
         }
     }
 
+    public function uploadRentalPaymentProof($request, $paymentCode)
+    {
+        $pembayaran = PembayaranRental::where('kode_pembayaran', $paymentCode)->first();
+        if (!$pembayaran) throw new Exception('Pembayaran tidak ditemukan', 404);
+
+        $data = $request->all();
+        if ($request->hasFile('bukti')) {
+            $file = $request->file('bukti');
+            $gambarPath = $file->store('superapps/pembayaran/travel', 's3');
+            $fullUrl = 'https://' . env('AWS_BUCKET') . '.' . 's3' . '.' . env('AWS_DEFAULT_REGION') . '.' . 'amazonaws.com/' . $gambarPath;
+            $data['bukti'] = $fullUrl;
+        } else {
+            $data['bukti'] = null;
+        }
+
+        $pembayaran->bukti_url = $data['bukti'];
+        if ($pembayaran->save()) {
+            return $pembayaran;
+        } else {
+            throw new Exception('Gagal menyimpan bukti pembayaran', 500);
+        }
+    }
+
     public function updatePaymentStatus($paymentCode)
     {
         $pembayaran = PembayaranRental::where('kode_pembayaran', $paymentCode)->first();

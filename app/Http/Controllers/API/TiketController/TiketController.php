@@ -209,6 +209,7 @@ class TiketController extends Controller
             $pesanan = Pesanan::with('titikJemput', 'titikAntar', 'jadwal.master_rute', 'penumpang.kursi')->where('id', $pembayaran->pesanan_id)->first();
             $pesanan->hari = Carbon::parse($pesanan->created_at)->translatedFormat('l');
             $pesanan->waktu_pemesanan = Carbon::parse($pesanan->created_at)->translatedFormat('d/m/Y H:i');
+            $pesanan->hari_keberangkatan = Carbon::parse($pesanan->jadwal->tanggal_berangkat)->translatedFormat('l');
             $pesanan->jam = Carbon::parse($pesanan->jadwal->waktu_keberangkatan)->translatedFormat('H:i');
             $qrcode = base64_encode(QrCode::format('png')->size(208)->margin(0)->generate("https://backend-superapps.newus.id/tiket/$paymentCode"));
             $pdf = FacadePdf::loadView('e-tiket', ['data' => $pesanan, 'qrcode' => $qrcode]);

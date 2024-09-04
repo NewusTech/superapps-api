@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\Paket\PaketController;
+use App\Http\Controllers\API\Penumpang\PenumpangController;
+use App\Http\Controllers\API\Perjalanan\PerjalananController;
 use App\Http\Controllers\API\TiketController\TiketController;
 use App\Models\Paket;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +23,7 @@ Route::get('/', function () {
 });
 
 Route::get('/tiket/{paymentCode}', [TiketController::class, 'template']);
+Route::get('/surat-jalan/{jadwalID}', [PerjalananController::class, 'suratJalan']);
 Route::get('/tiket/{paymentCode}/download', [TiketController::class, 'download']);
 Route::get('/invoice/{paymentCode}', [TiketController::class, 'invoice']);
 Route::get('/invoice/{paymentCode}/download', [TiketController::class, 'invoiceDownload']);
