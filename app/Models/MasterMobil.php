@@ -36,4 +36,9 @@ class MasterMobil extends Model
     {
         return $this->hasMany(Jadwal::class, 'master_mobil_id', 'id');
     }
+
+    public function images()
+    {
+        return $this->hasMany(MobilTravelImages::class, 'master_mobil_id', 'id');
+    }
 }

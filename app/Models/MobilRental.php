@@ -29,4 +29,9 @@ class MobilRental extends Model
     {
         return $this->hasMany(Rental::class);
     }
+
+    public function images()
+    {
+        return $this->hasMany(MobilRentalImages::class, 'mobil_rental_id', 'id');
+    }
 }
