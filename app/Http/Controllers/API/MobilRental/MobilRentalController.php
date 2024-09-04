@@ -50,7 +50,10 @@ class MobilRentalController extends Controller
     public function show(string $id)
     {
         try {
-            $data = MobilRental::findOrFail($id);
+            $data = MobilRental::with('images')->findOrFail($id);
+            $data->images->map(function ($mobil) {
+                return $mobil->image_url;
+            });
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data',
