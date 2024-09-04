@@ -27,7 +27,7 @@ class StoreRentalRequest extends FormRequest
             'username_fb' => 'required',
             'image_ktp' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
             'image_swafoto' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
-            'catatan_sopir' => 'required',
+            'catatan_sopir' => 'nullable',
             'nama' => 'required',
             'email' => 'required|email',
             'mobil_rental_id' => 'required|numeric',

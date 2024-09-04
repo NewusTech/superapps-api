@@ -20,6 +20,8 @@ use App\Http\Controllers\API\Users\ManageUsersController;
 use App\Http\Controllers\API\Users\UserController;
 use App\Http\Controllers\ArtikelController;
 use App\Http\Controllers\API\Banner\BannerController;
+use App\Http\Controllers\API\Images\MobilRentalImagesContrller;
+use App\Http\Controllers\API\Images\MobilTravelImagesController;
 use App\Http\Controllers\API\MobilRental\MobilRentalController;
 use App\Http\Controllers\API\Penginapan\PenginapanController;
 use App\Http\Controllers\API\Perjalanan\PerjalananController;
@@ -136,6 +138,14 @@ Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::post('process-payment', [RentalController::class, 'processPayment']);
     Route::get('booked-dates', [RentalController::class, 'getBookedDates']);
     Route::post('pembayaran/upload-bukti/{paymentCode}', [RentalController::class, 'uploadBuktiPembayaran']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'travel'], function () {
+    Route::resource('mobil-images', MobilTravelImagesController::class);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
+    Route::resource('mobil-images', MobilRentalImagesContrller::class);
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'perjalanan'], function () {

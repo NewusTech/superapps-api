@@ -94,9 +94,9 @@ class JadwalController extends Controller
                 ], 404);
             }
             $jadwal->map(function ($item) {
-                $mobil = MasterMobil::where('id', $item->master_mobil_id)->first();
+                $mobil = MasterMobil::with('images')->where('id', $item->master_mobil_id)->first();
                 $rute = MasterRute::where('id', $item->master_rute_id)->first();
-                $item->img_url = $mobil->image_url;
+                $item->img_url = $mobil->images->map(fn($item) => $item->image_url);
                 $item->carModel = $mobil->type;
                 $item->carSeat = $mobil->jumlah_kursi;
                 $item->departureTime = $item->waktu_keberangkatan;
