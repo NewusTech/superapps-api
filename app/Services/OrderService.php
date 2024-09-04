@@ -10,7 +10,7 @@ class OrderService
     protected $pesanan;
     public function __construct()
     {
-        $this->pesanan = Pesanan::with('jadwal', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user', 'pembayaran', 'penumpang.kursi');
+        $this->pesanan = Pesanan::with('jadwal', 'metode', 'jadwal.master_rute', 'jadwal.master_mobil', 'jadwal.master_supir', 'user', 'pembayaran', 'penumpang.kursi');
     }
     public function getAllOrders($status)
     {
@@ -70,7 +70,7 @@ class OrderService
                 'status' => $pesanan->pembayaran?->status ?? $pesanan->status,
                 'metode' => $pesanan->metode?->metode ?? null,
                 'kode_pembayaran' => $pesanan->pembayaran?->kode_pembayaran ?? null,
-                'no_rek' =>$pesanan->metode->no_rek,
+                'no_rek' => $pesanan->metode?->no_rek ?? null,
                 'payment_link' => $pesanan->pembayaran?->payment_link ?? null,
                 'created_at' => $pesanan->pembayaran?->created_at ?? null,
                 'expired_at' => Carbon::parse($pesanan->expired_at),
