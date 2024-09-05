@@ -18,7 +18,7 @@ class RentalController extends Controller
     protected $paymentService;
     public function __construct(RentalPaymentService $paymentService)
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['index', 'show', 'getBookedDates']]);
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
         $this->paymentService = $paymentService;
     }
