@@ -182,6 +182,23 @@ class JadwalController extends Controller
         }
     }
 
+    public function getSeatTaken(Request $request){
+        try {
+            $data = Kursi::where('jadwal_id', $request->jadwal_id)->where('status', 'like', '%terisi%')->get('nomor_kursi');
+            $data = $data->map(function ($kursi) {
+                return $kursi->nomor_kursi;
+            });
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil get data'
+            ]);
+        }
+        catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
 
     public function show(string $id)
     {
