@@ -46,8 +46,7 @@ class StoreRentalRequest extends FormRequest
 
         throw new HttpResponseException(response()->json([
             'success' => false,
-            'message' => 'Validation errors',
-            'data' => $errorMessages,
+            'message' => $errorMessages,
         ], 422));
     }
 
@@ -75,7 +74,6 @@ class StoreRentalRequest extends FormRequest
             'all_in.numeric' => 'All in harus berupa angka',
             'mobil_rental_id.numeric' => 'All in harus berupa angka',
             'mobil_rental_id' => 'Mobil wajib diisi',
-
         ];
     }
 }
