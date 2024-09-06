@@ -63,9 +63,9 @@ class RentalController extends Controller
         $this->applySearchFilter($query, $request, $fields);
 
         if ($request->has('startDate') && $request->has('endDate')) {
-            $tanggalAwal = $request->startDate;
-            $tanggalAkhir = $request->endDate;
-            $query->whereBetween('tanggal_mulai_sewa', [$tanggalAwal, $tanggalAkhir]);
+            $startDate = date('Y-m-d 00:00:00', strtotime($request->startDate));
+            $endDate = date('Y-m-d 23:59:59', strtotime($request->endDate));
+            $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
         return $query;
