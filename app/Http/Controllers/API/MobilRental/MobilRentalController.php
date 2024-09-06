@@ -23,7 +23,7 @@ class MobilRentalController extends Controller
     public function index()
     {
         try {
-            $data = MobilRental::get();
+            $data = MobilRental::with('images')->get();
             $data->map(function ($mobil) {
                 $mobil->bagasi = "Heatback";
             });
