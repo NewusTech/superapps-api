@@ -20,7 +20,6 @@ class StoreMobilRentalRequest extends FormRequest
             'type' => 'required|string|max:50',
             'jumlah_kursi' => 'required|integer|min:1',
             'fasilitas' => 'nullable|string|max:255',
-            'image_url' => 'nullable|url|max:255',
             'biaya_sewa' => 'required|numeric|min:0',
             'deskripsi' => 'nullable|string|max:1000',
             'mesin' => 'nullable|string|max:50',
@@ -28,6 +27,8 @@ class StoreMobilRentalRequest extends FormRequest
             'kapasitas_bagasi' => 'nullable|integer|min:0',
             'bahan_bakar' => 'nullable|string|max:50',
             'biaya_all_in' => 'nullable|numeric|min:0',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
     public function failedValidation(Validator $validator)
