@@ -45,7 +45,7 @@ class RentalPaymentService
 
             $rentalExists = Rental::whereHas('pembayaran', function ($query) {
                 $query->where('status', 'not like', "%Gagal%");
-            })
+            })->where('mobil_rental_id', $request->mobil_id)
                 ->where(function ($query) use ($request) {
                     $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
                         ->where('tanggal_akhir_sewa', '>=', Carbon::parse($request['tanggal_mulai_sewa']));
