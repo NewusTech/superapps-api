@@ -19,7 +19,7 @@ class RentalController extends Controller
     public function __construct(RentalPaymentService $paymentService)
     {
         $this->middleware('auth:api', ['except' => ['index', 'show', 'getBookedDates']]);
-        $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
+        $this->middleware('check.admin')->only(['store', 'update', 'destroy', 'confirmPayment']);
         $this->paymentService = $paymentService;
     }
     public function index()
@@ -105,7 +105,7 @@ class RentalController extends Controller
     public function getBookedDates(Request $request)
     {
         try {
-            $rental = Rental::whereHas('pembayaran', function($query){
+            $rental = Rental::whereHas('pembayaran', function ($query) {
                 $query->where('status', 'not like', "%Gagal%");
             })->where('mobil_rental_id', $request->mobil_id)->get(['tanggal_mulai_sewa', 'tanggal_akhir_sewa']);
 
@@ -227,6 +227,20 @@ class RentalController extends Controller
                 'message' => 'Berhasil update data',
                 'data' => $pembayaran
             ]);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
+
+    public function confirmPayment(Request $request, $paymentCode)
+    {
+        try {
+            $pembayaran = $this->paymentService->confirmPayment($request, $paymentCode);
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil update data',
+                'data' => $pembayaran
+            ], 200);
         } catch (\Throwable $th) {
             return response()->json(['message' => $th->getMessage()], 500);
         }

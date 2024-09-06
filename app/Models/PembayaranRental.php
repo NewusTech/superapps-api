@@ -19,6 +19,7 @@ class PembayaranRental extends Model
         'expired_at',
         'bukti_url',
         'kode_pembayaran',
+        'keterangan',
         'payment_link',
     ];
 

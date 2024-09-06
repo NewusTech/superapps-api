@@ -139,6 +139,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'rental'], function () {
     Route::post('process-payment', [RentalController::class, 'processPayment']);
     Route::get('booked-dates', [RentalController::class, 'getBookedDates']);
     Route::post('pembayaran/upload-bukti/{paymentCode}', [RentalController::class, 'uploadBuktiPembayaran']);
+    Route::put('confirm-payment/{paymentCode}', [RentalController::class, 'confirmPayment'] );
 });
 
 Route::group(['middleware' => 'api', 'prefix' => 'travel'], function () {

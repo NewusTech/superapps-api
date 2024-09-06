@@ -96,6 +96,7 @@ class RentalPaymentService
         }
 
         $pembayaran->bukti_url = $data['bukti'];
+        $pembayaran->status = 'Menunggu Verifikasi';
         if ($pembayaran->save()) {
             return $pembayaran;
         } else {
@@ -109,6 +110,15 @@ class RentalPaymentService
         $pembayaran->update([
             'status' => 'Sukses',
         ]);
+        return $pembayaran;
+    }
+
+    public function confirmPayment($request, $pembayaran){
+        $pembayaran = PembayaranRental::where('kode_pembayaran', $pembayaran)->first();
+
+        if (!$pembayaran) throw new Exception('Pembayaran tidak ditemukan', 404);
+
+        $pembayaran->update($request->all());
         return $pembayaran;
     }
 
