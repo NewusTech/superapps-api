@@ -23,8 +23,9 @@ class MobilRentalController extends Controller
     public function index()
     {
         try {
-            $data = MobilRental::with('images')->get();
-            $data->map(function ($mobil) {
+            $data = MobilRental::query()->with(['images'])->get();
+
+            $data->each(function ($mobil) {
                 $mobil->bagasi = "Heatback";
             });
             return response()->json([
@@ -45,6 +46,7 @@ class MobilRentalController extends Controller
             DB::beginTransaction();
 
             $validatedData = $request->validated();
+            $validatedData->image_url = 'https://newus-bucket.s3.ap-southeast-2.amazonaws.com/dir_mpp_lokal/video/1721809399371-3.jfif';
             $mobilRental = MobilRental::create($validatedData);
 
             $this->imageService->storeMobilRentalImages($request, $mobilRental);
