@@ -5,15 +5,20 @@ namespace App\Http\Controllers\API\MobilRental;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMobilRentalRequest;
 use App\Models\MobilRental;
+use App\Services\ImageService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MobilRentalController extends Controller
 {
 
-    public function __construct(){
+    protected  $imageService;
+    public function __construct(ImageService $imageService)
+    {
         $this->middleware('auth:api', ['except' => ['index', 'show']]);
         $this->middleware('check.admin')->only(['store', 'update', 'destroy']);
+        $this->imageService = $imageService;
     }
     public function index()
     {
@@ -32,17 +37,26 @@ class MobilRentalController extends Controller
         }
     }
 
-    public function create()
-    {
-    }
+    public function create() {}
 
     public function store(StoreMobilRentalRequest $request)
     {
         try {
+            DB::beginTransaction();
+
             $validatedData = $request->validated();
-            MobilRental::create($validatedData);
-            return response()->json(['message' => 'Berhasil create data'], 201);
-        } catch (Exception $e)  {
+            $mobilRental = MobilRental::create($validatedData);
+
+            $this->imageService->storeMobilRentalImages($request, $mobilRental);
+
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil create data',
+                'data' => $mobilRental,
+            ], 201);
+        } catch (Exception $e) {
+            DB::rollBack();
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
