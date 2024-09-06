@@ -18,13 +18,22 @@ class PasswordResetController extends Controller
         );
 
         if ($status === Password::RESET_LINK_SENT) {
-            return response()->json(['message' => 'Reset password link sent on your email id.'], 200);
+            return response()->json([
+                'success' => true,
+                'message' => 'Reset password link sent on your email.'
+            ], 200);
         }
         if ($status === Password::INVALID_USER) {
-            return response()->json(['message' => 'Invalid user'], 400);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid user'
+            ], 400);
         }
 
-        return response()->json(['message' => 'Unable to send reset link'], 400);
+        return response()->json([
+            'success' => false,
+            'message' => 'Unable to send reset link'
+        ], 400);
     }
     public function reset(Request $request)
     {
@@ -44,20 +53,35 @@ class PasswordResetController extends Controller
             );
 
             if ($response == Password::INVALID_TOKEN) {
-                return response()->json(['message' => 'Invalid token provided'], 400);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token provided'
+                ], 400);
             }
 
             if ($response == Password::INVALID_USER) {
-                return response()->json(['message' => 'Invalid user'], 400);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid user'
+                ], 400);
             }
 
             if ($response == Password::PASSWORD_RESET) {
-                return response()->json(['message' => 'Password has been reset successfully'], 200);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Password has been reset successfully'
+                ], 200);
             }
 
-            return response()->json(['message' => 'Password reset failed'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Password reset failed'
+            ], 500);
         } catch (\Throwable $th) {
-            return response()->json(['message' => $th->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 }

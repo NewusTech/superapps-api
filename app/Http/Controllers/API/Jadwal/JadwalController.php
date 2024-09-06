@@ -84,6 +84,7 @@ class JadwalController extends Controller
                     "master_supir_id",
                     "tanggal_berangkat",
                     "waktu_keberangkatan",
+                    "waktu_tiba",
                     "available_seats"
                 ]);
             if (!$jadwal) {
