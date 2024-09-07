@@ -191,9 +191,7 @@ class PembayaranController extends Controller
                 throw new Exception('Pesanan tidak ditemukan', 404);
             }
 
-            $data->update([
-                'status' => $request->status
-            ]);
+            $data->update($request->all());
 
             return response()->json([
                 'success' => true,
