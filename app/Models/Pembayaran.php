@@ -18,6 +18,7 @@ class Pembayaran extends Model
         'amount',
         'expired_at',
         'bukti_url',
+        'keterangan',
         'payment_link',
         'status'
     ];
