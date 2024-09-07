@@ -84,7 +84,7 @@ class RentalController extends Controller
                     'created_at' => $rental->created_at,
                     'expired_at' => Carbon::parse($rental->expired_at),
                     'kode_pembayaran' => $rental->pembayaran->kode_pembayaran,
-                    'mobil_type' => $rental->mobil->type,
+                    'mobil_type' => $rental->mobil?->type,
                     'area' => $rental->area,
                     'tanggal_awal_sewa' => $rental->tanggal_mulai_sewa,
                     'tanggal_akhir_sewa' => $rental->tanggal_akhir_sewa,

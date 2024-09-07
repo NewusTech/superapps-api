@@ -33,7 +33,7 @@ class AuthController extends Controller
             $user = User::where('email', $credentials['email'])->first();
 
             if (!$user || !Auth::guard('api')->attempt($credentials)) {
-                return response()->json(['message' => 'Unauthorized'], 401);
+                return response()->json(['message' => 'Login Gagal. Tolong cek kembali email dan password anda'], 401);
             }
             $role = Role::where('id', $user->role_id)->pluck('name')->first();
             $customClaims = [
