@@ -148,12 +148,12 @@ class PembayaranController extends Controller
     {
         try {
             $pembayaran = Pembayaran::where('kode_pembayaran', $paymentCode)->first();
-            if  (!$pembayaran) throw new Exception('Pembayaran tidak ditemukan', 404);
+            if (!$pembayaran) throw new Exception('Pembayaran tidak ditemukan', 404);
 
             $validator = Validator::make($request->all(), [
                 'bukti' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
-            if ($validator->fails()) return response()->json($validator->errors(), 422);
+            if ($validator->fails()) return response()->json(['message' => $validator->errors()], 422);
 
             $data = $request->all();
             if ($request->hasFile('bukti')) {
@@ -166,7 +166,13 @@ class PembayaranController extends Controller
             }
 
             $pembayaran->bukti_url = $data['bukti'];
-            $pembayaran->save();
+            if ($pembayaran->save()) {
+                $pembayaran->status = 'Menunggu Verifikasi';
+                $pembayaran->save();
+                $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+                $pesanan->status = 'Menunggu Verifikasi';
+                $pesanan->save();
+            }
 
             return response()->json([
                 'success' => true,
@@ -175,6 +181,27 @@ class PembayaranController extends Controller
             ]);
         } catch (\Throwable $th) {
             return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
+
+    public function confirmPayment(Request $request, $pamyentCode){
+        try {
+            $data = Pembayaran::where('kode_pembayaran', $pamyentCode)->first();
+            if (!$data) {
+                throw new Exception('Pesanan tidak ditemukan', 404);
+            }
+
+            $data->update([
+                'status' => $request->status
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'Berhasil update data'
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
