@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SupirSeeder::class);
         $this->call(MobilSeeder::class);
         $this->call(TitikLokasiSeeder::class);
+        $this->call(FasilitasMobilRentalSeeder::class);
         $this->call(MobilRentalSeeder::class);
         $this->call(FasilitasSeeder::class);
         $this->call(KebijakanHotelSeeder::class);
