@@ -124,6 +124,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'pesanan'], function () {
     Route::get('riwayat', [PesananController::class, 'getAllHistoryPesanan']);
     Route::get('riwayat/{orderCode}', [PesananController::class, 'getDetailPesanan']);
     Route::post('konfirmasi_pesanan', [PesananController::class, 'konfirmasiPesanan']);
+    Route::put('confirm-payment/{paymentCode}', [PembayaranController::class, 'confirmPayment'] );
 });
 
 Route::group(['middleware' => 'api'], function () {
