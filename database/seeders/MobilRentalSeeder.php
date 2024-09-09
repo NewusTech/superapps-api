@@ -46,5 +46,9 @@ class MobilRentalSeeder extends Seeder
         foreach ($mobil as $data) {
             MobilRental::create($data);
         }
+        $fasilitas = [1, 2, 3, 4, 5];
+        foreach (MobilRental::all() as $mobilRental) {
+            $mobilRental->fasilitas()->attach($fasilitas);
+        }
     }
 }

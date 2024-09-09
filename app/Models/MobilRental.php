@@ -34,4 +34,9 @@ class MobilRental extends Model
     {
         return $this->hasMany(MobilRentalImages::class, 'mobil_rental_id', 'id');
     }
+
+    public function fasilitas()
+    {
+        return $this->belongsToMany(FasilitasMobilRental::class, 'fasilitas_mobil', 'mobil_rental_id', 'fasilitas_mobil_id');
+    }
 }
