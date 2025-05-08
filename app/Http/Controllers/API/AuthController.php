@@ -79,7 +79,7 @@ class AuthController extends Controller
                 'master_cabang_id' => $request->master_cabang_id,
                 'password' => Hash::make($request->password),
                 'no_telp' => $request->no_telp,
-                'role_id' => $request->role_id ?? $roleCustomer->id,
+                'role_id' => $roleCustomer->id,
                 'image_url' => 'https://newus-bucket.s3.ap-southeast-2.amazonaws.com/superapps/assets/user.png',
             ]);
             $user->save();

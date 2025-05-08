@@ -62,6 +62,13 @@ Route::group([
     Route::patch('/change-password', [AuthController::class, 'changePassword']);
 });
 
+Route::group(['prefix' => 'users', 'middleware' => 'auth:api'], function () {
+    Route::get('/', [UserController::class, 'getAllUsers']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::put('/{id}', [UserController::class, 'update']);
+    Route::delete('/{id}', [UserController::class, 'destroy']);
+});
+
 Route::group(['middleware' => 'api', 'prefix' => 'rute'], function () {
     Route::resource('master_rute', MasterRuteController::class);
     Route::post('master_rute/{id}', [MasterRuteController::class, 'update']);

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1cab5b5f5d822447c20b8a60d0fee045",
+    "content-hash": "7a1b844d981afc250358d6da25a10f45",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -3346,43 +3346,40 @@
         },
         {
             "name": "php-open-source-saver/jwt-auth",
-            "version": "2.7.1",
+            "version": "2.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-Open-Source-Saver/jwt-auth.git",
-                "reference": "c2b0aa7968918c19c2d3d6bacf404bfd78cb178f"
+                "reference": "1365f0cb902411ffdb34afbc858ea45bae0b9afc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-Open-Source-Saver/jwt-auth/zipball/c2b0aa7968918c19c2d3d6bacf404bfd78cb178f",
-                "reference": "c2b0aa7968918c19c2d3d6bacf404bfd78cb178f",
+                "url": "https://api.github.com/repos/PHP-Open-Source-Saver/jwt-auth/zipball/1365f0cb902411ffdb34afbc858ea45bae0b9afc",
+                "reference": "1365f0cb902411ffdb34afbc858ea45bae0b9afc",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "illuminate/auth": "^10|^11",
-                "illuminate/contracts": "^10|^11",
-                "illuminate/http": "^10|^11",
-                "illuminate/support": "^10|^11",
+                "illuminate/auth": "^10|^11|^12",
+                "illuminate/contracts": "^10|^11|^12",
+                "illuminate/http": "^10|^11|^12",
+                "illuminate/support": "^10|^11|^12",
                 "lcobucci/jwt": "^5.0",
                 "namshi/jose": "^7.0",
                 "nesbot/carbon": "^2.0|^3.0",
-                "php": "^8.1"
+                "php": "^8.2"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3",
-                "illuminate/console": "^10|^11",
-                "illuminate/routing": "^10|^11",
-                "mockery/mockery": "^1.4.4",
-                "orchestra/testbench": "^8|^9",
-                "phpstan/phpstan": "^1",
+                "illuminate/console": "^10|^11|^12",
+                "illuminate/routing": "^10|^11|^12",
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^8|^9|^10",
+                "phpstan/phpstan": "^2",
                 "phpunit/phpunit": "^10.5|^11"
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-develop": "2.0-dev"
-                },
                 "laravel": {
                     "aliases": {
                         "JWTAuth": "PHPOpenSourceSaver\\JWTAuth\\Facades\\JWTAuth",
@@ -3391,6 +3388,9 @@
                     "providers": [
                         "PHPOpenSourceSaver\\JWTAuth\\Providers\\LaravelServiceProvider"
                     ]
+                },
+                "branch-alias": {
+                    "dev-develop": "2.0-dev"
                 }
             },
             "autoload": {
@@ -3418,6 +3418,11 @@
                     "name": "Fabio William Conceição",
                     "email": "messhias@gmail.com",
                     "role": "Developer"
+                },
+                {
+                    "name": "Max Snow",
+                    "email": "contact@maxsnow.me",
+                    "role": "Developer"
                 }
             ],
             "description": "JSON Web Token Authentication for Laravel and Lumen",
@@ -3433,7 +3438,7 @@
                 "issues": "https://github.com/PHP-Open-Source-Saver/jwt-auth/issues",
                 "source": "https://github.com/PHP-Open-Source-Saver/jwt-auth"
             },
-            "time": "2024-07-25T06:42:08+00:00"
+            "time": "2025-02-10T21:11:16+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -9530,5 +9535,5 @@
         "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }

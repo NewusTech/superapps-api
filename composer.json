@@ -15,7 +15,7 @@
         "league/flysystem-aws-s3-v3": "3.0",
         "mike42/escpos-php": "^2.2",
         "milon/barcode": "^11.0",
-        "php-open-source-saver/jwt-auth": "^2.3",
+        "php-open-source-saver/jwt-auth": "^2.8",
         "simplesoftwareio/simple-qrcode": "^2.0",
         "spatie/laravel-permission": "^6.4"
     },
