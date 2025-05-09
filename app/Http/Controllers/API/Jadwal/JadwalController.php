@@ -125,6 +125,67 @@ class JadwalController extends Controller
     }
 
 
+//     public function getJadwalByRute(Request $request)
+// {
+//     try {
+//         $validator = Validator::make($request->all(), [
+//             'from' => 'required|string',
+//             'to' => 'required|string',
+//             'date' => 'required|date_format:Y-m-d',
+//             'seats' => 'required|integer|min:1'
+//         ]);
+
+//         if ($validator->fails()) {
+//             return response()->json(['message' => $validator->errors()->first()], 400);
+//         }
+
+//         $date = Carbon::parse($request->date)->format('Y-m-d');
+//         $rute = MasterRute::where('kota_asal', 'like', "%$request->from%")
+//                           ->where('kota_tujuan', 'like', "%$request->to%")
+//                           ->first();
+
+//         if (!$rute) {
+//             return response()->json(['message' => 'Rute tidak ditemukan'], 404);
+//         }
+
+//         $jadwal = Jadwal::where('master_rute_id', $rute->id)
+//             ->whereDate('tanggal_berangkat', $date)
+//             ->orderBy('waktu_keberangkatan', 'asc')
+//             ->get([
+//                 "id", "master_rute_id", "master_mobil_id", "master_supir_id",
+//                 "tanggal_berangkat", "waktu_keberangkatan", "waktu_tiba", "available_seats"
+//             ]);
+
+//         if ($jadwal->isEmpty()) {
+//             return response()->json(['message' => 'Tidak ada jadwal tersedia'], 404);
+//         }
+
+//         $jadwal->map(function ($item) {
+//             $mobil = MasterMobil::with('images')->find($item->master_mobil_id);
+//             $rute = MasterRute::find($item->master_rute_id);
+//             $item->img_url = $mobil->images->map(fn($img) => $img->image_url);
+//             $item->carModel = $mobil->type;
+//             $item->carSeat = $mobil->jumlah_kursi;
+//             $item->departureTime = $item->waktu_keberangkatan;
+//             $item->departureDate = $item->tanggal_berangkat;
+//             $item->price = $rute->harga;
+//             $item->seatTaken = Kursi::where('jadwal_id', $item->id)
+//                                     ->where('status', 'terisi')
+//                                     ->pluck('nomor_kursi');
+//             $item->availableSeat = $item->available_seats - $item->seatTaken->count();
+//             $item->syarat_dan_ketentuan = SyaratKetentuan::first()->description ?? null;
+//         });
+
+//         return response()->json([
+//             'success' => true,
+//             'data' => $jadwal,
+//             'message' => 'Berhasil mendapatkan data jadwal'
+//         ]);
+//     } catch (Exception $e) {
+//         return response()->json(['message' => $e->getMessage()], 500);
+//     }
+// }
+
     public function store(Request $request)
     {
         try {

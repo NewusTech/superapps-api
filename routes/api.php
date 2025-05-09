@@ -30,6 +30,7 @@ use App\Http\Controllers\API\Printer\PrinterController;
 use App\Http\Controllers\API\Rental\RentalController;
 use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
 use App\Http\Controllers\API\TiketController\TiketController;
+use App\Http\Controllers\API\DatabaseKonsumen\KonsumenController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -62,12 +63,12 @@ Route::group([
     Route::patch('/change-password', [AuthController::class, 'changePassword']);
 });
 
-Route::group(['prefix' => 'users', 'middleware' => 'auth:api'], function () {
-    Route::get('/', [UserController::class, 'getAllUsers']);
-    Route::post('/', [UserController::class, 'store']);
-    Route::put('/{id}', [UserController::class, 'update']);
-    Route::delete('/{id}', [UserController::class, 'destroy']);
-});
+// Route::group(['prefix' => 'users', 'middleware' => 'auth:api'], function () {
+//     Route::get('/', [UserController::class, 'getAllUsers']);
+//     Route::post('/', [UserController::class, 'store']);
+//     Route::put('/{id}', [UserController::class, 'update']);
+//     Route::delete('/{id}', [UserController::class, 'destroy']);
+// });
 
 Route::group(['middleware' => 'api', 'prefix' => 'rute'], function () {
     Route::resource('master_rute', MasterRuteController::class);
@@ -208,4 +209,10 @@ Route::group(['middleware' => 'api', 'prefix' => 'banner'], function () {
 Route::group(['middleware' => 'api', 'prefix' => 'printer'], function () {
     // Route::post('print', [PrinterController::class, 'print']);
     Route::post('print/{paymentCode}', [PrinterController::class, 'print']);
+});
+
+Route::group(['middleware' => 'api', 'prefix' => 'konsumen'], function () {
+    Route::get('transaksi', [KonsumenController::class, 'getAllTransaksi']);
+    Route::get('transaksi/detail/{kode}', [KonsumenController::class, 'getDetailTransaksi']);
+
 });

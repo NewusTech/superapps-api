@@ -19,6 +19,7 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    protected $guard_name = 'web';
     /**
      * The attributes that are mass assignable.
      *
@@ -36,6 +37,7 @@ class User extends Authenticatable implements JWTSubject
         'master_cabang_id',
         'image_url'
     ];
+    
 
     /**
      * The attributes that should be hidden for serialization.

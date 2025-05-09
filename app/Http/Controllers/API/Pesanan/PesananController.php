@@ -236,7 +236,7 @@ class PesananController extends Controller
             }
 
             DB::commit();
-            CancelOrder::dispatch($pesanan)->delay(now()->addMinutes(15));
+            CancelOrder::dispatch($pesanan)->delay(now()->addMinutes(2));
             return response()->json([
                 'success' => true,
                 'data' => $pesanan,

@@ -109,21 +109,28 @@ class UserController extends Controller
         }
     }
 
-    // 🔹 POST: Tambah pengguna baru
+    // POST: Tambah pengguna
     public function store(Request $request)
     {
         try {
-            $validator = Validator::make($request->all(), [
+            $roleName = $request->role;
+
+            $rules = [
                 'nama' => 'required|string',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:6',
-                'role_id' => 'nullable|integer',
-            ]);
-
-            if ($request->filled('role_id')) {
-                $user->syncRoles($request->role_id); // role_id bisa berupa nama atau ID tergantung setup
+                'role' => 'required|string|exists:roles,name',
+            ];
+ 
+            if (strtolower($roleName) === 'admin') {
+                $rules['master_cabang_id'] = 'required|integer|exists:cabangs,id';
             }
 
+            if (strtolower($roleName) === 'customer' && $request->filled('master_cabang_id')) {
+                return response()->json(['message' => 'Customer tidak perlu memilih cabang'], 422);
+            }
+
+            $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['message' => $validator->errors()->first()], 422);
             }
@@ -132,13 +139,14 @@ class UserController extends Controller
                 'nama' => $request->nama,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role_id' => $request->role_id,
                 'master_cabang_id' => $request->master_cabang_id,
                 'no_telp' => $request->no_telp,
                 'nik' => $request->nik,
                 'alamat' => $request->alamat,
                 'kota' => $request->kota,
             ]);
+
+            $user->assignRole($roleName);
 
             return response()->json([
                 'success' => true,
@@ -150,26 +158,36 @@ class UserController extends Controller
         }
     }
 
-    // 🔹 PUT: Update pengguna by ID
+    // PUT: Update pengguna
     public function update(Request $request, $id)
     {
         try {
             $user = User::findOrFail($id);
 
-            // 🔒 Blokir update jika Super Admin
-            if ($user->role_id == 1) {
+            if ($user->hasRole('Super Admin')) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Pengguna Super Admin tidak dapat diubah.'
                 ], 403);
             }
 
-            $validator = Validator::make($request->all(), [
+            $roleName = $request->role;
+
+            $rules = [
                 'nama' => 'required|string',
                 'email' => 'required|email|unique:users,email,' . $user->id,
-                'role_id' => 'nullable|integer',
-            ]);
+                'role' => 'required|string|exists:roles,name',
+            ];
 
+            if (strtolower($roleName) === 'admin') {
+                $rules['master_cabang_id'] = 'required|integer|exists:cabangs,id';
+            }
+
+            if (strtolower($roleName) === 'customer' && $request->filled('master_cabang_id')) {
+                return response()->json(['message' => 'Customer tidak perlu memilih cabang'], 422);
+            }
+
+            $validator = Validator::make($request->all(), $rules);
             if ($validator->fails()) {
                 return response()->json(['message' => $validator->errors()->first()], 422);
             }
@@ -177,13 +195,14 @@ class UserController extends Controller
             $user->update([
                 'nama' => $request->nama,
                 'email' => $request->email,
-                'role_id' => $request->role_id,
                 'master_cabang_id' => $request->master_cabang_id,
                 'no_telp' => $request->no_telp,
                 'nik' => $request->nik,
                 'alamat' => $request->alamat,
                 'kota' => $request->kota,
             ]);
+
+            $user->syncRoles([$roleName]);
 
             return response()->json([
                 'success' => true,
@@ -195,30 +214,29 @@ class UserController extends Controller
         }
     }
 
-
     // 🔹 DELETE: Hapus pengguna
-    public function destroy($id)
-    {
-        try {
-            $user = User::findOrFail($id);
+ // DELETE: Hapus pengguna
+ public function destroy($id)
+ {
+     try {
+         $user = User::findOrFail($id);
 
-            // 🔒 Blokir hapus jika Super Admin
-            if ($user->role_id == 1) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Pengguna Super Admin tidak dapat dihapus.'
-                ], 403);
-            }
+         if ($user->hasRole('Super Admin')) {
+             return response()->json([
+                 'success' => false,
+                 'message' => 'Pengguna Super Admin tidak dapat dihapus.'
+             ], 403);
+         }
 
-            $user->delete();
+         $user->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Pengguna berhasil dihapus'
-            ]);
-        } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
-    }
+         return response()->json([
+             'success' => true,
+             'message' => 'Pengguna berhasil dihapus'
+         ]);
+     } catch (Exception $e) {
+         return response()->json(['message' => $e->getMessage()], 500);
+     }
+ }
 
 }
