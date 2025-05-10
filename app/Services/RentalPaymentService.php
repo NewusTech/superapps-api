@@ -6,6 +6,7 @@ use App\Models\MetodePembayaran;
 use App\Models\PembayaranRental;
 use App\Models\Pesanan;
 use App\Models\Rental;
+use App\Helpers\MidtransHelper;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -17,8 +18,9 @@ class RentalPaymentService
     protected $midtransEnv;
     public function __construct()
     {
-        $this->midtransEnv = $this->getMidtransEnv();
+        $this->midtransEnv = MidtransHelper::getEnv();
     }
+
     private function handleImageUpload($request)
     {
         if ($request['image_ktp'] && $request['image_swafoto']) {
@@ -33,6 +35,7 @@ class RentalPaymentService
         }
         return $request;
     }
+
     public function processRentalPayment($request)
     {
         try {
@@ -45,20 +48,21 @@ class RentalPaymentService
 
             $rentalExists = Rental::whereHas('pembayaran', function ($query) {
                 $query->where('status', 'not like', "%Gagal%");
-            })->where('mobil_rental_id', $request['mobil_rental_id'])
-            ->where(function ($query) use ($request) {
-                $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
-                ->where('tanggal_akhir_sewa', '>=', Carbon::parse($request['tanggal_mulai_sewa']));
-            })->exists();
+            })
+                ->where('mobil_rental_id', $request['mobil_rental_id'])
+                ->where(function ($query) use ($request) {
+                    $query->where('tanggal_mulai_sewa', '<=', Carbon::parse($request['tanggal_akhir_sewa']))
+                          ->where('tanggal_akhir_sewa', '>=', Carbon::parse($request['tanggal_mulai_sewa']));
+                })->exists();
 
             if ($rentalExists) {
                 throw new Exception('Tanggal tersebut sudah dibooking.', 409);
             }
+
             $request['user_id'] = auth()->user()->id;
             $request = $this->handleImageUpload($request);
 
             $rental = Rental::create($request);
-
             $pembayaran = new PembayaranRental();
             $pembayaran->rental_id = $rental->id;
 
@@ -72,6 +76,7 @@ class RentalPaymentService
                 default:
                     throw new Exception('Metode pembayaran tidak valid');
             }
+
             DB::commit();
             return $response;
         } catch (Exception $e) {
@@ -107,17 +112,14 @@ class RentalPaymentService
     public function updatePaymentStatus($paymentCode)
     {
         $pembayaran = PembayaranRental::where('kode_pembayaran', $paymentCode)->first();
-        $pembayaran->update([
-            'status' => 'Sukses',
-        ]);
+        $pembayaran->update(['status' => 'Sukses']);
         return $pembayaran;
     }
 
-    public function confirmPayment($request, $pembayaran){
+    public function confirmPayment($request, $pembayaran)
+    {
         $pembayaran = PembayaranRental::where('kode_pembayaran', $pembayaran)->first();
-
         if (!$pembayaran) throw new Exception('Pembayaran tidak ditemukan', 404);
-
         $pembayaran->update($request->all());
         return $pembayaran;
     }
@@ -143,19 +145,19 @@ class RentalPaymentService
                 [
                     "name" => "Rental",
                     "price" => $pembayaran->nominal,
-                    "quantity" => 1,
+                    "quantity" => 1
                 ]
             ],
             'usage_limit' => 1
         ];
 
-        $auth = base64_encode($this->midtransEnv['PRODUCTION']['server_key']);
+        $auth = base64_encode($this->midtransEnv['server_key']);
 
         $response = Http::withHeaders([
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
             'Authorization' => "Basic $auth"
-        ])->post($this->midtransEnv['PRODUCTION']['url'], $params);
+        ])->post($this->midtransEnv['url'], $params);
 
         if ($response->failed()) {
             return response()->json(['message' => json_decode($response->body())], 500);
@@ -166,6 +168,7 @@ class RentalPaymentService
         $pembayaran->status = 'Menunggu pembayaran';
         $response->kode = 1;
         $pembayaran->save();
+
         return response()->json([
             'success' => true,
             'data' => $response,
@@ -179,6 +182,7 @@ class RentalPaymentService
         $pembayaran->kode_pembayaran = PembayaranRental::generateUniqueKodeBayar();
         $pembayaran->nominal = $this->countNominalBiayaRental($pembayaran->rental, $pembayaran);
         $metode = MetodePembayaran::where('id', $pembayaran->rental->metode_id)->first();
+
         $data = [
             'kode_pembayaran' => $pembayaran->kode_pembayaran,
             'harga' => $pembayaran->nominal,
@@ -187,6 +191,7 @@ class RentalPaymentService
             'nomor_rekening' => $metode->no_rek,
             'kode' => 2
         ];
+
         $pembayaran->save();
 
         return response()->json([
@@ -198,24 +203,6 @@ class RentalPaymentService
 
     protected function countNominalBiayaRental($rental, $pembayaran)
     {
-        $nominal = $rental->durasi_sewa * ($rental->mobil->biaya_sewa + ($rental->all_in ? $rental->mobil->biaya_all_in : 0));
-        return $nominal;
-    }
-
-    protected function getMidtransEnv()
-    {
-        return [
-            'SANDBOX' => [
-                'client_key' => env('MIDTRANS_SANDBOX_CLIENT_KEY'),
-                'server_key' => env('MIDTRANS_SANDBOX_SERVER_KEY'),
-                'url' => env('MIDTRANS_SANDBOX_TRANSACTION_API_URL'),
-            ],
-            'PRODUCTION' => [
-                'client_key' => env('MIDTRANS_PRODUCTION_CLIENT_KEY'),
-                'server_key' => env('MIDTRANS_PRODUCTION_SERVER_KEY'),
-                'url' => env('MIDTRANS_PRODUCTION_TRANSACTION_API_URL'),
-            ],
-
-        ];
+        return $rental->durasi_sewa * ($rental->mobil->biaya_sewa + ($rental->all_in ? $rental->mobil->biaya_all_in : 0));
     }
 }

@@ -25,29 +25,14 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'nama',
-        'email',
-        'no_telp',
-        'alamat',
-        'kota',
-        'nik',
-        'password',
-        'role_id',
-        'master_cabang_id',
-        'image_url'
-    ];
-    
+    protected $fillable = ['nama', 'email', 'no_telp', 'alamat', 'kota', 'nik', 'password', 'role_id', 'master_cabang_id', 'image_url', 'is_default_password'];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * The attributes that should be cast.
@@ -78,7 +63,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'email' => $this->email,
-            'name' => $this->name
+            'name' => $this->name,
         ];
     }
 }

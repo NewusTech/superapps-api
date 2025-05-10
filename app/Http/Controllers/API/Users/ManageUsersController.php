@@ -21,16 +21,16 @@ class ManageUsersController extends Controller
     {
         try {
             $superAdmin = Role::where('name', 'Super Admin')->first();
-    
+
             $users = User::with('roles')
-                ->where('role_id', '!=', $superAdmin->id)
+                ->when($superAdmin, fn($q) => $q->where('role_id', '!=', $superAdmin->id))
                 ->orderBy('created_at', 'desc')
                 ->get();
-    
+
             return response()->json([
                 'success' => true,
                 'data' => $users,
-                'message' => 'Berhasil get data pengguna',
+                'message' => 'Berhasil mengambil data pengguna.',
             ]);
         } catch (Exception $e) {
             return response()->json([
@@ -39,7 +39,6 @@ class ManageUsersController extends Controller
             ], 500);
         }
     }
-    
 
     public function show($id)
     {
@@ -69,6 +68,11 @@ class ManageUsersController extends Controller
     public function store(Request $request)
     {
         try {
+            $role = Role::find((int) $request->role_id);
+            if (!$role) {
+                throw new Exception("Role dengan ID {$request->role_id} tidak ditemukan.");
+            }
+
             $rules = [
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email|unique:users',
@@ -76,11 +80,6 @@ class ManageUsersController extends Controller
                 'role_id' => 'required|numeric',
                 'no_telp' => 'nullable|string|max:20',
             ];
-
-            $role = Role::find((int) $request->role_id);
-            if (!$role) {
-                throw new Exception("Role dengan ID {$request->role_id} tidak ditemukan.");
-            }
 
             if (in_array($role->name, ['Admin', 'Super Admin'])) {
                 $rules['cabang_id'] = 'required|numeric';
@@ -90,7 +89,8 @@ class ManageUsersController extends Controller
             if ($validator->fails()) {
                 throw new Exception($validator->errors()->first());
             }
-            $password = $request->password ?? '12345678'; // ✅ default
+
+            $password = $request->password ?? '12345678';
 
             $user = new User([
                 'nama' => $request->nama,
@@ -105,14 +105,12 @@ class ManageUsersController extends Controller
 
             $user->save();
 
+            // Ensure the web guard version of role exists
             if ($role->guard_name !== 'web') {
-                $existingWebRole = Role::where('name', $role->name)->where('guard_name', 'web')->first();
-                if (!$existingWebRole) {
-                    Role::create([
-                        'name' => $role->name,
-                        'guard_name' => 'web',
-                    ]);
-                }
+                Role::firstOrCreate([
+                    'name' => $role->name,
+                    'guard_name' => 'web',
+                ]);
             }
 
             $user->assignRole($role->name);
@@ -133,46 +131,62 @@ class ManageUsersController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required',
-                'email' => 'required|email',
-                'password' => 'required',
-                'role_id' => 'required|numeric',
-            ]);
-
-            if ($validator->fails()) {
-                throw new Exception($validator->errors()->first());
-            }
-
             $user = User::find($id);
 
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'data' => '',
-                    'message' => 'ID tidak ditemukan',
-                ]);
+                    'message' => 'Pengguna tidak ditemukan.',
+                ], 404);
+            }
+
+            $role = Role::find((int) $request->role_id);
+            if (!$role) {
+                throw new Exception("Role dengan ID {$request->role_id} tidak ditemukan.");
+            }
+
+            $rules = [
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'role_id' => 'required|numeric',
+                'no_telp' => 'nullable|string|max:20',
+                'password' => 'nullable|string|min:6',
+            ];
+
+            if (in_array($role->name, ['Admin', 'Super Admin'])) {
+                $rules['cabang_id'] = 'required|numeric';
+            }
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                throw new Exception($validator->errors()->first());
             }
 
             $user->nama = $request->nama;
-            $user->email = $request->email;
-            $user->role_id = $request->role_id;
+            $user->email = strtolower($request->email);
+            $user->role_id = $role->id;
             $user->no_telp = $request->no_telp;
+            $user->master_cabang_id = in_array($role->name, ['Admin', 'Super Admin']) ? $request->cabang_id : null;
 
-            if ($request->password !== null) {
+            if (!empty($request->password)) {
                 $user->password = Hash::make($request->password);
                 $user->is_default_password = false;
             }
 
             $user->save();
 
+            $user->syncRoles([$role->name]);
+
             return response()->json([
                 'success' => true,
                 'data' => $user,
-                'message' => 'Berhasil mengupdate data',
+                'message' => 'Berhasil memperbarui data pengguna.',
             ]);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -184,19 +198,22 @@ class ManageUsersController extends Controller
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'data' => '',
-                    'message' => 'ID tidak ditemukan',
-                ]);
+                    'message' => 'Pengguna tidak ditemukan.',
+                ], 404);
             }
 
             $user->delete();
+
             return response()->json([
                 'success' => true,
                 'data' => $user,
-                'message' => 'Berhasil menghapus data',
+                'message' => 'Berhasil menghapus pengguna.',
             ]);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 }

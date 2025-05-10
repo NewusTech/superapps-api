@@ -89,6 +89,7 @@ class KonsumenController extends Controller
                     'supir' => optional($pesanan->jadwal->master_supir)->nama ?? '-',
                     'status' => $pesanan->status,
                     'status_pembayaran' => $pesanan->pembayaran->status ?? '-',
+                    'kode_pembayaran' => $pesanan->pembayaran->kode_pembayaran ?? '-',
                     'total_harga' => $pesanan->pembayaran->amount ?? 0,
                     'penumpang' => $pesanan->penumpang->map(function ($p) {
                         return [

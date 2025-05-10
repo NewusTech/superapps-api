@@ -9,6 +9,7 @@ use App\Models\PembayaranRental;
 use App\Models\Pesanan;
 use App\Models\User;
 use App\Services\PaymentService;
+use App\Helpers\MidtransHelper;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -24,23 +25,6 @@ class PembayaranController extends Controller
         $this->middleware('check.admin')->only(['update', 'destroy', 'index', 'storeMetodePembayaran', 'deleteMetodePembayaran', 'updateStatusPembayaran']);
         $this->paymentService = $paymentService;
     }
-    private function getMidtransEnv()
-    {
-        return [
-            'SANDBOX' => [
-                'client_key' => env('MIDTRANS_SANDBOX_CLIENT_KEY'),
-                'server_key' => env('MIDTRANS_SANDBOX_SERVER_KEY'),
-                'url' => env('MIDTRANS_SANDBOX_TRANSACTION_API_URL'),
-            ],
-            'PRODUCTION' => [
-                'client_key' => env('MIDTRANS_PRODUCTION_CLIENT_KEY'),
-                'server_key' => env('MIDTRANS_PRODUCTION_SERVER_KEY'),
-                'url' => env('MIDTRANS_PRODUCTION_TRANSACTION_API_URL'),
-            ],
-
-        ];
-    }
-
     public function index()
     {
         try {
@@ -54,7 +38,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function showPembayaran(Request $request)
     {
         try {
@@ -79,7 +62,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function testProsesPembayaran(Request $request)
     {
         $midtransEnv = $this->getMidtransEnv();
@@ -143,7 +125,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function uploadBuktiPembayaran(Request $request, $paymentCode)
     {
         try {
@@ -183,7 +164,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }
-
     public function confirmPayment(Request $request, $pamyentCode){
         try {
             $data = Pembayaran::where('kode_pembayaran', $pamyentCode)->first();
@@ -202,7 +182,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function updateStatusPembayaran($orderCode)
     {
         try {
@@ -228,6 +207,77 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+    // public function handleMidtransNotification(Request $request)
+    // {
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'order_id' => 'required',
+    //             'transaction_status' => 'required',
+    //         ]);
+
+    //         if ($validator->fails()) {
+    //             return response()->json($validator->errors(), 422);
+    //         }
+
+    //         $data = $request->all();
+    //         $paymentCode = $data['order_id'];
+    //         $status = $data['transaction_status'];
+    //         // Extract the payment code from the order id
+    //         $paymentIdParts = explode("-", $paymentCode);
+    //         $formattedPaymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
+
+    //         $auth = base64_encode($this->getMidtransEnv()['SANDBOX']['server_key']);
+    //         $response = Http::withHeaders([
+    //             'Accept' => 'application/json',
+    //             'Content-Type' => 'application/json',
+    //             'Authorization' => "Basic $auth"
+    //         ])->get("https://api.sandbox.midtrans.com/v2/{$paymentCode}/status");
+
+    //         if ($response->failed()) {
+    //             return response()->json(['message' => json_decode($response->body())], 500);
+    //         }
+
+    //         $response = json_decode($response->body());
+    //         $status = $response->transaction_status;
+
+    //         $pembayaran = Pembayaran::where('kode_pembayaran', $formattedPaymentCode)->first();
+    //         $pembayaranRental = PembayaranRental::where('kode_pembayaran', $formattedPaymentCode)->first(); // Find pembayaran_rental
+    //         $statusMapping = [
+    //             'capture' => 'Sukses',
+    //             'settlement' => 'Sukses',
+    //             'pending' => 'Menunggu pembayaran',
+    //             'deny' => 'Gagal',
+    //             'cancel' => 'Gagal',
+    //             'expire' => 'Gagal',
+    //             'failure' => 'Gagal',
+    //         ];
+    //         $convertedStatus = $statusMapping[$status] ?? 'Gagal';
+
+    //         if ($pembayaran) {
+    //             $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
+    //             $pembayaran->update([
+    //                 'status' => $convertedStatus,
+    //             ]);
+    //             $pesanan->update([
+    //                 'status' => $convertedStatus,
+    //             ]);
+    //             $this->paymentService->handleCancelPayment($pembayaran, $pesanan);
+    //         }
+
+    //         if ($pembayaranRental) {
+    //             $pembayaranRental->update([
+    //                 'status' => $convertedStatus,
+    //             ]);
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Berhasil update data',
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return response()->json(['message' => $e->getMessage()], 500);
+    //     }
+    // }
     public function handleMidtransNotification(Request $request)
     {
         try {
@@ -243,16 +293,19 @@ class PembayaranController extends Controller
             $data = $request->all();
             $paymentCode = $data['order_id'];
             $status = $data['transaction_status'];
-            // Extract the payment code from the order id
+
             $paymentIdParts = explode("-", $paymentCode);
             $formattedPaymentCode = implode("-", array_slice($paymentIdParts, 0, 3));
 
-            $auth = base64_encode($this->getMidtransEnv()['PRODUCTION']['server_key']);
+            $midtransEnv = MidtransHelper::getEnv();
+            $auth = base64_encode($midtransEnv['server_key']);
+            $statusUrl = MidtransHelper::getStatusUrl($paymentCode);
+
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
                 'Authorization' => "Basic $auth"
-            ])->get("https://api.midtrans.com/v2/{$paymentCode}/status");
+            ])->get($statusUrl);
 
             if ($response->failed()) {
                 return response()->json(['message' => json_decode($response->body())], 500);
@@ -262,7 +315,8 @@ class PembayaranController extends Controller
             $status = $response->transaction_status;
 
             $pembayaran = Pembayaran::where('kode_pembayaran', $formattedPaymentCode)->first();
-            $pembayaranRental = PembayaranRental::where('kode_pembayaran', $formattedPaymentCode)->first(); // Find pembayaran_rental
+            $pembayaranRental = PembayaranRental::where('kode_pembayaran', $formattedPaymentCode)->first();
+
             $statusMapping = [
                 'capture' => 'Sukses',
                 'settlement' => 'Sukses',
@@ -276,19 +330,13 @@ class PembayaranController extends Controller
 
             if ($pembayaran) {
                 $pesanan = Pesanan::where('id', $pembayaran->pesanan_id)->first();
-                $pembayaran->update([
-                    'status' => $convertedStatus,
-                ]);
-                $pesanan->update([
-                    'status' => $convertedStatus,
-                ]);
+                $pembayaran->update(['status' => $convertedStatus]);
+                $pesanan->update(['status' => $convertedStatus]);
                 $this->paymentService->handleCancelPayment($pembayaran, $pesanan);
             }
 
             if ($pembayaranRental) {
-                $pembayaranRental->update([
-                    'status' => $convertedStatus,
-                ]);
+                $pembayaranRental->update(['status' => $convertedStatus]);
             }
 
             return response()->json([
@@ -324,7 +372,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function getMetodePembayaran()
     {
         try {
@@ -376,7 +423,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function storeMetodePembayaran(Request $request)
     {
         try {
@@ -399,7 +445,6 @@ class PembayaranController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-
     public function deleteMetodePembayaran($id)
     {
         try {
