@@ -12,5 +12,7 @@ class MasterCabang extends Model
     protected $fillable = [
         'nama',
         'alamat',
+        'kode_provinsi',
+        'kode_kota',
     ];
 }

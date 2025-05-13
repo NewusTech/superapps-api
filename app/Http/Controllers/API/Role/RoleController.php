@@ -98,7 +98,7 @@ class RoleController extends Controller
 
             $role = Role::create([
                 'name' => $request->name,
-                'guard_name' => 'web',
+                'guard_name' => 'api',
             ]);
 
             $role->syncPermissions($request->permissions);

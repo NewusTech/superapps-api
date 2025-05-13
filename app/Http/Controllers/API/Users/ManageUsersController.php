@@ -106,10 +106,10 @@ class ManageUsersController extends Controller
             $user->save();
 
             // Ensure the web guard version of role exists
-            if ($role->guard_name !== 'web') {
+            if ($role->guard_name !== 'api') {
                 Role::firstOrCreate([
                     'name' => $role->name,
-                    'guard_name' => 'web',
+                    'guard_name' => 'api',
                 ]);
             }
 

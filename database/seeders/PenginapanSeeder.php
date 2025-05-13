@@ -23,17 +23,7 @@ class PenginapanSeeder extends Seeder
                 'harga' => 100000,
                 'tipe' => 'apartemen',
                 'status' => 'tersedia',
-            ],
-            [
-                'title' => 'Penginapan B',
-                'lokasi' => 'Lokasi B',
-                'jumlah_kamar' => 3,
-                'luas_ruangan' => 50,
-                'rating' => 5,
-                'harga' => 100000,
-                'tipe' => 'apartemen',
-                'status' => 'tersedia',
-            ],
+            ]
         ];
 
         foreach ($penginapans as $penginapan) {

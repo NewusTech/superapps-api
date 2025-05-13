@@ -216,3 +216,93 @@ Route::group(['middleware' => 'api', 'prefix' => 'konsumen'], function () {
     Route::get('transaksi/detail/{kode}', [KonsumenController::class, 'getDetailTransaksi']);
 
 });
+
+// use Illuminate\Support\Facades\Route;
+
+// use App\Http\Controllers\API\Auth\PasswordResetController;
+// use App\Http\Controllers\API\AuthController;
+// use App\Http\Controllers\API\Jadwal\JadwalController;
+// use App\Http\Controllers\API\Kursi\KursiController;
+// use App\Http\Controllers\API\Laporan\LaporanController;
+// use App\Http\Controllers\API\MasterMobil\MasterMobilController;
+// use App\Http\Controllers\API\MasterCabang\MasterCabangController;
+// use App\Http\Controllers\API\MasterRute\MasterRuteController;
+// use App\Http\Controllers\API\MasterTitikJemput\MasterTitikJemputController;
+// use App\Http\Controllers\API\MasterSupir\MasterSupirController;
+// use App\Http\Controllers\API\Paket\PaketController;
+// use App\Http\Controllers\API\Pariwisata\PariwisataController;
+// use App\Http\Controllers\API\Pembayaran\PembayaranController;
+// use App\Http\Controllers\API\Penumpang\PenumpangController;
+// use App\Http\Controllers\API\Pesanan\PesananController;
+// use App\Http\Controllers\API\Role\RoleController;
+// use App\Http\Controllers\API\Users\ManageUsersController;
+// use App\Http\Controllers\API\Users\UserController;
+// use App\Http\Controllers\ArtikelController;
+// use App\Http\Controllers\API\Banner\BannerController;
+// use App\Http\Controllers\API\FasilitasMobilRental\FasilitasMobilRentalController;
+// use App\Http\Controllers\API\Images\MobilRentalImagesContrller;
+// use App\Http\Controllers\API\Images\MobilTravelImagesController;
+// use App\Http\Controllers\API\MobilRental\MobilRentalController;
+// use App\Http\Controllers\API\Penginapan\PenginapanController;
+// use App\Http\Controllers\API\Perjalanan\PerjalananController;
+// use App\Http\Controllers\API\Printer\PrinterController;
+// use App\Http\Controllers\API\Rental\RentalController;
+// use App\Http\Controllers\API\SyaratKetentuan\SyaratKetentuanController;
+// use App\Http\Controllers\API\TiketController\TiketController;
+// use App\Http\Controllers\API\DatabaseKonsumen\KonsumenController;
+
+// use Illuminate\Http\Request;
+
+// Route::middleware('auth:sanctum')->get('/user', fn(Request $request) => $request->user());
+
+// Route::prefix('auth')->middleware('api')->group(function () {
+//     Route::post('/login', [AuthController::class, 'login'])->name('login');
+//     Route::post('/register', [AuthController::class, 'register'])->name('register');
+//     Route::resource('/user-profile', UserController::class)->middleware('check.permission:users.read');
+//     Route::post('/profile-photo/update', [UserController::class, 'profilePhotoUpdate']);
+//     Route::put('/update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
+//     Route::post('/lupa-password', [PasswordResetController::class, 'sendResetLinkEmail']);
+//     Route::post('password/reset', [PasswordResetController::class, 'reset']);
+//     Route::patch('/change-password', [AuthController::class, 'changePassword']);
+// });
+
+// $routes = [
+//     ['rute', MasterRuteController::class, 'rute'],
+//     ['mobil', MasterMobilController::class, 'mobil'],
+//     ['jadwal', JadwalController::class, 'jadwal'],
+//     ['kursi', KursiController::class, 'kursi'],
+//     ['paket', PaketController::class, 'paket'],
+//     ['pesanan', PesananController::class, 'pesanan'],
+//     ['penginapan', PenginapanController::class, 'penginapan'],
+//     ['supir', MasterSupirController::class, 'supir'],
+//     ['titik_jemput', MasterTitikJemputController::class, 'titik_jemput'],
+//     ['cabang', MasterCabangController::class, 'master_cabang'],
+//     ['penumpang', PenumpangController::class, 'penumpang'],
+//     ['users/manage_user', ManageUsersController::class, 'users'],
+//     ['roles/role', RoleController::class, 'roles'],
+//     ['pariwisata', PariwisataController::class, 'pariwisata'],
+//     ['banner', BannerController::class, 'banner'],
+//     ['artikel', ArtikelController::class, 'artikel'],
+//     ['printer', PrinterController::class, 'printer'],
+//     ['rental/rental', RentalController::class, 'rental'],
+//     ['rental/mobil', MobilRentalController::class, 'rental.mobil'],
+//     ['rental/fasilitas', FasilitasMobilRentalController::class, 'rental.fasilitas'],
+//     ['travel/mobil-images', MobilTravelImagesController::class, 'travel.mobil_images'],
+//     ['rental/mobil-images', MobilRentalImagesContrller::class, 'rental.mobil_images'],
+//     ['perjalanan', PerjalananController::class, 'perjalanan'],
+//     ['konsumen', KonsumenController::class, 'konsumen'],
+//     ['laporan', LaporanController::class, 'laporan'],
+//     ['pembayaran', PembayaranController::class, 'pembayaran'],
+//     ['syarat-ketentuan', SyaratKetentuanController::class, 'syarat_ketentuan'],
+// ];
+
+// foreach ($routes as [$prefix, $controller, $permission]) {
+//     Route::prefix($prefix)->middleware(["api", "check.permission:$permission.read"])->group(function () use ($controller) {
+//         Route::resource('/', $controller);
+//     });
+// }
+
+// Route::prefix('roles')->middleware(['api', 'check.permission:roles.read'])->group(function () {
+//     Route::resource('role', RoleController::class);
+//     Route::get('permission', [RoleController::class, 'getAllPermission'])->middleware('check.permission:permissions.read');
+// });

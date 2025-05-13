@@ -2,67 +2,51 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
-use App\Models\MasterCabang;
-use App\Models\MasterMobil;
-use App\Models\MasterRute;
-use App\Models\MasterSupir;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
-    private $permissions = [
-        'create',
-        'update',
-        'read',
-        'delete'
-    ];
-
     public function run(): void
     {
-        foreach ($this->permissions as $permission) {
-            Permission::create(['name' => $permission]);
-        }
-
-        $this->call(CabangSeeder::class);
-        $this->call(RuteSeeder::class);
-        $this->call(SupirSeeder::class);
-        $this->call(MobilSeeder::class);
-        $this->call(TitikLokasiSeeder::class);
-        $this->call(FasilitasMobilRentalSeeder::class);
-        $this->call(MobilRentalSeeder::class);
-        $this->call(FasilitasSeeder::class);
-        $this->call(KebijakanHotelSeeder::class);
-        $this->call(ImageSeeder::class);
-        $this->call(PenginapanSeeder::class);
-
-        // Create admin User and assign the role to him.
-        $superAdmin = Role::create(['name' => 'Super Admin']);
-        $admin = Role::create(['name' => 'Admin']);
-        $roleCustomer = Role::create(['name' => 'Customer']);
-
-        $permissions = Permission::pluck('id', 'id')->all();
-
-        $superAdmin->syncPermissions($permissions);
-        $admin->syncPermissions($permissions);
-
-        $user = User::create([
-            'nama' => 'admin',
-            'email' => 'admin@mailinator.com',
-            'password' => Hash::make('password'),
-            'master_cabang_id' => 1,
-            'role_id' => $superAdmin->id
+        // Jalankan seeder modular
+        $this->call([
+            CabangSeeder::class,
+            RuteSeeder::class,
+            SupirSeeder::class,
+            MobilSeeder::class,
+            TitikLokasiSeeder::class,
+            FasilitasMobilRentalSeeder::class,
+            MobilRentalSeeder::class,
+            FasilitasSeeder::class,
+            KebijakanHotelSeeder::class,
+            ImageSeeder::class,
+            PenginapanSeeder::class,
+            RoleAndPermissionSeeder::class,
         ]);
 
-        $user->assignRole([$superAdmin->id]);
+        // Ambil role Super Admin yang sudah dibuat di RoleAndPermissionSeeder
+        $superAdmin = Role::where('name', 'Super Admin')->where('guard_name', 'api')->first();
+
+        // Ambil semua permissions
+        $permissions = Permission::pluck('name')->toArray();
+
+        // Buat user admin
+        $user = User::firstOrCreate(
+            ['email' => 'admin@mailinator.com'],
+            [
+                'nama' => 'admin',
+                'password' => Hash::make('password'),
+                'master_cabang_id' => 1,
+                'role_id' => $superAdmin->id
+            ]
+        );
+
+        // Assign role & permissions
+        $user->assignRole($superAdmin);
+        $user->syncPermissions($permissions);
     }
 }

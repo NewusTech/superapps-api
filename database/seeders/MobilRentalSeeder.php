@@ -26,20 +26,7 @@ class MobilRentalSeeder extends Seeder
                 'bahan_bakar' => 'Bensin',
                 'biaya_sewa' => 1800000,
                 'biaya_all_in' => 1000000,
-            ],
-            [
-                'nopol' => 'B 5678 ZAA',
-                'type' => 'Hi Ace Commuter',
-                'jumlah_kursi' => 16,
-                'fasilitas' => 'AC, Radio, USB, Bluetooth',
-                'image_url' => 'https://newus-bucket.s3.ap-southeast-2.amazonaws.com/dir_mpp_lokal/video/1721809399371-3.jfif',
-                'mesin' => '1800 CC',
-                'transmisi' => 'Otomatis',
-                'kapasitas_bagasi' => '80 L',
-                'bahan_bakar' => 'Bensin',
-                'biaya_sewa' => 1500000,
-                'biaya_all_in' => 1000000,
-            ],
+            ]
             // tambahkan data lainnya...
         ];
 

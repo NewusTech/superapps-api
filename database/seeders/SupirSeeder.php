@@ -16,9 +16,6 @@ class SupirSeeder extends Seeder
         $dataSupirSeeder =  [[
             'nama' => 'Heri',
             'no_telp' => '0812345678912'
-        ], [
-            'nama' => 'Budi',
-            'no_telp' => '084141512912'
         ]];
         foreach ($dataSupirSeeder as $item) {
             MasterSupir::create($item);

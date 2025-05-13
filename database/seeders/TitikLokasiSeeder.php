@@ -20,19 +20,7 @@ class TitikLokasiSeeder extends Seeder
             ],[
                 'nama' => 'Perum Puri Gading',
                 'master_cabang_id' => 1
-            ],[
-                'nama' => 'Pintu Tol Itera',
-                'master_cabang_id' => 1
-            ],[
-                'nama' => 'Simpang suki, Kertapati',
-                'master_cabang_id' => 2
-            ],[
-                'nama' => 'Simpang Tegal Binagun, Jakabaring',
-                'master_cabang_id' => 2
-            ],[
-                'nama' => 'Simpang 4 kayu agung, Plaju',
-                'master_cabang_id' => 2
-            ],
+            ]
         ];
 
         foreach ($data as $titik) {
